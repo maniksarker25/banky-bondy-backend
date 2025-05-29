@@ -1,12 +1,19 @@
-import { z } from "zod";
+import { z } from 'zod';
 
-export const updateAudio-topicData = z.object({
+export const createAudioTopicSchema = z.object({
     body: z.object({
-        name: z.string().optional(),
-        phone: z.string().optional(),
-        address: z.string().optional(),
+        name: z.string().min(1, 'Name is required'),
     }),
 });
 
-const Audio-topicValidations = { updateAudio-topicData };
-export default Audio-topicValidations;
+export const updateAudioTopicSchema = z.object({
+    body: z.object({
+        name: z.string().min(1).optional(),
+    }),
+});
+
+const audioTopicValidations = {
+    createAudioTopicSchema,
+    updateAudioTopicSchema,
+};
+export default audioTopicValidations;
