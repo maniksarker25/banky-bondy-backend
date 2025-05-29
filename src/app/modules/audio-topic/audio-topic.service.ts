@@ -63,8 +63,11 @@ const getSingleTopic = async (id: string) => {
 // delete category
 const deleteAudioTopicFromDB = async (id: string) => {
     const result = await AudioTopic.findByIdAndDelete(id);
-    if (result) {
+    if (!result) {
         throw new AppError(httpStatus.NOT_FOUND, 'Audio topic not found');
+    }
+    if (result.topic_image) {
+        deleteFileFromS3(result.topic_image);
     }
     return result;
 };
