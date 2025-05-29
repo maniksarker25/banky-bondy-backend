@@ -1,21 +1,80 @@
-import httpStatus from "http-status";
-import AppError from "../../error/appError";
-import { IAudio-topic } from "./audio-topic.interface";
-import audio-topicModel from "./audio-topic.model";
+import httpStatus from 'http-status';
+import AppError from '../../error/appError';
 
-const updateUserProfile = async (id: string, payload: Partial<IAudio-topic>) => {
-    if (payload.email || payload.username) {
-        throw new AppError(httpStatus.BAD_REQUEST, "You cannot change the email or username");
+import { deleteFileFromS3 } from '../../helper/deleteFromS3';
+import QueryBuilder from '../../builder/QueryBuilder';
+import { IAudioTopic } from './audio-topic.interface';
+import AudioTopic from './audio-topic.model';
+
+// create category into db
+const createAudioTopicIntoDB = async (payload: IAudioTopic) => {
+    const result = await AudioTopic.create(payload);
+    return result;
+};
+const updateAudioTopicIntoDB = async (
+    id: string,
+    payload: Partial<IAudioTopic>
+) => {
+    const audioTopic = await AudioTopic.findOne({ _id: id });
+    if (!audioTopic) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Audio topic not found');
     }
-    const user = await audio-topicModel.findById(id);
-    if (!user) {
-        throw new AppError(httpStatus.NOT_FOUND, "Profile not found");
-    }
-    return await audio-topicModel.findByIdAndUpdate(id, payload, {
+    const result = await AudioTopic.findByIdAndUpdate(id, payload, {
         new: true,
         runValidators: true,
     });
+
+    if (payload.topic_image) {
+        if (audioTopic.topic_image) {
+            deleteFileFromS3(audioTopic.topic_image);
+        }
+    }
+    return result;
 };
 
-const Audio-topicServices = { updateUserProfile };
-export default Audio-topicServices;
+const getAllTopics = async (query: Record<string, unknown>) => {
+    const resultQuery = new QueryBuilder(
+        AudioTopic.find({ isDeleted: false }),
+        query
+    )
+        .search(['name'])
+        .fields()
+        .filter()
+        .paginate()
+        .sort();
+
+    const result = await resultQuery.modelQuery;
+    const meta = await resultQuery.countTotal();
+    return {
+        meta,
+        result,
+    };
+};
+
+const getSingleTopic = async (id: string) => {
+    const topic = await AudioTopic.findById(id);
+    if (!topic) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Category not found');
+    }
+
+    return topic;
+};
+
+// delete category
+const deleteAudioTopicFromDB = async (id: string) => {
+    const result = await AudioTopic.findByIdAndDelete(id);
+    if (result) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Audio topic not found');
+    }
+    return result;
+};
+
+const categoryService = {
+    createAudioTopicIntoDB,
+    updateAudioTopicIntoDB,
+    getAllTopics,
+    getSingleTopic,
+    deleteAudioTopicFromDB,
+};
+
+export default categoryService;

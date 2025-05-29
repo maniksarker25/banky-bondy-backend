@@ -1,7 +1,7 @@
 import { model, Schema } from 'mongoose';
 import { IAudioTopic } from './audio-topic.interface';
 
-const CategorySchema: Schema = new Schema<IAudioTopic>(
+const AudioTopicSchema: Schema = new Schema<IAudioTopic>(
     {
         name: { type: String, required: true },
         topic_image: { type: String, required: true },
@@ -16,6 +16,6 @@ const CategorySchema: Schema = new Schema<IAudioTopic>(
     }
 );
 
-const Category = model<IAudioTopic>('AudioTopic', CategorySchema);
+const AudioTopic = model<IAudioTopic>('AudioTopic', AudioTopicSchema);
 
-export default Category;
+export default AudioTopic;
