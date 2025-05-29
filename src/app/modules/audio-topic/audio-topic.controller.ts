@@ -1,9 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import catchAsync from '../../utilities/catchasync';
 import sendResponse from '../../utilities/sendResponse';
 import audioTopicService from './audio-topic.service';
+import { getCloudFrontUrl } from '../../helper/mutler-s3-uploader';
 
 const createAudioTopic = catchAsync(async (req, res) => {
+    const file: any = req.files?.topic_image;
+    if (req.files?.topic_image) {
+        req.body.topic_image = getCloudFrontUrl(file[0].key);
+    }
     const result = await audioTopicService.createAudioTopicIntoDB(req.body);
     sendResponse(res, {
         statusCode: httpStatus.CREATED,
@@ -15,6 +21,10 @@ const createAudioTopic = catchAsync(async (req, res) => {
 
 const updateAudioTopic = catchAsync(async (req, res) => {
     const { id } = req.params;
+    const file: any = req.files?.topic_image;
+    if (req.files?.topic_image) {
+        req.body.topic_image = getCloudFrontUrl(file[0].key);
+    }
     const result = await audioTopicService.updateAudioTopicIntoDB(id, req.body);
     sendResponse(res, {
         statusCode: httpStatus.OK,

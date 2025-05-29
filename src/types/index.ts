@@ -17,6 +17,7 @@ declare namespace Express {
             category_image?: File[];
             video?: File[];
             question_image?: File[];
+            topic_image?: File[];
         };
     }
 }
