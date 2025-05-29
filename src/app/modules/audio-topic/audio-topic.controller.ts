@@ -1,24 +1,69 @@
-import httpStatus from "http-status";
-import catchAsync from "../../utilities/catchasync";
-import sendResponse from "../../utilities/sendResponse";
-import audio-topicServices from "./audio-topic.service";
+import httpStatus from 'http-status';
+import catchAsync from '../../utilities/catchasync';
+import sendResponse from '../../utilities/sendResponse';
+import audioTopicService from './audio-topic.service';
 
-const updateUserProfile = catchAsync(async (req, res) => {
-    const { files } = req;
-    if (files && typeof files === "object" && "profile_image" in files) {
-        req.body.profile_image = files["profile_image"][0].path;
-    }
-    const result = await audio-topicServices.updateUserProfile(
-        req.user.profileId,
-        req.body
-    );
+const createAudioTopic = catchAsync(async (req, res) => {
+    const result = await audioTopicService.createAudioTopicIntoDB(req.body);
     sendResponse(res, {
-        statusCode: httpStatus.OK,
+        statusCode: httpStatus.CREATED,
         success: true,
-        message: "Profile updated successfully",
+        message: 'Audio topic created successfully',
         data: result,
     });
 });
 
-const Audio-topicController = { updateUserProfile };
-export default Audio-topicController;
+const updateAudioTopic = catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const result = await audioTopicService.updateAudioTopicIntoDB(id, req.body);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Audio topic updated successfully',
+        data: result,
+    });
+});
+
+const getAllAudioTopics = catchAsync(async (req, res) => {
+    const query = req.query;
+    const { meta, result } = await audioTopicService.getAllTopics(query);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Audio topics retrieved successfully',
+        meta,
+        data: result,
+    });
+});
+
+const getSingleAudioTopic = catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const result = await audioTopicService.getSingleTopic(id);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Audio topic retrieved successfully',
+        data: result,
+    });
+});
+
+const deleteAudioTopic = catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const result = await audioTopicService.deleteAudioTopicFromDB(id);
+    sendResponse(res, {
+        statusCode: httpStatus.NO_CONTENT,
+        success: true,
+        message: 'Audio topic deleted successfully',
+        data: result,
+    });
+});
+
+const audioTopicController = {
+    createAudioTopic,
+    updateAudioTopic,
+    getAllAudioTopics,
+    getSingleAudioTopic,
+    deleteAudioTopic,
+};
+
+export default audioTopicController;
