@@ -42,16 +42,30 @@
 
 //   user ObjectId [ref: > users.id]
 
+//   username string
+
 //   name string
 
 //   email string
 
 //   phone string
 
+//   bondRatingCount number
+//   totalBondRating number
+
+//   recomandedSkillPeoples ObjectId[] [ref:> SkillPeople.id]
+
 //   profile_image string
 //   createdAt Date
 //   updatedAt Date
 
+// }
+
+// Table SkillPeople {
+//   id ObjectId [pk]
+//   name string
+//   profession string
+//   phone string
 // }
 
 // Table superadmins {
@@ -196,6 +210,8 @@
 
 //   cover_image string
 
+//   isPublic boolean
+
 //   joinControll enum("Public","Private")
 
 //   ower ObjectId [ref:> normalusers.id]
@@ -265,15 +281,36 @@
 
 //   user ObjectId [ref:> normalusers.id]
 
-//   title string
+//   offer string
 
-//   type enum("Give",'Get')
+//   want string
 
 //   tag string
 //   createdAt Date
 //   updatedAt Date
 
 //  }
+
+// Table BondRequest {
+//   id ObjectId [pk]
+//   user ObjectId [ref:> normalusers.id]
+//   give string
+//   get string
+//   location string
+//   radius number
+//   createdAt Date
+//   updated Date
+// }
+
+// Table CombinedBond {
+//   id ObjectId
+//   name string
+//   participants OjbectId[] [ref:> normalusers.id]
+//   requestedBonds ObjectId[] [ref:> BondRequest.id]
+//   status enum("onging",'completed')
+//   createdAt Date
+//   updated Date
+// }
 
 // Table Report {
 
@@ -319,10 +356,42 @@
 // Table Institution {
 
 //   id ObjectId [pk ]
-
-//   user ObjectId [ref:> normalusers.id]
+//   name string
+//   description string
+//   groupOneName string
+//   groupTwoName string
+//   facebookLink string
+//   instagramLink string
+//   creator ObjectId [ref:> normalusers.id]
 //   createdAt Date
 //   updatedAt Date
+// }
+
+// Table InstitutionMumber {
+//   id ObjectId [pk]
+//   group enum(1,2)
+//   user OjbectId [ref:> normalusers.id]
+//   createdAt Date
+//   updatedAt Date
+// }
+
+// Table InstitutionConversation {
+//   id OjbectId [pk]
+//   name string
+//   isPublic boolean
+//   ussers OjbectId[] [ref:> normalusers.id]
+//   likers OjbectId[] [ref:> normalusers.id]
+//   createdAt Date
+//   updatedAt Date
+// }
+
+// Table ConversationComment {
+//   id ObjectId [pk]
+//   institutionConversation OjbectId [ref:> InstitutionConversation.id]
+//   comment string
+//   likers OjbectId[] [ref:> normalusers.id]
+//   createdAt Date
+//   updated Date
 // }
 
 // Table Transaction {

@@ -9,6 +9,10 @@ const NormalUserSchema = new Schema<INormalUser>(
             required: true,
             ref: 'User',
         },
+        // username: {
+        //     type: String,
+        //     required: true,
+        // },
         name: {
             type: String,
             required: true,
@@ -25,6 +29,9 @@ const NormalUserSchema = new Schema<INormalUser>(
             type: String,
             default: '',
         },
+        cover_image: {
+            type: String,
+        },
         gender: {
             type: String,
             enum: Object.values(ENUM_GENDER),
@@ -32,8 +39,14 @@ const NormalUserSchema = new Schema<INormalUser>(
         dateOfBirth: {
             type: Date,
         },
-        country: {
+        address: {
             type: String,
+        },
+        bio: {
+            type: String,
+        },
+        skills: {
+            type: [String],
         },
     },
     {
