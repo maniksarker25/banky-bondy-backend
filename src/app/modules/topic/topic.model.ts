@@ -3,16 +3,11 @@ import { ITopic } from './topic.interface';
 
 const TopicSchema = new Schema<ITopic>(
     {
-        category: {
-            type: Schema.Types.ObjectId,
-            required: true,
-            ref: 'Category',
-        },
-        topic_icon: {
+        topic_image: {
             type: String,
             required: true,
         },
-        name: { type: String, required: true },
+        name: { type: String, required: true, unique: true },
         isDeleted: {
             type: Boolean,
             default: false,

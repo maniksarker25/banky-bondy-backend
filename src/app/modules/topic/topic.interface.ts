@@ -1,7 +1,5 @@
-import { Types } from 'mongoose';
 export interface ITopic {
-    category: Types.ObjectId;
-    topic_icon: string;
+    topic_image: string;
     name: string;
     isDeleted: boolean;
 }

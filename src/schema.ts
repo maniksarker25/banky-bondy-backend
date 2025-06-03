@@ -50,15 +50,31 @@
 
 //   phone string
 
+//   facebookLink string
+//   instagramLink string
+
+//   skills string[]
+//   address string
+//   bio string
+
 //   bondRatingCount number
 //   totalBondRating number
 
 //   recomandedSkillPeoples ObjectId[] [ref:> SkillPeople.id]
 
 //   profile_image string
+//   cover_image string
 //   createdAt Date
 //   updatedAt Date
 
+// }
+
+// Table Relatives  {
+//   id ObjectId [pk]
+//   relative ObjectId [ref:> normalusers.id]
+//   relativeType string
+//   createdAt Date
+//   updatedAt Date
 // }
 
 // Table SkillPeople {
@@ -447,3 +463,5 @@
 // Ref: "Project"."cover_image" < "ProjectMumber"."project"
 
 // Ref: "Project"."cover_image" < "ProjectMumber"."user"
+
+// Ref: "ProjectJoinRequest"."user" < "CombinedBond"."name"

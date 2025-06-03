@@ -1,21 +1,12 @@
 import httpStatus from 'http-status';
 import AppError from '../../error/appError';
 import { ITopic } from './topic.interface';
-import Category from '../category/category.model';
 import { Topic } from './topic.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { deleteFileFromS3 } from '../../helper/deleteFromS3';
 
 // Create Topic
 const createTopic = async (payload: ITopic) => {
-    const category = await Category.findById(payload.category);
-    if (!category) {
-        if (payload.topic_icon) {
-            deleteFileFromS3(payload.topic_icon);
-        }
-        throw new AppError(httpStatus.NOT_FOUND, 'Category not found');
-    }
-
     const result = await Topic.create(payload);
     return result;
 };
@@ -51,12 +42,6 @@ const getTopicById = async (topicId: string) => {
 
 // Update Topic
 const updateTopic = async (topicId: string, payload: ITopic) => {
-    if (payload.category) {
-        const category = await Category.findById(payload.category);
-        if (!category) {
-            throw new AppError(httpStatus.NOT_FOUND, 'Category not found');
-        }
-    }
     const topic = await Topic.findById(topicId);
     if (!topic) {
         throw new AppError(httpStatus.NOT_FOUND, 'Topic not found');
@@ -68,8 +53,8 @@ const updateTopic = async (topicId: string, payload: ITopic) => {
         { new: true }
     );
 
-    if (payload.topic_icon && topic.topic_icon) {
-        deleteFileFromS3(topic.topic_icon);
+    if (payload.topic_image && topic.topic_image) {
+        deleteFileFromS3(topic.topic_image);
     }
 
     return updatedTopic;

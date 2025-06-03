@@ -7,9 +7,9 @@ import { getCloudFrontUrl } from '../../helper/mutler-s3-uploader';
 
 // Create Topic
 const createTopic = catchAsync(async (req, res) => {
-    const file: any = req.files?.topic_icon;
-    if (req.files?.topic_icon) {
-        req.body.topic_icon = getCloudFrontUrl(file[0].key);
+    const file: any = req.files?.topic_image;
+    if (req.files?.topic_image) {
+        req.body.topic_image = getCloudFrontUrl(file[0].key);
     }
     const result = await TopicServices.createTopic(req.body);
     sendResponse(res, {
@@ -45,9 +45,9 @@ const getTopicById = catchAsync(async (req, res) => {
 
 // Update Topic
 const updateTopic = catchAsync(async (req, res) => {
-    const file: any = req.files?.topic_icon;
-    if (req.files?.topic_icon) {
-        req.body.topic_icon = getCloudFrontUrl(file[0].key);
+    const file: any = req.files?.topic_image;
+    if (req.files?.topic_image) {
+        req.body.topic_image = getCloudFrontUrl(file[0].key);
     }
     const { topicId } = req.params;
     const result = await TopicServices.updateTopic(topicId, req.body);
