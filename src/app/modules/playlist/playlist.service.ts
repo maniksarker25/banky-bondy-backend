@@ -1,21 +1,80 @@
-import httpStatus from "http-status";
-import AppError from "../../error/appError";
-import { IPlaylist } from "./playlist.interface";
-import playlistModel from "./playlist.model";
+import httpStatus from 'http-status';
+import AppError from '../../error/appError';
+import QueryBuilder from '../../builder/QueryBuilder';
+import Playlist from './playlist.model';
+import { IPlaylist } from './playlist.interface';
 
-const updateUserProfile = async (id: string, payload: Partial<IPlaylist>) => {
-    if (payload.email || payload.username) {
-        throw new AppError(httpStatus.BAD_REQUEST, "You cannot change the email or username");
-    }
-    const user = await playlistModel.findById(id);
-    if (!user) {
-        throw new AppError(httpStatus.NOT_FOUND, "Profile not found");
-    }
-    return await playlistModel.findByIdAndUpdate(id, payload, {
-        new: true,
-        runValidators: true,
-    });
+// Create Playlist
+const createPlaylist = async (payload: IPlaylist) => {
+    const result = await Playlist.create(payload);
+    return result;
 };
 
-const PlaylistServices = { updateUserProfile };
-export default PlaylistServices;
+// Get All Playlists with QueryBuilder
+const getAllPlaylists = async (query: Record<string, unknown>) => {
+    const playlistQuery = new QueryBuilder(
+        Playlist.find().populate('user').populate('audios'),
+        query
+    )
+        .search(['name', 'description'])
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
+
+    const result = await playlistQuery.modelQuery;
+    const meta = await playlistQuery.countTotal();
+
+    return {
+        meta,
+        result,
+    };
+};
+
+// Get Playlist by ID
+const getPlaylistById = async (playlistId: string) => {
+    const playlist = await Playlist.findById(playlistId)
+        .populate('user')
+        .populate('audios');
+    if (!playlist) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Playlist not found');
+    }
+    return playlist;
+};
+
+// Update Playlist
+const updatePlaylist = async (
+    playlistId: string,
+    payload: Partial<IPlaylist>
+) => {
+    const playlist = await Playlist.findById(playlistId);
+    if (!playlist) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Playlist not found');
+    }
+    const updatedPlaylist = await Playlist.findByIdAndUpdate(
+        playlistId,
+        payload,
+        { new: true }
+    );
+    return updatedPlaylist;
+};
+
+// Delete Playlist
+const deletePlaylist = async (playlistId: string) => {
+    const playlist = await Playlist.findById(playlistId);
+    if (!playlist) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Playlist not found');
+    }
+    const result = await Playlist.findByIdAndDelete(playlistId);
+    return result;
+};
+
+const PlaylistService = {
+    createPlaylist,
+    getAllPlaylists,
+    getPlaylistById,
+    updatePlaylist,
+    deletePlaylist,
+};
+
+export default PlaylistService;
