@@ -1,24 +1,75 @@
-import httpStatus from "http-status";
-import catchAsync from "../../utilities/catchasync";
-import sendResponse from "../../utilities/sendResponse";
-import relativeServices from "./relative.service";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import httpStatus from 'http-status';
+import catchAsync from '../../utilities/catchasync';
+import sendResponse from '../../utilities/sendResponse';
+import RelativeService from './relative.service';
 
-const updateUserProfile = catchAsync(async (req, res) => {
-    const { files } = req;
-    if (files && typeof files === "object" && "profile_image" in files) {
-        req.body.profile_image = files["profile_image"][0].path;
-    }
-    const result = await relativeServices.updateUserProfile(
-        req.user.profileId,
-        req.body
-    );
+// Create Relative
+const createRelative = catchAsync(async (req, res) => {
+    // Assuming no file upload here, remove if you add file support
+    const result = await RelativeService.createRelative(req.body);
     sendResponse(res, {
-        statusCode: httpStatus.OK,
+        statusCode: httpStatus.CREATED,
         success: true,
-        message: "Profile updated successfully",
+        message: 'Relative created successfully',
         data: result,
     });
 });
 
-const RelativeController = { updateUserProfile };
+// Get All Relatives
+const getAllRelatives = catchAsync(async (req, res) => {
+    const result = await RelativeService.getAllRelatives(req.query);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Relatives retrieved successfully',
+        data: result,
+    });
+});
+
+// Get Relative by ID
+const getRelativeById = catchAsync(async (req, res) => {
+    const { relativeId } = req.params;
+    const result = await RelativeService.getRelativeById(relativeId);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Relative retrieved successfully',
+        data: result,
+    });
+});
+
+// Update Relative
+const updateRelative = catchAsync(async (req, res) => {
+    // Assuming no file upload here, remove if you add file support
+    const { relativeId } = req.params;
+    const result = await RelativeService.updateRelative(relativeId, req.body);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Relative updated successfully',
+        data: result,
+    });
+});
+
+// Delete Relative
+const deleteRelative = catchAsync(async (req, res) => {
+    const { relativeId } = req.params;
+    const result = await RelativeService.deleteRelative(relativeId);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Relative deleted successfully',
+        data: result,
+    });
+});
+
+const RelativeController = {
+    createRelative,
+    getAllRelatives,
+    getRelativeById,
+    updateRelative,
+    deleteRelative,
+};
+
 export default RelativeController;

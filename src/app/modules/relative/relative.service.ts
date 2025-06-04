@@ -1,21 +1,82 @@
-import httpStatus from "http-status";
-import AppError from "../../error/appError";
-import { IRelative } from "./relative.interface";
-import relativeModel from "./relative.model";
+import httpStatus from 'http-status';
+import AppError from '../../error/appError';
+import QueryBuilder from '../../builder/QueryBuilder';
+import Relative from './relative.model';
+import { IRelative } from './relative.interface';
 
-const updateUserProfile = async (id: string, payload: Partial<IRelative>) => {
-    if (payload.email || payload.username) {
-        throw new AppError(httpStatus.BAD_REQUEST, "You cannot change the email or username");
-    }
-    const user = await relativeModel.findById(id);
-    if (!user) {
-        throw new AppError(httpStatus.NOT_FOUND, "Profile not found");
-    }
-    return await relativeModel.findByIdAndUpdate(id, payload, {
-        new: true,
-        runValidators: true,
-    });
+// Create Relative
+const createRelative = async (payload: IRelative) => {
+    const result = await Relative.create(payload);
+    return result;
 };
 
-const RelativeServices = { updateUserProfile };
-export default RelativeServices;
+// Get All Relatives with QueryBuilder for filters, search, pagination etc.
+const getAllRelatives = async (query: Record<string, unknown>) => {
+    // Let's assume you want to search by "relation" string field
+    const relativeQuery = new QueryBuilder(
+        Relative.find().populate('user').populate('relative'),
+        query
+    )
+        .search(['relation'])
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
+
+    const result = await relativeQuery.modelQuery;
+    const meta = await relativeQuery.countTotal();
+
+    return {
+        meta,
+        result,
+    };
+};
+
+// Get Relative by ID
+const getRelativeById = async (relativeId: string) => {
+    const relative = await Relative.findById(relativeId)
+        .populate('user')
+        .populate('relative');
+    if (!relative) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Relative not found');
+    }
+    return relative;
+};
+
+// Update Relative
+const updateRelative = async (
+    relativeId: string,
+    payload: Partial<IRelative>
+) => {
+    const relative = await Relative.findById(relativeId);
+    if (!relative) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Relative not found');
+    }
+
+    const updatedRelative = await Relative.findByIdAndUpdate(
+        relativeId,
+        payload,
+        { new: true }
+    );
+    return updatedRelative;
+};
+
+// Delete Relative
+const deleteRelative = async (relativeId: string) => {
+    const relative = await Relative.findById(relativeId);
+    if (!relative) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Relative not found');
+    }
+    const result = await Relative.findByIdAndDelete(relativeId);
+    return result;
+};
+
+const RelativeService = {
+    createRelative,
+    getAllRelatives,
+    getRelativeById,
+    updateRelative,
+    deleteRelative,
+};
+
+export default RelativeService;

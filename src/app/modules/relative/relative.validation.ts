@@ -1,12 +1,32 @@
-import { z } from "zod";
+import { z } from 'zod';
 
-export const updateRelativeData = z.object({
+export const createRelativeValidationSchema = z.object({
     body: z.object({
-        name: z.string().optional(),
-        phone: z.string().optional(),
-        address: z.string().optional(),
+        user: z
+            .string({ required_error: 'User ID is required' })
+            .length(24, 'Invalid user ID'),
+        relative: z
+            .string({ required_error: 'Relative ID is required' })
+            .length(24, 'Invalid relative ID'),
+        relation: z.string({ required_error: 'Relation is required' }),
     }),
 });
 
-const RelativeValidations = { updateRelativeData };
+export const updateRelativeValidationSchema = z.object({
+    body: z
+        .object({
+            user: z.string().length(24).optional(),
+            relative: z.string().length(24).optional(),
+            relation: z.string().optional(),
+        })
+        .refine((data) => Object.keys(data).length > 0, {
+            message: 'At least one field must be provided for update',
+        }),
+});
+
+const RelativeValidations = {
+    createRelativeValidationSchema,
+    updateRelativeValidationSchema,
+};
+
 export default RelativeValidations;
