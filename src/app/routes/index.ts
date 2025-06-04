@@ -11,6 +11,8 @@ import { feedbackRoutes } from '../modules/feedback/feedback.routes';
 import { transactionRoutes } from '../modules/transaction/transaction.routes';
 import { topicRoutes } from '../modules/topic/topic.routes';
 import { reportRoutes } from '../modules/report/report.routes';
+import { skillRoutes } from '../modules/skill/skill.routes';
+import { relativeRoutes } from '../modules/relative/relative.routes';
 
 const router = Router();
 
@@ -66,6 +68,14 @@ const moduleRoutes = [
     {
         path: '/report',
         router: reportRoutes,
+    },
+    {
+        path: '/skill',
+        router: skillRoutes,
+    },
+    {
+        path: '/relative',
+        router: relativeRoutes,
     },
 ];
 

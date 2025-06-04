@@ -1,25 +1,48 @@
-import express from "express";
-import auth from "../../middlewares/auth";
-import { USER_ROLE } from "../user/user.constant";
-import validateRequest from "../../middlewares/validateRequest";
-import relativeValidations from "./relative.validation";
-import relativeController from "./relative.controller";
-import { uploadFile } from "../../helper/fileUploader";
+import express from 'express';
+
+import auth from '../../middlewares/auth';
+import { USER_ROLE } from '../user/user.constant';
+import RelativeController from './relative.controller';
+import validateRequest from '../../middlewares/validateRequest';
+import RelativeValidations from './relative.validation';
 
 const router = express.Router();
 
+// Route to create a new relative
+router.post(
+    '/create-relative',
+    auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+    validateRequest(RelativeValidations.createRelativeValidationSchema),
+    RelativeController.createRelative
+);
+
+// Route to get all relatives
+router.get(
+    '/all-relatives',
+    auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
+    RelativeController.getAllRelatives
+);
+
+// Route to get a relative by ID
+router.get(
+    '/single-relative/:relativeId',
+    auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
+    RelativeController.getRelativeById
+);
+
+// Route to update a relative by ID
 router.patch(
-    "/update-profile",
-    auth(USER_ROLE.user),
-    uploadFile(),
-    (req, res, next) => {
-        if (req.body.data) {
-            req.body = JSON.parse(req.body.data);
-        }
-        next();
-    },
-    validateRequest(relativeValidations.updateRelativeData),
-    relativeController.updateUserProfile
+    '/update-relative/:relativeId',
+    auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+    validateRequest(RelativeValidations.updateRelativeValidationSchema),
+    RelativeController.updateRelative
+);
+
+// Route to delete a relative by ID
+router.delete(
+    '/delete-relative/:relativeId',
+    auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+    RelativeController.deleteRelative
 );
 
 export const relativeRoutes = router;
