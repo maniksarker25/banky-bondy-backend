@@ -1,24 +1,96 @@
-import httpStatus from "http-status";
-import catchAsync from "../../utilities/catchasync";
-import sendResponse from "../../utilities/sendResponse";
-import projectServices from "./project.service";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import httpStatus from 'http-status';
+import catchAsync from '../../utilities/catchasync';
+import sendResponse from '../../utilities/sendResponse';
+import ProjectService from './project.service';
+import { getCloudFrontUrl } from '../../helper/mutler-s3-uploader';
 
-const updateUserProfile = catchAsync(async (req, res) => {
-    const { files } = req;
-    if (files && typeof files === "object" && "profile_image" in files) {
-        req.body.profile_image = files["profile_image"][0].path;
+// Create Project
+const createProject = catchAsync(async (req, res) => {
+    const file: any = req.files?.project_cover;
+    if (req.files?.project_cover) {
+        req.body.cover_image = getCloudFrontUrl(file[0].key);
     }
-    const result = await projectServices.updateUserProfile(
-        req.user.profileId,
-        req.body
-    );
+    const result = await ProjectService.createProject(req.body);
     sendResponse(res, {
-        statusCode: httpStatus.OK,
+        statusCode: httpStatus.CREATED,
         success: true,
-        message: "Profile updated successfully",
+        message: 'Project created successfully',
         data: result,
     });
 });
 
-const ProjectController = { updateUserProfile };
+// Get All Projects
+const getAllProjects = catchAsync(async (req, res) => {
+    const result = await ProjectService.getAllProjects(req.query);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Projects retrieved successfully',
+        data: result,
+    });
+});
+// Get my project
+const getMyProjects = catchAsync(async (req, res) => {
+    const result = await ProjectService.getMyProjects(
+        req.user.profileId,
+        req.query
+    );
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Projects retrieved successfully',
+        data: result,
+    });
+});
+
+// Get Project by ID
+const getProjectById = catchAsync(async (req, res) => {
+    const { projectId } = req.params;
+    const result = await ProjectService.getProjectById(projectId);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Project retrieved successfully',
+        data: result,
+    });
+});
+
+// Update Project
+const updateProject = catchAsync(async (req, res) => {
+    const file: any = req.files?.project_cover;
+    if (req.files?.project_cover) {
+        req.body.cover_image = getCloudFrontUrl(file[0].key);
+    }
+    const { projectId } = req.params;
+    const result = await ProjectService.updateProject(projectId, req.body);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Project updated successfully',
+        data: result,
+    });
+});
+
+// Delete Project
+const deleteProject = catchAsync(async (req, res) => {
+    const { projectId } = req.params;
+    const result = await ProjectService.deleteProject(projectId);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Project deleted successfully',
+        data: result,
+    });
+});
+
+const ProjectController = {
+    createProject,
+    getAllProjects,
+    getProjectById,
+    getMyProjects,
+    updateProject,
+    deleteProject,
+};
+
 export default ProjectController;
