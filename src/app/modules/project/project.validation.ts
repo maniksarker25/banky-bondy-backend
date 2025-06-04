@@ -1,12 +1,41 @@
-import { z } from "zod";
+import { z } from 'zod';
+import { ENUM_JOIN_CONTROLL, ENUM_PROJECT_STATUS } from './project.enum';
 
-export const updateProjectData = z.object({
+export const createProjectValidationSchema = z.object({
     body: z.object({
-        name: z.string().optional(),
-        phone: z.string().optional(),
-        address: z.string().optional(),
+        name: z.string({ required_error: 'Name is required' }),
+        description: z.string({ required_error: 'Description is required' }),
+        isPublic: z.boolean({ required_error: 'isPublic is required' }),
+        joinControll: z.enum(
+            Object.values(ENUM_JOIN_CONTROLL) as [string, ...string[]]
+        ),
+        status: z.enum(
+            Object.values(ENUM_PROJECT_STATUS) as [string, ...string[]]
+        ),
     }),
 });
 
-const ProjectValidations = { updateProjectData };
+export const updateProjectValidationSchema = z.object({
+    body: z
+        .object({
+            name: z.string().optional(),
+            description: z.string().optional(),
+            isPublic: z.boolean().optional(),
+            joinControll: z.enum(
+                Object.values(ENUM_JOIN_CONTROLL) as [string, ...string[]]
+            ),
+            status: z.enum(
+                Object.values(ENUM_PROJECT_STATUS) as [string, ...string[]]
+            ),
+        })
+        .refine((data) => Object.keys(data).length > 0, {
+            message: 'At least one field must be provided for update',
+        }),
+});
+
+const ProjectValidations = {
+    createProjectValidationSchema,
+    updateProjectValidationSchema,
+};
+
 export default ProjectValidations;

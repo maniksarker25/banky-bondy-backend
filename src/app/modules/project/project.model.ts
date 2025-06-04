@@ -1,16 +1,34 @@
-import { model, Schema } from "mongoose";
-import { IProject } from "./project.interface";
+import { Schema, model } from 'mongoose';
+import { IProject } from './project.interface';
+import { ENUM_JOIN_CONTROLL, ENUM_PROJECT_STATUS } from './project.enum';
 
-const projectSchema = new Schema<IProject>({
-    user: { type: Schema.Types.ObjectId, required: true, ref: "User" },
-    name: { type: String, required: true },
-    phone: { type: String },
-    email: { type: String, required: true, unique: true },
-    address: { type: String },
-    profile_image: { type: String, default: "" },
-    totalAmount: { type: Number, default: 0 },
-    totalPoint: { type: Number, default: 0 }
-}, { timestamps: true });
+const projectSchema = new Schema<IProject>(
+    {
+        name: { type: String, required: true, trim: true },
+        description: { type: String, required: true },
+        cover_image: { type: String },
+        isPublic: { type: Boolean, required: true },
+        joinControll: {
+            type: String,
+            enum: Object.values(ENUM_JOIN_CONTROLL),
+            default: ENUM_JOIN_CONTROLL.Public,
+        },
+        ower: {
+            type: Schema.Types.ObjectId,
+            ref: 'NormalUser',
+            required: true,
+        },
+        status: {
+            type: String,
+            enum: Object.values(ENUM_PROJECT_STATUS),
+            default: ENUM_PROJECT_STATUS.Ongoing,
+        },
+    },
+    {
+        timestamps: true,
+    }
+);
 
-const projectModel = model<IProject>("Project", projectSchema);
-export default projectModel;
+const Project = model<IProject>('Project', projectSchema);
+
+export default Project;
