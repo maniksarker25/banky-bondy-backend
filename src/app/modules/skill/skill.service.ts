@@ -63,7 +63,7 @@ const deleteTopic = async (skillId: string) => {
     return result;
 };
 
-const TopicServices = {
+const SkillServices = {
     createSkill,
     getAllSkill,
     getSkillById,
@@ -71,4 +71,4 @@ const TopicServices = {
     deleteTopic,
 };
 
-export default TopicServices;
+export default SkillServices;
