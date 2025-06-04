@@ -16,9 +16,8 @@ import { createToken } from './user.utils';
 import config from '../../config';
 import SuperAdmin from '../superAdmin/superAdmin.model';
 const generateVerifyCode = (): number => {
-    return Math.floor(10000 + Math.random() * 900000);
+    return Math.floor(100000 + Math.random() * 900000);
 };
-
 const registerUser = async (
     payload: INormalUser & { password: string; confirmPassword: string }
 ) => {
