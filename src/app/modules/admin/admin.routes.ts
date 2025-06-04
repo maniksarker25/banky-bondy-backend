@@ -35,12 +35,6 @@ router.delete(
     AdminController.deleteAdmin
 );
 
-router.patch(
-    '/update-admin-status/:id',
-    auth(USER_ROLE.superAdmin),
-    AdminController.updateShopStatus
-);
-
 router.get(
     '/all-admins',
     auth(USER_ROLE.superAdmin),

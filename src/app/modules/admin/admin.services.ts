@@ -83,49 +83,11 @@ const deleteAdminFromDB = async (id: string) => {
     }
 };
 
-// update Admin status
-const updateAdminStatus = async (id: string, status: string) => {
-    const session = await Admin.startSession();
-    session.startTransaction();
-
-    try {
-        const result = await Admin.findByIdAndUpdate(
-            id,
-            { status: status },
-            { runValidators: true, new: true, session: session }
-        );
-
-        if (!result) {
-            throw new AppError(httpStatus.NOT_FOUND, 'Admin not found');
-        }
-
-        const isActive = status === 'active';
-
-        await User.findOneAndUpdate(
-            { _id: result.user },
-            { isActive: isActive },
-            { runValidators: true, new: true, session: session }
-        );
-
-        await session.commitTransaction();
-        session.endSession();
-
-        return result;
-    } catch (error) {
-        await session.abortTransaction();
-        session.endSession();
-        throw new AppError(
-            httpStatus.SERVICE_UNAVAILABLE,
-            'Something went wrong ,try again letter '
-        );
-    }
-};
-
 // get all Admin
 
 const getAllAdminFromDB = async (query: Record<string, any>) => {
     const AdminQuery = new QueryBuilder(Admin.find(), query)
-        .search(['storeName'])
+        .search(['name'])
         .fields()
         .filter()
         .paginate()
@@ -142,7 +104,6 @@ const getAllAdminFromDB = async (query: Record<string, any>) => {
 const AdminServices = {
     createAdmin,
     updateAdminProfile,
-    updateAdminStatus,
     getAllAdminFromDB,
     deleteAdminFromDB,
 };

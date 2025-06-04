@@ -46,19 +46,6 @@ const deleteAdmin = catchAsync(async (req, res) => {
     });
 });
 
-// update shop status
-const updateAdminStatus = catchAsync(async (req, res) => {
-    const result = await AdminServices.updateAdminStatus(
-        req?.params?.id,
-        req?.body?.status
-    );
-    sendResponse(res, {
-        statusCode: httpStatus.OK,
-        success: true,
-        message: 'Admin status updated successfully',
-        data: result,
-    });
-});
 const getAllAdmin = catchAsync(async (req, res) => {
     const result = await AdminServices.getAllAdminFromDB(req?.query);
     sendResponse(res, {
@@ -72,7 +59,6 @@ const getAllAdmin = catchAsync(async (req, res) => {
 const AdminController = {
     updateAdminProfile,
     createAdmin,
-    updateShopStatus: updateAdminStatus,
     getAllAdmin,
     deleteAdmin,
 };
