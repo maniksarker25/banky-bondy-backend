@@ -5,16 +5,17 @@ import Relative from './relative.model';
 import { IRelative } from './relative.interface';
 
 // Create Relative
-const createRelative = async (payload: IRelative) => {
-    const result = await Relative.create(payload);
+const createRelative = async (userId: string, payload: IRelative) => {
+    const result = await Relative.create({ ...payload, user: userId });
     return result;
 };
 
-// Get All Relatives with QueryBuilder for filters, search, pagination etc.
-const getAllRelatives = async (query: Record<string, unknown>) => {
-    // Let's assume you want to search by "relation" string field
+const getAllRelatives = async (
+    userId: string,
+    query: Record<string, unknown>
+) => {
     const relativeQuery = new QueryBuilder(
-        Relative.find().populate('user').populate('relative'),
+        Relative.find({ user: userId }).populate('user').populate('relative'),
         query
     )
         .search(['relation'])
@@ -45,10 +46,14 @@ const getRelativeById = async (relativeId: string) => {
 
 // Update Relative
 const updateRelative = async (
+    userId: string,
     relativeId: string,
     payload: Partial<IRelative>
 ) => {
-    const relative = await Relative.findById(relativeId);
+    const relative = await Relative.findOne({
+        user: userId,
+        relative: relativeId,
+    });
     if (!relative) {
         throw new AppError(httpStatus.NOT_FOUND, 'Relative not found');
     }
@@ -62,8 +67,11 @@ const updateRelative = async (
 };
 
 // Delete Relative
-const deleteRelative = async (relativeId: string) => {
-    const relative = await Relative.findById(relativeId);
+const deleteRelative = async (userId: string, relativeId: string) => {
+    const relative = await Relative.findOne({
+        user: userId,
+        relative: relativeId,
+    });
     if (!relative) {
         throw new AppError(httpStatus.NOT_FOUND, 'Relative not found');
     }

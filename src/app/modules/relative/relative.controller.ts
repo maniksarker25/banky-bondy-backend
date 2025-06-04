@@ -7,7 +7,10 @@ import RelativeService from './relative.service';
 // Create Relative
 const createRelative = catchAsync(async (req, res) => {
     // Assuming no file upload here, remove if you add file support
-    const result = await RelativeService.createRelative(req.body);
+    const result = await RelativeService.createRelative(
+        req.user.profileId,
+        req.body
+    );
     sendResponse(res, {
         statusCode: httpStatus.CREATED,
         success: true,
@@ -18,7 +21,10 @@ const createRelative = catchAsync(async (req, res) => {
 
 // Get All Relatives
 const getAllRelatives = catchAsync(async (req, res) => {
-    const result = await RelativeService.getAllRelatives(req.query);
+    const result = await RelativeService.getAllRelatives(
+        req.user.profileId,
+        req.query
+    );
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
@@ -43,7 +49,11 @@ const getRelativeById = catchAsync(async (req, res) => {
 const updateRelative = catchAsync(async (req, res) => {
     // Assuming no file upload here, remove if you add file support
     const { relativeId } = req.params;
-    const result = await RelativeService.updateRelative(relativeId, req.body);
+    const result = await RelativeService.updateRelative(
+        req.user.profileId,
+        relativeId,
+        req.body
+    );
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
@@ -55,7 +65,10 @@ const updateRelative = catchAsync(async (req, res) => {
 // Delete Relative
 const deleteRelative = catchAsync(async (req, res) => {
     const { relativeId } = req.params;
-    const result = await RelativeService.deleteRelative(relativeId);
+    const result = await RelativeService.deleteRelative(
+        req.user.profileId,
+        relativeId
+    );
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
