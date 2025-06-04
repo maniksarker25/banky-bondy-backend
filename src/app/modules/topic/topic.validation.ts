@@ -1,9 +1,17 @@
 import { z } from 'zod';
-export const createTopicValidationSchema = z.object({
+const createTopicValidationSchema = z.object({
     body: z.object({
         name: z.string({ required_error: 'Name is required' }),
     }),
 });
+const updateTopicValidationSchema = z.object({
+    body: z.object({
+        name: z.string().optional(),
+    }),
+});
 
-const TopicValidations = { createTopicValidationSchema };
+const TopicValidations = {
+    createTopicValidationSchema,
+    updateTopicValidationSchema,
+};
 export default TopicValidations;
