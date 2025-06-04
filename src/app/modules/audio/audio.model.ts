@@ -8,6 +8,10 @@ const audioSchema = new Schema<IAudio>(
             ref: 'Topic',
             required: true,
         },
+        audio_url: {
+            type: String,
+            required: true,
+        },
         title: { type: String, required: true, trim: true },
         description: { type: String },
         cover_image: { type: String, required: false },
