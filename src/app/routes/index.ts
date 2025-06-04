@@ -10,6 +10,7 @@ import { metaRoutes } from '../modules/meta/meta.routes';
 import { feedbackRoutes } from '../modules/feedback/feedback.routes';
 import { transactionRoutes } from '../modules/transaction/transaction.routes';
 import { topicRoutes } from '../modules/topic/topic.routes';
+import { reportRoutes } from '../modules/report/report.routes';
 
 const router = Router();
 
@@ -61,6 +62,10 @@ const moduleRoutes = [
     {
         path: '/topic',
         router: topicRoutes,
+    },
+    {
+        path: '/report',
+        router: reportRoutes,
     },
 ];
 
