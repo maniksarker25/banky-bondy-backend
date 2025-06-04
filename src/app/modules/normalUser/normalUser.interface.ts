@@ -14,5 +14,5 @@ export interface INormalUser {
     dateOfBirth: Date;
     address: string;
     bio: string;
-    skills: string[];
+    skills: [Types.ObjectId];
 }

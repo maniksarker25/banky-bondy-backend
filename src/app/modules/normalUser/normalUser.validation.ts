@@ -23,7 +23,6 @@ export const createNormalUserSchema = z.object({
         dateOfBirth: z.string().optional(),
         address: z.string().optional(),
         bio: z.string().optional(),
-        skills: z.array(z.string()).optional(),
     }),
 });
 
@@ -39,7 +38,6 @@ export const updateNormalUserData = z.object({
         dateOfBirth: z.string().optional(),
         address: z.string().optional(),
         bio: z.string().optional(),
-        skills: z.array(z.string()).optional(),
     }),
 });
 

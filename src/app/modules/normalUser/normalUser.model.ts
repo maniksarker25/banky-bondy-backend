@@ -46,7 +46,7 @@ const NormalUserSchema = new Schema<INormalUser>(
             type: String,
         },
         skills: {
-            type: [String],
+            type: [Schema.Types.ObjectId],
         },
     },
     {
