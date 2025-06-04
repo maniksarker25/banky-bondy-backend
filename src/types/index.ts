@@ -18,6 +18,8 @@ declare namespace Express {
             video?: File[];
             question_image?: File[];
             topic_image?: File[];
+            audio?: File[];
+            audio_cover?: File[];
             project_cover?: File[];
         };
     }

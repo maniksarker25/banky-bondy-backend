@@ -5,8 +5,8 @@ import Audio from './audio.model';
 import { IAudio } from './audio.interface';
 
 // Create Audio
-const createAudio = async (payload: IAudio) => {
-    const result = await Audio.create(payload);
+const createAudio = async (userId: string, payload: IAudio) => {
+    const result = await Audio.create({ ...payload, user: userId });
     return result;
 };
 
@@ -62,8 +62,12 @@ const getAudioById = async (audioId: string) => {
 };
 
 // Update Audio
-const updateAudio = async (audioId: string, payload: Partial<IAudio>) => {
-    const audio = await Audio.findById(audioId);
+const updateAudio = async (
+    userId: string,
+    audioId: string,
+    payload: Partial<IAudio>
+) => {
+    const audio = await Audio.findOne({ user: userId, _id: audioId });
     if (!audio) {
         throw new AppError(httpStatus.NOT_FOUND, 'Audio not found');
     }

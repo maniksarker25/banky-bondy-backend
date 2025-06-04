@@ -1,12 +1,24 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import catchAsync from '../../utilities/catchasync';
 import sendResponse from '../../utilities/sendResponse';
 import AudioService from './audio.service';
+import { getCloudFrontUrl } from '../../helper/mutler-s3-uploader';
 
 // Create Audio
 const createAudio = catchAsync(async (req, res) => {
-    const result = await AudioService.createAudio(req.body);
+    const audiFile: any = req.files?.audio;
+    if (req.files?.audio) {
+        req.body.audio_url = getCloudFrontUrl(audiFile[0].key);
+    }
+    const file: any = req.files?.audio_cover;
+    if (req.files?.audio_cover) {
+        req.body.cover_image = getCloudFrontUrl(audiFile[0].key);
+    }
+
+    const result = await AudioService.createAudio(req.user.profileId, req.body);
     sendResponse(res, {
         statusCode: httpStatus.CREATED,
         success: true,
@@ -53,8 +65,20 @@ const getAudioById = catchAsync(async (req, res) => {
 
 // Update Audio
 const updateAudio = catchAsync(async (req, res) => {
+    const audiFile: any = req.files?.audio;
+    if (req.files?.audio) {
+        req.body.audio_url = getCloudFrontUrl(audiFile[0].key);
+    }
+    const file: any = req.files?.audio_cover;
+    if (req.files?.audio_cover) {
+        req.body.cover_image = getCloudFrontUrl(audiFile[0].key);
+    }
     const { audioId } = req.params;
-    const result = await AudioService.updateAudio(audioId, req.body);
+    const result = await AudioService.updateAudio(
+        req.user.profileId,
+        audioId,
+        req.body
+    );
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
