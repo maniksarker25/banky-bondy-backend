@@ -1,12 +1,18 @@
-import { z } from "zod";
+import { z } from 'zod';
 
-export const updateSkillData = z.object({
+export const createSkillValidationSchema = z.object({
+    body: z.object({
+        name: z.string({ required_error: 'Name is required' }),
+    }),
+});
+export const updateSkillValidationSchema = z.object({
     body: z.object({
         name: z.string().optional(),
-        phone: z.string().optional(),
-        address: z.string().optional(),
     }),
 });
 
-const SkillValidations = { updateSkillData };
+const SkillValidations = {
+    createSkillValidationSchema,
+    updateSkillValidationSchema,
+};
 export default SkillValidations;

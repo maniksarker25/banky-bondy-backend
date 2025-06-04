@@ -7,6 +7,5 @@ export interface IAdmin {
     email: string;
     phoneNumber: string;
     profile_image: string;
-    status: 'active' | 'inactive';
     isDeleted: boolean;
 }
