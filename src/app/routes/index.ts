@@ -15,6 +15,7 @@ import { skillRoutes } from '../modules/skill/skill.routes';
 import { relativeRoutes } from '../modules/relative/relative.routes';
 import { projectRoutes } from '../modules/project/project.routes';
 import { audioRoutes } from '../modules/audio/audio.routes';
+import { audioBookmarkRoutes } from '../modules/audioBookmark/audio.bookmark.routes';
 
 const router = Router();
 
@@ -86,6 +87,10 @@ const moduleRoutes = [
     {
         path: '/audio',
         router: audioRoutes,
+    },
+    {
+        path: '/audio-bookmark',
+        router: audioBookmarkRoutes,
     },
 ];
 
