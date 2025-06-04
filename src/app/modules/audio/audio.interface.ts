@@ -1,6 +1,7 @@
 import { Types } from 'mongoose';
 
 export interface IAudio {
+    user: Types.ObjectId;
     audioTopic: Types.ObjectId;
     title: string;
     audio_url: string;

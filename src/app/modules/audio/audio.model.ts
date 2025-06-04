@@ -3,6 +3,10 @@ import { IAudio } from './audio.interface';
 
 const audioSchema = new Schema<IAudio>(
     {
+        user: {
+            type: Schema.Types.ObjectId,
+            required: true,
+        },
         audioTopic: {
             type: Schema.Types.ObjectId,
             ref: 'Topic',
