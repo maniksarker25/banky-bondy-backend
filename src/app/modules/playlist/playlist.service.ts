@@ -3,10 +3,11 @@ import AppError from '../../error/appError';
 import QueryBuilder from '../../builder/QueryBuilder';
 import Playlist from './playlist.model';
 import { IPlaylist } from './playlist.interface';
+import { deleteFileFromS3 } from '../../helper/deleteFromS3';
 
 // Create Playlist
-const createPlaylist = async (payload: IPlaylist) => {
-    const result = await Playlist.create(payload);
+const createPlaylist = async (userId: string, payload: IPlaylist) => {
+    const result = await Playlist.create({ ...payload, user: userId });
     return result;
 };
 
@@ -14,6 +15,29 @@ const createPlaylist = async (payload: IPlaylist) => {
 const getAllPlaylists = async (query: Record<string, unknown>) => {
     const playlistQuery = new QueryBuilder(
         Playlist.find().populate('user').populate('audios'),
+        query
+    )
+        .search(['name', 'description'])
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
+
+    const result = await playlistQuery.modelQuery;
+    const meta = await playlistQuery.countTotal();
+
+    return {
+        meta,
+        result,
+    };
+};
+// Get All Playlists with QueryBuilder
+const getMyPlaylists = async (
+    userId: string,
+    query: Record<string, unknown>
+) => {
+    const playlistQuery = new QueryBuilder(
+        Playlist.find({ user: userId }).populate('audios'),
         query
     )
         .search(['name', 'description'])
@@ -44,10 +68,11 @@ const getPlaylistById = async (playlistId: string) => {
 
 // Update Playlist
 const updatePlaylist = async (
+    userId: string,
     playlistId: string,
     payload: Partial<IPlaylist>
 ) => {
-    const playlist = await Playlist.findById(playlistId);
+    const playlist = await Playlist.findOne({ user: userId, _id: playlistId });
     if (!playlist) {
         throw new AppError(httpStatus.NOT_FOUND, 'Playlist not found');
     }
@@ -56,6 +81,11 @@ const updatePlaylist = async (
         payload,
         { new: true }
     );
+
+    if (payload.cover_image && playlist.cover_image) {
+        deleteFileFromS3(playlist.cover_image);
+    }
+
     return updatedPlaylist;
 };
 
@@ -66,6 +96,9 @@ const deletePlaylist = async (playlistId: string) => {
         throw new AppError(httpStatus.NOT_FOUND, 'Playlist not found');
     }
     const result = await Playlist.findByIdAndDelete(playlistId);
+    if (playlist.cover_image) {
+        deleteFileFromS3(playlist.cover_image);
+    }
     return result;
 };
 
@@ -75,6 +108,7 @@ const PlaylistService = {
     getPlaylistById,
     updatePlaylist,
     deletePlaylist,
+    getMyPlaylists,
 };
 
 export default PlaylistService;

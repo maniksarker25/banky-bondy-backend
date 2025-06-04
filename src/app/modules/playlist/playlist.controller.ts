@@ -3,10 +3,18 @@ import httpStatus from 'http-status';
 import catchAsync from '../../utilities/catchasync';
 import sendResponse from '../../utilities/sendResponse';
 import PlaylistService from './playlist.service';
+import { getCloudFrontUrl } from '../../helper/mutler-s3-uploader';
 
 // Create Playlist
 const createPlaylist = catchAsync(async (req, res) => {
-    const result = await PlaylistService.createPlaylist(req.body);
+    const file: any = req.files?.playlist_cover;
+    if (req.files?.playlist_cover) {
+        req.body.cover_image = getCloudFrontUrl(file[0].key);
+    }
+    const result = await PlaylistService.createPlaylist(
+        req.user.profileId,
+        req.body
+    );
     sendResponse(res, {
         statusCode: httpStatus.CREATED,
         success: true,
@@ -18,6 +26,18 @@ const createPlaylist = catchAsync(async (req, res) => {
 // Get All Playlists
 const getAllPlaylists = catchAsync(async (req, res) => {
     const result = await PlaylistService.getAllPlaylists(req.query);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Playlists retrieved successfully',
+        data: result,
+    });
+});
+const getMyPlaylists = catchAsync(async (req, res) => {
+    const result = await PlaylistService.getMyPlaylists(
+        req.user.profileId,
+        req.query
+    );
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
@@ -40,8 +60,16 @@ const getPlaylistById = catchAsync(async (req, res) => {
 
 // Update Playlist
 const updatePlaylist = catchAsync(async (req, res) => {
+    const file: any = req.files?.playlist_cover;
+    if (req.files?.playlist_cover) {
+        req.body.cover_image = getCloudFrontUrl(file[0].key);
+    }
     const { playlistId } = req.params;
-    const result = await PlaylistService.updatePlaylist(playlistId, req.body);
+    const result = await PlaylistService.updatePlaylist(
+        req.user.profileId,
+        playlistId,
+        req.body
+    );
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
@@ -68,6 +96,7 @@ const PlaylistController = {
     getPlaylistById,
     updatePlaylist,
     deletePlaylist,
+    getMyPlaylists,
 };
 
 export default PlaylistController;
