@@ -39,6 +39,11 @@ const createAdmin = async (payload: IAdmin & { password: string }) => {
             user: user[0]._id,
         };
         const admin = await Admin.create([adminPayload], { session });
+        await User.findByIdAndUpdate(
+            user[0]._id,
+            { profileId: admin[0]._id },
+            { session }
+        );
 
         await session.commitTransaction();
         session.endSession();

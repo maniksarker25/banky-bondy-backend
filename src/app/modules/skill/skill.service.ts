@@ -29,7 +29,7 @@ const getAllSkill = async (query: Record<string, unknown>) => {
 
 // Get Topic by ID
 const getSkillById = async (skillId: string) => {
-    const topic = await Skill.findById(skillId).populate('category');
+    const topic = await Skill.findById(skillId);
     if (!topic) {
         throw new AppError(httpStatus.NOT_FOUND, 'Topic not found');
     }
