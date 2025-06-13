@@ -13,10 +13,7 @@ const createTopic = async (payload: ITopic) => {
 
 // Get All Topics
 const getAllTopics = async (query: Record<string, unknown>) => {
-    const topicQuery = new QueryBuilder(
-        Topic.find({ isDeleted: false }).populate('category'),
-        query
-    )
+    const topicQuery = new QueryBuilder(Topic.find({ isDeleted: false }), query)
         .search(['name'])
         .fields()
         .filter()
@@ -33,7 +30,7 @@ const getAllTopics = async (query: Record<string, unknown>) => {
 
 // Get Topic by ID
 const getTopicById = async (topicId: string) => {
-    const topic = await Topic.findById(topicId).populate('category');
+    const topic = await Topic.findById(topicId);
     if (!topic) {
         throw new AppError(httpStatus.NOT_FOUND, 'Topic not found');
     }
@@ -71,7 +68,9 @@ const deleteTopic = async (topicId: string) => {
         { isDeleted: true },
         { new: true, runValidators: true }
     );
-
+    if (topic.topic_image) {
+        deleteFileFromS3(topic.topic_image);
+    }
     return result;
 };
 
