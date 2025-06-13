@@ -22,7 +22,7 @@ const updateAdminProfile = catchAsync(async (req, res) => {
         req.body.profile_image = getCloudFrontUrl(file[0].key);
     }
     const result = await AdminServices.updateAdminProfile(
-        req?.user?.id,
+        req?.params?.id,
         req?.body
     );
     sendResponse(res, {

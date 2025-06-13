@@ -51,8 +51,8 @@ const createAdmin = async (payload: IAdmin & { password: string }) => {
     }
 };
 
-const updateAdminProfile = async (userId: string, payload: Partial<IAdmin>) => {
-    const result = await Admin.findOneAndUpdate({ user: userId }, payload, {
+const updateAdminProfile = async (id: string, payload: Partial<IAdmin>) => {
+    const result = await Admin.findByIdAndUpdate(id, payload, {
         new: true,
         runValidators: true,
     });
@@ -87,7 +87,10 @@ const deleteAdminFromDB = async (id: string) => {
 // get all Admin
 
 const getAllAdminFromDB = async (query: Record<string, any>) => {
-    const AdminQuery = new QueryBuilder(Admin.find(), query)
+    const AdminQuery = new QueryBuilder(
+        Admin.find().populate({ path: 'user', select: 'isBlocked' }),
+        query
+    )
         .search(['name'])
         .fields()
         .filter()

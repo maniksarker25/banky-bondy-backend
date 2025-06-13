@@ -22,11 +22,7 @@ const updateAdminProfileValidationSchema = z.object({
                 .email({ message: 'Invalid email address' })
                 .optional(),
             profileImage: z.string().optional(),
-            bankName: z.string().optional(),
-            accountName: z.string().optional(),
-            accountNumber: z.number().nullable().optional(),
-            branchCode: z.number().nullable().optional(),
-            status: z.enum(['active', 'inactive']).default('active'),
+            phoneNumber: z.string().optional(),
         })
         .partial(),
 });
