@@ -105,11 +105,20 @@ const getAllAdminFromDB = async (query: Record<string, any>) => {
     };
 };
 
+const getSingleAdmin = async (id: string) => {
+    const result = await Admin.findById(id).populate({
+        path: 'user',
+        select: 'isBlocked',
+    });
+    return result;
+};
+
 const AdminServices = {
     createAdmin,
     updateAdminProfile,
     getAllAdminFromDB,
     deleteAdminFromDB,
+    getSingleAdmin,
 };
 
 export default AdminServices;
