@@ -34,7 +34,7 @@ router.get(
     PlaylistController.getPlaylistById
 );
 
-// Update Playlist
+// Update Playlist-----
 router.patch(
     '/update-playlist/:playlistId',
     auth(USER_ROLE.superAdmin, USER_ROLE.admin),
