@@ -39,6 +39,7 @@ export const uploadFile = () => {
             'course_banner',
             'banner',
             'class_banner',
+            'topic_image',
         ];
 
         if (file.fieldname === undefined) {
@@ -104,6 +105,8 @@ export const uploadFile = () => {
                 uploadPath = 'uploads/images/course_banner';
             } else if (file.fieldname === 'thumbnail') {
                 uploadPath = 'uploads/images/thumbnail';
+            } else if (file.fieldname === 'topic_image') {
+                uploadPath = 'uploads/images/audio_topic';
             } else {
                 uploadPath = 'uploads';
             }
@@ -144,6 +147,7 @@ export const uploadFile = () => {
         { name: 'chat_videos', maxCount: 2 },
         { name: 'chat_images', maxCount: 7 },
         { name: 'topic_icon', maxCount: 1 },
+        { name: 'topic_image', maxCount: 1 },
     ]);
 
     return upload;
