@@ -10,8 +10,8 @@ const router = express.Router();
 
 // Route to create a new relative
 router.post(
-    '/create-relative',
-    auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
+    '/add-relative',
+    auth(USER_ROLE.user),
     validateRequest(RelativeValidations.createRelativeValidationSchema),
     RelativeController.createRelative
 );
@@ -19,21 +19,21 @@ router.post(
 // Route to get all relatives
 router.get(
     '/all-relatives',
-    auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
+    auth(USER_ROLE.user),
     RelativeController.getAllRelatives
 );
 
 // Route to get a relative by ID
 router.get(
     '/single-relative/:relativeId',
-    auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
+    auth(USER_ROLE.user),
     RelativeController.getRelativeById
 );
 
 // Route to update a relative by ID
 router.patch(
     '/update-relative/:relativeId',
-    auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
+    auth(USER_ROLE.user),
     validateRequest(RelativeValidations.updateRelativeValidationSchema),
     RelativeController.updateRelative
 );
@@ -41,7 +41,7 @@ router.patch(
 // Route to delete a relative by ID
 router.delete(
     '/delete-relative/:relativeId',
-    auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
+    auth(USER_ROLE.user),
     RelativeController.deleteRelative
 );
 

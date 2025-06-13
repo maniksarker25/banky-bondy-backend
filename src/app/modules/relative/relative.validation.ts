@@ -2,9 +2,6 @@ import { z } from 'zod';
 
 export const createRelativeValidationSchema = z.object({
     body: z.object({
-        user: z
-            .string({ required_error: 'User ID is required' })
-            .length(24, 'Invalid user ID'),
         relative: z
             .string({ required_error: 'Relative ID is required' })
             .length(24, 'Invalid relative ID'),
@@ -15,7 +12,6 @@ export const createRelativeValidationSchema = z.object({
 export const updateRelativeValidationSchema = z.object({
     body: z
         .object({
-            user: z.string().length(24).optional(),
             relative: z.string().length(24).optional(),
             relation: z.string().optional(),
         })

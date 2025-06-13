@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { IRelative } from './relative.interface';
+import { ENUM_FAMILY_SIDE } from './relative.enum';
 
 const relativeSchema = new Schema<IRelative>(
     {
@@ -14,6 +15,10 @@ const relativeSchema = new Schema<IRelative>(
             required: true,
         },
         relation: { type: String, required: true, trim: true },
+        familySide: {
+            type: String,
+            enum: Object.values(ENUM_FAMILY_SIDE),
+        },
     },
     { timestamps: true }
 );

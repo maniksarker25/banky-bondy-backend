@@ -6,6 +6,16 @@ import { IRelative } from './relative.interface';
 
 // Create Relative
 const createRelative = async (userId: string, payload: IRelative) => {
+    const isExists = await Relative.findOne({
+        user: userId,
+        relative: payload.relative,
+    });
+    if (isExists) {
+        throw new AppError(
+            httpStatus.BAD_REQUEST,
+            'You already added this person as relative'
+        );
+    }
     const result = await Relative.create({ ...payload, user: userId });
     return result;
 };
@@ -15,7 +25,10 @@ const getAllRelatives = async (
     query: Record<string, unknown>
 ) => {
     const relativeQuery = new QueryBuilder(
-        Relative.find({ user: userId }).populate('user').populate('relative'),
+        Relative.find({ user: userId }).populate({
+            path: 'relative',
+            select: 'name profile_image',
+        }),
         query
     )
         .search(['relation'])
@@ -50,10 +63,7 @@ const updateRelative = async (
     relativeId: string,
     payload: Partial<IRelative>
 ) => {
-    const relative = await Relative.findOne({
-        user: userId,
-        relative: relativeId,
-    });
+    const relative = await Relative.findById(relativeId);
     if (!relative) {
         throw new AppError(httpStatus.NOT_FOUND, 'Relative not found');
     }
@@ -68,10 +78,7 @@ const updateRelative = async (
 
 // Delete Relative
 const deleteRelative = async (userId: string, relativeId: string) => {
-    const relative = await Relative.findOne({
-        user: userId,
-        relative: relativeId,
-    });
+    const relative = await Relative.findOne({ user: userId, _id: relativeId });
     if (!relative) {
         throw new AppError(httpStatus.NOT_FOUND, 'Relative not found');
     }
