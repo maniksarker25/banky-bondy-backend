@@ -7,10 +7,7 @@ import { getCloudFrontUrl } from '../../helper/mutler-s3-uploader';
 
 // register Admin
 const createAdmin = catchAsync(async (req, res) => {
-    const result = await AdminServices.createAdmin(
-        req?.body?.password,
-        req?.body?.admin
-    );
+    const result = await AdminServices.createAdmin(req.body);
     sendResponse(res, {
         statusCode: httpStatus.CREATED,
         success: true,

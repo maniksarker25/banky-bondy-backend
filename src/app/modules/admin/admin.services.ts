@@ -12,7 +12,8 @@ import { TUser } from '../user/user.interface';
 import { USER_ROLE } from '../user/user.constant';
 
 // register Admin
-const createAdmin = async (password: string, adminData: IAdmin) => {
+const createAdmin = async (payload: IAdmin & { password: string }) => {
+    const { password, ...adminData } = payload;
     const admin = await User.isUserExists(adminData?.email);
     if (admin) {
         throw new AppError(httpStatus.BAD_REQUEST, 'This admin already exists');

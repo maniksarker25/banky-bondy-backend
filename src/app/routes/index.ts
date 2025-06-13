@@ -17,6 +17,7 @@ import { projectRoutes } from '../modules/project/project.routes';
 import { audioRoutes } from '../modules/audio/audio.routes';
 import { audioBookmarkRoutes } from '../modules/audioBookmark/audio.bookmark.routes';
 import { playlistRoutes } from '../modules/playlist/playlist.routes';
+import { AdminRoutes } from '../modules/admin/admin.routes';
 
 const router = Router();
 
@@ -33,7 +34,10 @@ const moduleRoutes = [
         path: '/normal-user',
         router: normalUserRoutes,
     },
-
+    {
+        path: '/admin',
+        router: AdminRoutes,
+    },
     {
         path: '/manage',
         router: ManageRoutes,
