@@ -16,8 +16,13 @@ router.post(
 
 router.get(
     '/all-reports',
-    auth(USER_ROLE.superAdmin),
+    auth(USER_ROLE.superAdmin, USER_ROLE.admin),
     ReportController.getAllReports
+);
+router.delete(
+    '/delete-report/:id',
+    auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+    ReportController.deleteReport
 );
 
 export const reportRoutes = router;

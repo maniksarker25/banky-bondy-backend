@@ -20,12 +20,10 @@ const getAllReports = async (query: Record<string, unknown>) => {
             .populate({
                 path: 'reportFrom',
                 select: 'profile_image name',
-                populate: { path: 'mainSkill', select: 'name' },
             })
             .populate({
                 path: 'reportTo',
                 select: 'profile_image name',
-                populate: { path: 'mainSkill', select: 'name' },
             }),
         query
     )
@@ -44,9 +42,15 @@ const getAllReports = async (query: Record<string, unknown>) => {
     };
 };
 
+const deleteReport = async (id: string) => {
+    const result = await Report.findByIdAndDelete(id);
+    return result;
+};
+
 const ReportService = {
     createReport,
     getAllReports,
+    deleteReport,
 };
 
 export default ReportService;
