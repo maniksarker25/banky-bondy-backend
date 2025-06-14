@@ -71,7 +71,7 @@ const updateAudio = catchAsync(async (req, res) => {
     }
     const file: any = req.files?.audio_cover;
     if (req.files?.audio_cover) {
-        req.body.cover_image = getCloudFrontUrl(audiFile[0].key);
+        req.body.cover_image = getCloudFrontUrl(file[0].key);
     }
     const { audioId } = req.params;
     const result = await AudioService.updateAudio(

@@ -41,7 +41,7 @@ router.get(
 // Update Audio
 router.patch(
     '/update-audio/:audioId',
-    auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+    auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
     uploadFile(),
     (req: Request, res: Response, next: NextFunction) => {
         if (req.body.data) {

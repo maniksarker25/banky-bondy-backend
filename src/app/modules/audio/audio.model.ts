@@ -18,7 +18,7 @@ const audioSchema = new Schema<IAudio>(
         },
         title: { type: String, required: true, trim: true },
         description: { type: String },
-        cover_image: { type: String, required: false },
+        cover_image: { type: String, required: true },
         tags: { type: [String], default: [] },
         totalPlay: { type: Number, default: 0 },
         duration: { type: Number, required: true },
