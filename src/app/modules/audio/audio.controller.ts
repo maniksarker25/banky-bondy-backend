@@ -90,7 +90,7 @@ const updateAudio = catchAsync(async (req, res) => {
 // Delete Audio
 const deleteAudio = catchAsync(async (req, res) => {
     const { audioId } = req.params;
-    const result = await AudioService.deleteAudio(audioId);
+    const result = await AudioService.deleteAudio(req.user.profileId, audioId);
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,

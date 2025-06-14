@@ -35,7 +35,7 @@ const getAllAudios = async (query: Record<string, unknown>) => {
 // Get All audios with QueryBuilder
 const getMyAudios = async (userId: string, query: Record<string, unknown>) => {
     const audioQuery = new QueryBuilder(
-        Audio.find({}).populate('audioTopic'),
+        Audio.find({ user: userId }).populate('audioTopic'),
         query
     )
         .search(['title', 'description'])
@@ -86,8 +86,8 @@ const updateAudio = async (
 };
 
 // Delete Audio
-const deleteAudio = async (audioId: string) => {
-    const audio = await Audio.findById(audioId);
+const deleteAudio = async (userId: string, audioId: string) => {
+    const audio = await Audio.findOne({ _id: audioId, user: userId });
     if (!audio) {
         throw new AppError(httpStatus.NOT_FOUND, 'Audio not found');
     }

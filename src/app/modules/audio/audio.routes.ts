@@ -56,7 +56,7 @@ router.patch(
 // Delete Audio
 router.delete(
     '/delete-audio/:audioId',
-    auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+    auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
     AudioController.deleteAudio
 );
 
