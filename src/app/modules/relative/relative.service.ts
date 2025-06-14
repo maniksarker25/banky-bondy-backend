@@ -76,7 +76,7 @@ const updateRelative = async (
     return updatedRelative;
 };
 
-// Delete Relative
+// Delete Relative----
 const deleteRelative = async (userId: string, relativeId: string) => {
     const relative = await Relative.findOne({ user: userId, _id: relativeId });
     if (!relative) {
