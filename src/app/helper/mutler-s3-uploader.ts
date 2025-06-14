@@ -31,7 +31,8 @@ export const uploadFile = () => {
             'player_image',
             'player_bg_image',
             'reward_image',
-            'video',
+            'audio',
+            'audio_cover',
             'thumbnail',
             'chat_images',
             'chat_videos',
@@ -61,7 +62,17 @@ export const uploadFile = () => {
                 file.mimetype === 'video/x-flv' ||
                 file.mimetype === 'video/3gpp' ||
                 file.mimetype === 'video/3gpp2' ||
-                file.mimetype === 'video/x-matroska'
+                file.mimetype === 'video/x-matroska' ||
+                file.mimetype === 'audio/mpeg' ||
+                file.mimetype === 'audio/mp3' ||
+                file.mimetype === 'audio/wav' ||
+                file.mimetype === 'audio/x-wav' ||
+                file.mimetype === 'audio/ogg' ||
+                file.mimetype === 'audio/webm' ||
+                file.mimetype === 'audio/aac' ||
+                file.mimetype === 'audio/flac' ||
+                file.mimetype === 'audio/x-m4a' ||
+                file.mimetype === 'audio/mp4'
             ) {
                 cb(null, true);
             } else {
@@ -99,10 +110,10 @@ export const uploadFile = () => {
                 uploadPath = 'uploads/images/team_bg_image';
             } else if (file.fieldname === 'player_image') {
                 uploadPath = 'uploads/images/player_image';
-            } else if (file.fieldname === 'class_banner') {
-                uploadPath = 'uploads/images/class_banner';
-            } else if (file.fieldname === 'course_banner') {
-                uploadPath = 'uploads/images/course_banner';
+            } else if (file.fieldname === 'audio_cover') {
+                uploadPath = 'uploads/images/audio_cover';
+            } else if (file.fieldname === 'audio') {
+                uploadPath = 'uploads/audios';
             } else if (file.fieldname === 'thumbnail') {
                 uploadPath = 'uploads/images/thumbnail';
             } else if (file.fieldname === 'topic_image') {
@@ -142,8 +153,8 @@ export const uploadFile = () => {
         { name: 'class_banner', maxCount: 1 },
         { name: 'player_bg_image', maxCount: 1 },
         { name: 'banner', maxCount: 1 },
-        { name: 'course_banner', maxCount: 1 },
-        { name: 'video', maxCount: 5 },
+        { name: 'audio_cover', maxCount: 1 },
+        { name: 'audio', maxCount: 1 },
         { name: 'chat_videos', maxCount: 2 },
         { name: 'chat_images', maxCount: 7 },
         { name: 'topic_icon', maxCount: 1 },

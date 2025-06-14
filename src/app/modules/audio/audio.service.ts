@@ -3,6 +3,7 @@ import AppError from '../../error/appError';
 import QueryBuilder from '../../builder/QueryBuilder';
 import Audio from './audio.model';
 import { IAudio } from './audio.interface';
+import { deleteFileFromS3 } from '../../helper/deleteFromS3';
 
 // Create Audio
 const createAudio = async (userId: string, payload: IAudio) => {
@@ -74,6 +75,13 @@ const updateAudio = async (
     const updatedAudio = await Audio.findByIdAndUpdate(audioId, payload, {
         new: true,
     });
+
+    if (payload.audio_url && audio.audio_url) {
+        deleteFileFromS3(audio.audio_url);
+    }
+    if (payload.cover_image && audio.cover_image) {
+        deleteFileFromS3(audio.cover_image);
+    }
     return updatedAudio;
 };
 
@@ -84,6 +92,12 @@ const deleteAudio = async (audioId: string) => {
         throw new AppError(httpStatus.NOT_FOUND, 'Audio not found');
     }
     const result = await Audio.findByIdAndDelete(audioId);
+    if (audio.audio_url) {
+        deleteFileFromS3(audio.audio_url);
+    }
+    if (audio.cover_image) {
+        deleteFileFromS3(audio.cover_image);
+    }
     return result;
 };
 
