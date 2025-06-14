@@ -29,7 +29,10 @@ const audioBookmarkAddDelete = async (profileId: string, audioId: string) => {
 
 // get bookmark from db
 const getMyBookmarkFromDB = async (profileId: string) => {
-    const result = await AudioBookmark.find({ user: profileId });
+    const result = await AudioBookmark.find({ user: profileId }).populate({
+        path: 'audio',
+        populate: { path: 'audioTopic' },
+    });
     return result;
 };
 

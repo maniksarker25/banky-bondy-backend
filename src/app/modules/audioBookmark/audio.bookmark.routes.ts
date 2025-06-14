@@ -6,7 +6,7 @@ import productBookmarkController from './audio.bookmark.controller';
 const router = express.Router();
 
 router.post(
-    '/add-delete-audio-bookmark/:id',
+    '/add-delete/:id',
     auth(USER_ROLE.user),
     productBookmarkController.audioBookmarkAddDelete
 );
