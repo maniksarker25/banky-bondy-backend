@@ -4,6 +4,8 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import Project from './project.model';
 import { IProject } from './project.interface';
 import { deleteFileFromS3 } from '../../helper/deleteFromS3';
+import ProjectMember from '../projectMember/projectMember.model';
+import ProjectJoinRequest from '../projectJoinRequest/projectJoinRequest.model';
 
 // Create Project
 const createProject = async (userId: string, payload: IProject) => {
@@ -86,7 +88,8 @@ const deleteProject = async (projectId: string) => {
         throw new AppError(httpStatus.NOT_FOUND, 'Project not found');
     }
     const result = await Project.findByIdAndDelete(projectId);
-
+    await ProjectMember.deleteMany({ project: projectId });
+    await ProjectJoinRequest.deleteMany({ project: projectId });
     if (project.cover_image) {
         deleteFileFromS3(project.cover_image);
     }
