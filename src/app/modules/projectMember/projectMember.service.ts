@@ -31,6 +31,7 @@ import ProjectMember from './projectMember.model';
 // };
 
 import { Types } from 'mongoose';
+import NormalUser from '../normalUser/normalUser.model';
 
 const getAllProjectMember = async (
     projectId: string,
@@ -117,6 +118,10 @@ const addMember = async (
     const project = await Project.findOne({ ower: profileId, _id: projectId });
     if (!project) {
         throw new AppError(httpStatus.NOT_FOUND, 'This is not your project');
+    }
+    const userExist = await NormalUser.exists({ _id: payload.user });
+    if (!userExist) {
+        throw new AppError(httpStatus.NOT_FOUND, 'User not found');
     }
     const result = await ProjectMember.findOneAndUpdate(
         { project: projectId, user: payload.user },
