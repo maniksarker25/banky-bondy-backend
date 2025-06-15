@@ -10,6 +10,8 @@ export interface IAudio {
     tags: string[];
     totalPlay: number;
     duration: number;
+    totalRating: number;
+    ratingCount: number;
     createdAt?: Date;
     updatedAt?: Date;
 }
