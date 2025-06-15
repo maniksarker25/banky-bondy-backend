@@ -39,7 +39,7 @@ export const uploadFile = () => {
             'product_image',
             'course_banner',
             'banner',
-            'class_banner',
+            'playlist_cover',
             'topic_image',
         ];
 
@@ -108,8 +108,8 @@ export const uploadFile = () => {
                 uploadPath = 'uploads/images/banner_image';
             } else if (file.fieldname === 'team_bg_image') {
                 uploadPath = 'uploads/images/team_bg_image';
-            } else if (file.fieldname === 'player_image') {
-                uploadPath = 'uploads/images/player_image';
+            } else if (file.fieldname === 'playlist_cover') {
+                uploadPath = 'uploads/images/playlist_cover';
             } else if (file.fieldname === 'audio_cover') {
                 uploadPath = 'uploads/images/audio_cover';
             } else if (file.fieldname === 'audio') {
@@ -159,6 +159,7 @@ export const uploadFile = () => {
         { name: 'chat_images', maxCount: 7 },
         { name: 'topic_icon', maxCount: 1 },
         { name: 'topic_image', maxCount: 1 },
+        { name: 'playlist_cover', maxCount: 1 },
     ]);
 
     return upload;

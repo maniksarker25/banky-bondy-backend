@@ -14,7 +14,11 @@ const createPlaylist = async (userId: string, payload: IPlaylist) => {
 // Get All Playlists with QueryBuilder
 const getAllPlaylists = async (query: Record<string, unknown>) => {
     const playlistQuery = new QueryBuilder(
-        Playlist.find().populate('user').populate('audios'),
+        Playlist.find().populate({
+            path: 'user',
+            select: 'name profile_image',
+        }),
+        // .populate('audios'),
         query
     )
         .search(['name', 'description'])
@@ -58,7 +62,7 @@ const getMyPlaylists = async (
 // Get Playlist by ID
 const getPlaylistById = async (playlistId: string) => {
     const playlist = await Playlist.findById(playlistId)
-        .populate('user')
+        .populate({ path: 'user', select: 'name profile_image' })
         .populate('audios');
     if (!playlist) {
         throw new AppError(httpStatus.NOT_FOUND, 'Playlist not found');
@@ -90,8 +94,8 @@ const updatePlaylist = async (
 };
 
 // Delete Playlist
-const deletePlaylist = async (playlistId: string) => {
-    const playlist = await Playlist.findById(playlistId);
+const deletePlaylist = async (userId: string, playlistId: string) => {
+    const playlist = await Playlist.findOne({ user: userId, _id: playlistId });
     if (!playlist) {
         throw new AppError(httpStatus.NOT_FOUND, 'Playlist not found');
     }

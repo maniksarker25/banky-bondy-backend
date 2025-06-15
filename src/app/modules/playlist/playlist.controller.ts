@@ -81,7 +81,10 @@ const updatePlaylist = catchAsync(async (req, res) => {
 // Delete Playlist
 const deletePlaylist = catchAsync(async (req, res) => {
     const { playlistId } = req.params;
-    const result = await PlaylistService.deletePlaylist(playlistId);
+    const result = await PlaylistService.deletePlaylist(
+        req.user.profileId,
+        playlistId
+    );
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
