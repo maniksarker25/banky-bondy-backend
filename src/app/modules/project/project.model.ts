@@ -6,14 +6,14 @@ const projectSchema = new Schema<IProject>(
     {
         name: { type: String, required: true, trim: true },
         description: { type: String, required: true },
-        cover_image: { type: String },
+        cover_image: { type: String, required: true },
         isPublic: { type: Boolean, required: true },
         joinControll: {
             type: String,
             enum: Object.values(ENUM_JOIN_CONTROLL),
             default: ENUM_JOIN_CONTROLL.Public,
         },
-        ower: {
+        owner: {
             type: Schema.Types.ObjectId,
             ref: 'NormalUser',
             required: true,

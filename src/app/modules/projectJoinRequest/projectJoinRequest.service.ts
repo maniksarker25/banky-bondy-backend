@@ -7,6 +7,10 @@ import ProjectMember from '../projectMember/projectMember.model';
 import { ENUM_PROJECT_MUMBER_TYPE } from '../projectMember/projectMumber.enum';
 
 const sendJoinRequest = async (userId: string, projectId: string) => {
+    const project = await Project.exists({ _id: projectId });
+    if (!project) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Project not found');
+    }
     const result = await ProjectJoinRequest.create({
         user: userId,
         project: projectId,
@@ -25,7 +29,7 @@ const approveRejectRequest = async (
     }
 
     const project = await Project.findById(request.project);
-    if (project?.ower.toString() != userId) {
+    if (project?.owner.toString() != userId) {
         throw new AppError(
             httpStatus.NOT_FOUND,
             'This is not your project join request'

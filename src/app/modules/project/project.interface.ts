@@ -7,7 +7,7 @@ export interface IProject {
     cover_image?: string;
     isPublic: boolean;
     joinControll: (typeof ENUM_JOIN_CONTROLL)[keyof typeof ENUM_JOIN_CONTROLL];
-    ower: Types.ObjectId;
+    owner: Types.ObjectId;
     status: (typeof ENUM_PROJECT_STATUS)[keyof typeof ENUM_PROJECT_STATUS];
     createdAt?: Date;
     updatedAt?: Date;

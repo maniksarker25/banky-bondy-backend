@@ -9,7 +9,7 @@ import ProjectJoinRequest from '../projectJoinRequest/projectJoinRequest.model';
 
 // Create Project
 const createProject = async (userId: string, payload: IProject) => {
-    const result = await Project.create({ ...payload, ower: userId });
+    const result = await Project.create({ ...payload, owner: userId });
     return result;
 };
 
@@ -57,11 +57,21 @@ const getMyProjects = async (
 
 // Get Project by ID
 const getProjectById = async (projectId: string) => {
-    const project = await Project.findById(projectId).populate('ower');
+    const project = await Project.findById(projectId).populate({
+        path: 'owner',
+        select: 'name profile_image',
+    });
     if (!project) {
         throw new AppError(httpStatus.NOT_FOUND, 'Project not found');
     }
-    return project;
+    const totalParticipate = await ProjectMember.countDocuments({
+        project: projectId,
+    });
+
+    return {
+        ...project.toObject(),
+        totalParticipate,
+    };
 };
 
 // Update Project
