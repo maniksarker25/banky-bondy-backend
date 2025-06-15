@@ -103,6 +103,13 @@ const deleteAudio = async (userId: string, audioId: string) => {
 };
 
 const giveRating = async (userId: string, audioId: string, rating: number) => {
+    const ratingExist = await AudioRating.findOne({
+        user: userId,
+        audio: audioId,
+    });
+    if (ratingExist) {
+        throw new AppError(httpStatus.NOT_FOUND, 'You already rate that audio');
+    }
     const session = await mongoose.startSession();
 
     try {

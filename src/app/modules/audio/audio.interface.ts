@@ -15,3 +15,9 @@ export interface IAudio {
     createdAt?: Date;
     updatedAt?: Date;
 }
+
+export interface IAudioRating {
+    user: Types.ObjectId;
+    audio: Types.ObjectId;
+    rating: number;
+}
