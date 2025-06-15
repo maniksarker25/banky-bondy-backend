@@ -59,5 +59,10 @@ router.delete(
     auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
     AudioController.deleteAudio
 );
+router.delete(
+    '/give-rating/:audioId',
+    auth(USER_ROLE.user),
+    AudioController.giveRating
+);
 
 export const audioRoutes = router;

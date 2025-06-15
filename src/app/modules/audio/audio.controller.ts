@@ -98,6 +98,21 @@ const deleteAudio = catchAsync(async (req, res) => {
         data: result,
     });
 });
+// give rating
+const giveRating = catchAsync(async (req, res) => {
+    const { audioId } = req.params;
+    const result = await AudioService.giveRating(
+        req.user.profileId,
+        audioId,
+        req.body.rating
+    );
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Audio rating added successfully',
+        data: result,
+    });
+});
 
 const AudioController = {
     createAudio,
@@ -106,6 +121,7 @@ const AudioController = {
     updateAudio,
     deleteAudio,
     getMyAudios,
+    giveRating,
 };
 
 export default AudioController;

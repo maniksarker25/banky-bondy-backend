@@ -1,9 +1,10 @@
 import httpStatus from 'http-status';
 import AppError from '../../error/appError';
 import QueryBuilder from '../../builder/QueryBuilder';
-import Audio from './audio.model';
+import Audio, { AudioRating } from './audio.model';
 import { IAudio } from './audio.interface';
 import { deleteFileFromS3 } from '../../helper/deleteFromS3';
+import mongoose from 'mongoose';
 
 // Create Audio
 const createAudio = async (userId: string, payload: IAudio) => {
@@ -101,6 +102,32 @@ const deleteAudio = async (userId: string, audioId: string) => {
     return result;
 };
 
+const giveRating = async (userId: string, audioId: string, rating: number) => {
+    const session = await mongoose.startSession();
+
+    try {
+        session.startTransaction();
+
+        await AudioRating.create([{ user: userId, audio: audioId, rating }], {
+            session,
+        });
+
+        const result = await Audio.findByIdAndUpdate(
+            audioId,
+            { $inc: { ratingCount: 1, totalRating: rating } },
+            { new: true, session }
+        );
+
+        await session.commitTransaction();
+        return result;
+    } catch (error) {
+        await session.abortTransaction();
+        throw error;
+    } finally {
+        session.endSession();
+    }
+};
+
 const AudioService = {
     createAudio,
     getAllAudios,
@@ -108,6 +135,7 @@ const AudioService = {
     updateAudio,
     deleteAudio,
     getMyAudios,
+    giveRating,
 };
 
 export default AudioService;

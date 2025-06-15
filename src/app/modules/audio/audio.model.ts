@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Schema, model } from 'mongoose';
 import { IAudio } from './audio.interface';
 
@@ -34,6 +35,25 @@ const audioSchema = new Schema<IAudio>(
     { timestamps: true }
 );
 
-const Audio = model<IAudio>('Audio', audioSchema);
+const audioRatingSchema = new Schema<any>(
+    {
+        user: {
+            type: Schema.Types.ObjectId,
+            ref: 'NormalUser',
+            required: true,
+        },
+        rating: {
+            type: Number,
+            max: 5,
+            required: true,
+            min: 1,
+        },
+    },
+    {
+        timestamps: true,
+    }
+);
 
+const Audio = model<IAudio>('Audio', audioSchema);
+export const AudioRating = model<any>('AudioRating', audioRatingSchema);
 export default Audio;
