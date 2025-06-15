@@ -47,8 +47,8 @@ router.get(
 
 // Update Project
 router.patch(
-    '/update-project/:projectId',
-    auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+    '/update/:projectId',
+    auth(USER_ROLE.user),
     uploadFile(),
     (req: Request, res: Response, next: NextFunction) => {
         if (req.body.data) {
