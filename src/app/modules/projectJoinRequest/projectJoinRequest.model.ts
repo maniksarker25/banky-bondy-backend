@@ -23,9 +23,9 @@ const projectJoinRequestSchema = new Schema<IProjectJoinRequest>(
     { timestamps: true }
 );
 
-const ProjectJoinRequestModel = model<IProjectJoinRequest>(
+const ProjectJoinRequest = model<IProjectJoinRequest>(
     'ProjectJoinRequest',
     projectJoinRequestSchema
 );
 
-export default ProjectJoinRequestModel;
+export default ProjectJoinRequest;
