@@ -39,6 +39,7 @@ const approveRejectRequest = async (
             type: ENUM_PROJECT_MUMBER_TYPE.Consumer,
             role: 'Consumer',
         });
+        await ProjectJoinRequest.findByIdAndDelete(requestId);
         return result;
     } else if (status == ENUM_PROJECT_JOIN_REQEST_STATUS.Rejected) {
         const result = await ProjectJoinRequest.findByIdAndDelete(requestId);
@@ -46,9 +47,17 @@ const approveRejectRequest = async (
     }
 };
 
+const getJoinRequests = async (projectId: string) => {
+    const result = await ProjectJoinRequest.find({
+        project: projectId,
+    }).populate({ path: 'user', select: 'name profile_image' });
+    return result;
+};
+
 const ProjectJoinRequestServices = {
     sendJoinRequest,
     approveRejectRequest,
+    getJoinRequests,
 };
 
 export default ProjectJoinRequestServices;

@@ -9,7 +9,7 @@ import ProjectJoinRequestController from './projectJoinRequest.controller';
 const router = express.Router();
 
 router.post(
-    '/send-join-request/:id',
+    '/send-request/:id',
     auth(USER_ROLE.user),
     projectJoinRequestController.sendJoinRequest
 );
@@ -19,6 +19,12 @@ router.patch(
     auth(USER_ROLE.user),
     validateRequest(ProjectJoinRequestValidations.acceptRejectValidationSchema),
     ProjectJoinRequestController.approveRejectRequest
+);
+
+router.get(
+    '/get-join-requests/:id',
+    auth(USER_ROLE.user),
+    ProjectJoinRequestController.getJoinRequests
 );
 
 export const projectJoinRequestRoutes = router;

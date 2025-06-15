@@ -28,6 +28,21 @@ const approveRejectRequest = catchAsync(async (req, res) => {
         data: result,
     });
 });
+const getJoinRequests = catchAsync(async (req, res) => {
+    const result = await ProjectJoinRequestServices.getJoinRequests(
+        req.params.id
+    );
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: `Join requests retrieved successfully`,
+        data: result,
+    });
+});
 
-const ProjectJoinRequestController = { sendJoinRequest, approveRejectRequest };
+const ProjectJoinRequestController = {
+    sendJoinRequest,
+    approveRejectRequest,
+    getJoinRequests,
+};
 export default ProjectJoinRequestController;
