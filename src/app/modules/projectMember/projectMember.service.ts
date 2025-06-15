@@ -1,27 +1,110 @@
-import httpStatus from 'http-status';
-import AppError from '../../error/appError';
-import { IProjectMember } from './projectMember.interface';
-import projectMemberModel from './projectMember.model';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import ProjectMember from './projectMember.model';
 
-const updateUserProfile = async (
-    id: string,
-    payload: Partial<IProjectMember>
+// const getAllProjectMember = async (
+//     projectId: string,
+//     query: Record<string, unknown>
+// ) => {
+//     const mumberQuery = new QueryBuilder(
+//         ProjectMember.find({ project: projectId }).populate({
+//             path: 'user',
+//             select: 'name profile_image',
+//         }),
+//         query
+//     )
+//         .search(['user.name', 'description'])
+//         .filter()
+//         .sort()
+//         .paginate()
+//         .fields();
+
+//     const result = await mumberQuery.modelQuery;
+//     const meta = await mumberQuery.countTotal();
+
+//     return {
+//         meta,
+//         result,
+//     };
+// };
+
+import { Types } from 'mongoose';
+
+const getAllProjectMember = async (
+    projectId: string,
+    query: Record<string, any>
 ) => {
-    if (payload.email || payload.username) {
-        throw new AppError(
-            httpStatus.BAD_REQUEST,
-            'You cannot change the email or username'
-        );
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 10;
+    const skip = (page - 1) * limit;
+    const searchTerm = query.searchTerm || '';
+
+    const matchStage: any = {
+        project: new Types.ObjectId(projectId),
+    };
+    if (query.type) {
+        matchStage.type = query.type;
     }
-    const user = await projectMemberModel.findById(id);
-    if (!user) {
-        throw new AppError(httpStatus.NOT_FOUND, 'Profile not found');
-    }
-    return await projectMemberModel.findByIdAndUpdate(id, payload, {
-        new: true,
-        runValidators: true,
-    });
+
+    const searchMatchStage = searchTerm
+        ? {
+              'user.name': { $regex: searchTerm, $options: 'i' },
+          }
+        : {};
+
+    const pipeline: any[] = [
+        { $match: matchStage },
+        {
+            $lookup: {
+                from: 'normalusers',
+                localField: 'user',
+                foreignField: '_id',
+                as: 'user',
+            },
+        },
+        { $unwind: '$user' },
+        { $match: searchMatchStage },
+        {
+            $facet: {
+                meta: [{ $count: 'total' }],
+                result: [
+                    {
+                        $project: {
+                            _id: 1,
+                            project: 1,
+                            type: 1,
+                            role: 1,
+                            createdAt: 1,
+                            updatedAt: 1,
+                            user: {
+                                _id: '$user._id',
+                                name: '$user.name',
+                                profile_image: '$user.profile_image',
+                            },
+                        },
+                    },
+                    { $sort: { createdAt: -1 } },
+                    { $skip: skip },
+                    { $limit: limit },
+                ],
+            },
+        },
+    ];
+
+    const aggResult = await ProjectMember.aggregate(pipeline);
+    const result = aggResult[0]?.result || [];
+    const total = aggResult[0]?.meta[0]?.total || 0;
+    const totalPage = Math.ceil(total / limit);
+
+    return {
+        meta: {
+            page,
+            limit,
+            total,
+            totalPage,
+        },
+        result,
+    };
 };
 
-const ProjectMemberServices = { updateUserProfile };
+const ProjectMemberServices = { getAllProjectMember };
 export default ProjectMemberServices;

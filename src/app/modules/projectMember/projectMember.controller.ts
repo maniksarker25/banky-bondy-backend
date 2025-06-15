@@ -1,24 +1,20 @@
-import httpStatus from "http-status";
-import catchAsync from "../../utilities/catchasync";
-import sendResponse from "../../utilities/sendResponse";
-import projectMemberServices from "./projectMember.service";
+import httpStatus from 'http-status';
+import catchAsync from '../../utilities/catchasync';
+import sendResponse from '../../utilities/sendResponse';
+import projectMemberServices from './projectMember.service';
 
-const updateUserProfile = catchAsync(async (req, res) => {
-    const { files } = req;
-    if (files && typeof files === "object" && "profile_image" in files) {
-        req.body.profile_image = files["profile_image"][0].path;
-    }
-    const result = await projectMemberServices.updateUserProfile(
-        req.user.profileId,
-        req.body
+const getAllProjectMember = catchAsync(async (req, res) => {
+    const result = await projectMemberServices.getAllProjectMember(
+        req.params.id,
+        req.query
     );
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: "Profile updated successfully",
+        message: 'Profile updated successfully',
         data: result,
     });
 });
 
-const ProjectMemberController = { updateUserProfile };
+const ProjectMemberController = { getAllProjectMember };
 export default ProjectMemberController;

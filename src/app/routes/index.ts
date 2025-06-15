@@ -19,6 +19,7 @@ import { audioBookmarkRoutes } from '../modules/audioBookmark/audio.bookmark.rou
 import { playlistRoutes } from '../modules/playlist/playlist.routes';
 import { AdminRoutes } from '../modules/admin/admin.routes';
 import { projectJoinRequestRoutes } from '../modules/projectJoinRequest/projectJoinRequest.routes';
+import { projectMemberRoutes } from '../modules/projectMember/projectMember.routes';
 
 const router = Router();
 
@@ -105,6 +106,10 @@ const moduleRoutes = [
     {
         path: '/project-join-request',
         router: projectJoinRequestRoutes,
+    },
+    {
+        path: '/project-member',
+        router: projectMemberRoutes,
     },
 ];
 
