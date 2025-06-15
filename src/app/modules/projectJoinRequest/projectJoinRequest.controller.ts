@@ -15,6 +15,19 @@ const sendJoinRequest = catchAsync(async (req, res) => {
         data: result,
     });
 });
+const approveRejectRequest = catchAsync(async (req, res) => {
+    const result = await ProjectJoinRequestServices.approveRejectRequest(
+        req.user.profileId,
+        req.params.id,
+        req.body.status
+    );
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: `Join request ${req.body.status} successfully`,
+        data: result,
+    });
+});
 
-const ProjectJoinRequestController = { sendJoinRequest };
+const ProjectJoinRequestController = { sendJoinRequest, approveRejectRequest };
 export default ProjectJoinRequestController;

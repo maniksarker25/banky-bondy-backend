@@ -3,6 +3,8 @@ import AppError from '../../error/appError';
 import ProjectJoinRequest from './projectJoinRequest.model';
 import Project from '../project/project.model';
 import { ENUM_PROJECT_JOIN_REQEST_STATUS } from './projectJoinRequest.enum';
+import ProjectMember from '../projectMember/projectMember.model';
+import { ENUM_PROJECT_MUMBER_TYPE } from '../projectMember/projectMumber.enum';
 
 const sendJoinRequest = async (userId: string, projectId: string) => {
     const result = await ProjectJoinRequest.create({
@@ -30,13 +32,23 @@ const approveRejectRequest = async (
         );
     }
 
-    // if(status == ENUM_PROJECT_JOIN_REQEST_STATUS.Approved){
-    //     const result = await
-    // }
+    if (status == ENUM_PROJECT_JOIN_REQEST_STATUS.Approved) {
+        const result = await ProjectMember.create({
+            user: request.user,
+            project: request.project,
+            type: ENUM_PROJECT_MUMBER_TYPE.Consumer,
+            role: 'Consumer',
+        });
+        return result;
+    } else if (status == ENUM_PROJECT_JOIN_REQEST_STATUS.Rejected) {
+        const result = await ProjectJoinRequest.findByIdAndDelete(requestId);
+        return result;
+    }
 };
 
 const ProjectJoinRequestServices = {
     sendJoinRequest,
+    approveRejectRequest,
 };
 
 export default ProjectJoinRequestServices;

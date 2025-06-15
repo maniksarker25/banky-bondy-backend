@@ -1,12 +1,16 @@
-import { z } from "zod";
+import { z } from 'zod';
+import { ENUM_PROJECT_JOIN_REQEST_STATUS } from './projectJoinRequest.enum';
 
-export const updateProjectJoinRequestData = z.object({
+export const acceptRejectValidationSchema = z.object({
     body: z.object({
-        name: z.string().optional(),
-        phone: z.string().optional(),
-        address: z.string().optional(),
+        status: z.enum(
+            Object.values(ENUM_PROJECT_JOIN_REQEST_STATUS) as [
+                string,
+                ...string[],
+            ]
+        ),
     }),
 });
 
-const ProjectJoinRequestValidations = { updateProjectJoinRequestData };
+const ProjectJoinRequestValidations = { acceptRejectValidationSchema };
 export default ProjectJoinRequestValidations;

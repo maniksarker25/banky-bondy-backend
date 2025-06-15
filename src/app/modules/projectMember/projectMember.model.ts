@@ -6,12 +6,12 @@ const projectMemberSchema = new Schema<IProjectMember>(
     {
         user: {
             type: Schema.Types.ObjectId,
-            ref: 'normalusers',
+            ref: 'NormalUser',
             required: true,
         },
         project: {
             type: Schema.Types.ObjectId,
-            ref: 'projects',
+            ref: 'Project',
             required: true,
         },
         type: {
