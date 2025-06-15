@@ -62,8 +62,8 @@ router.patch(
 
 // Delete Project
 router.delete(
-    '/delete-project/:projectId',
-    auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+    '/delete/:projectId',
+    auth(USER_ROLE.user),
     ProjectController.deleteProject
 );
 

@@ -82,8 +82,8 @@ const updateProject = async (projectId: string, payload: Partial<IProject>) => {
 };
 
 // Delete Project
-const deleteProject = async (projectId: string) => {
-    const project = await Project.findById(projectId);
+const deleteProject = async (userId: string, projectId: string) => {
+    const project = await Project.findOne({ _id: projectId, ower: userId });
     if (!project) {
         throw new AppError(httpStatus.NOT_FOUND, 'Project not found');
     }
