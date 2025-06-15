@@ -6,8 +6,8 @@ import { IProject } from './project.interface';
 import { deleteFileFromS3 } from '../../helper/deleteFromS3';
 
 // Create Project
-const createProject = async (payload: IProject) => {
-    const result = await Project.create(payload);
+const createProject = async (userId: string, payload: IProject) => {
+    const result = await Project.create({ ...payload, ower: userId });
     return result;
 };
 

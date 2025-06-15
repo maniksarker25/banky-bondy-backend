@@ -11,7 +11,7 @@ const router = express.Router();
 
 // Create Project
 router.post(
-    '/create-project',
+    '/create',
     auth(USER_ROLE.user),
     uploadFile(),
     (req: Request, res: Response, next: NextFunction) => {

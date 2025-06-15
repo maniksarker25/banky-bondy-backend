@@ -11,7 +11,10 @@ const createProject = catchAsync(async (req, res) => {
     if (req.files?.project_cover) {
         req.body.cover_image = getCloudFrontUrl(file[0].key);
     }
-    const result = await ProjectService.createProject(req.body);
+    const result = await ProjectService.createProject(
+        req.user.profileId,
+        req.body
+    );
     sendResponse(res, {
         statusCode: httpStatus.CREATED,
         success: true,
