@@ -16,5 +16,19 @@ const getAllProjectMember = catchAsync(async (req, res) => {
     });
 });
 
-const ProjectMemberController = { getAllProjectMember };
+const addMember = catchAsync(async (req, res) => {
+    const result = await projectMemberServices.addMember(
+        req.user.profileId,
+        req.params.id,
+        req.body
+    );
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Member added successfully',
+        data: result,
+    });
+});
+
+const ProjectMemberController = { getAllProjectMember, addMember };
 export default ProjectMemberController;

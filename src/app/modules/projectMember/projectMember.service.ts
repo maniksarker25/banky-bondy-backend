@@ -1,4 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import httpStatus from 'http-status';
+import AppError from '../../error/appError';
+import Project from '../project/project.model';
 import ProjectMember from './projectMember.model';
 
 // const getAllProjectMember = async (
@@ -106,5 +109,22 @@ const getAllProjectMember = async (
     };
 };
 
-const ProjectMemberServices = { getAllProjectMember };
+const addMember = async (
+    profileId: string,
+    projectId: string,
+    payload: any
+) => {
+    const project = await Project.findOne({ ower: profileId, _id: projectId });
+    if (!project) {
+        throw new AppError(httpStatus.NOT_FOUND, 'This is not your project');
+    }
+    const result = await ProjectMember.findOneAndUpdate(
+        { project: projectId, user: payload.user },
+        { project: projectId, ...payload },
+        { new: true, upsert: true, setDefaultsOnInsert: true }
+    );
+    return result;
+};
+
+const ProjectMemberServices = { getAllProjectMember, addMember };
 export default ProjectMemberServices;

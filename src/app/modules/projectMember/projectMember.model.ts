@@ -19,7 +19,7 @@ const projectMemberSchema = new Schema<IProjectMember>(
             enum: Object.values(ENUM_PROJECT_MUMBER_TYPE),
             required: true,
         },
-        role: { type: String, required: true },
+        role: { type: String, default: 'Consumer' },
     },
     { timestamps: true }
 );
