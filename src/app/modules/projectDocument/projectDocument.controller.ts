@@ -1,10 +1,17 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import sendResponse from '../../utilities/sendResponse';
 import projectDocumentServices from './projectDocument.service';
 import catchAsync from '../../utilities/catchasync';
+import { getCloudFrontUrl } from '../../helper/mutler-s3-uploader';
 
 const createProjectDocument = catchAsync(async (req, res) => {
+    const file: any = req.files?.project_ducument;
+    if (req.files?.project_ducument) {
+        req.body.document_url = getCloudFrontUrl(file[0].key);
+    }
     const result = await projectDocumentServices.createProjectDocument(
+        req.user.profileId,
         req.body
     );
     sendResponse(res, {
@@ -29,7 +36,12 @@ const getAllProjectDocuments = catchAsync(async (req, res) => {
 
 const updateProjectDocument = catchAsync(async (req, res) => {
     const { id } = req.params;
+    const file: any = req.files?.project_ducument;
+    if (req.files?.project_ducument) {
+        req.body.document_url = getCloudFrontUrl(file[0].key);
+    }
     const result = await projectDocumentServices.updateProjectDocument(
+        req.user.profileId,
         id,
         req.body
     );
@@ -43,7 +55,10 @@ const updateProjectDocument = catchAsync(async (req, res) => {
 
 const deleteProjectDocument = catchAsync(async (req, res) => {
     const { id } = req.params;
-    const result = await projectDocumentServices.deleteProjectDocument(id);
+    const result = await projectDocumentServices.deleteProjectDocument(
+        req.user.profileId,
+        id
+    );
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,

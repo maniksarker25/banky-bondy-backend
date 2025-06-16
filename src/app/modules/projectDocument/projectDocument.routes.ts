@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.post(
     '/create-project-document',
-    auth(USER_ROLE.superAdmin),
+    auth(USER_ROLE.user),
     uploadFile(),
     (req: Request, res: Response, next: NextFunction) => {
         if (req.body.data) {
