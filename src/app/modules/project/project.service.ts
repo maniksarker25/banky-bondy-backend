@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import AppError from '../../error/appError';
 import QueryBuilder from '../../builder/QueryBuilder';
@@ -6,11 +7,44 @@ import { IProject } from './project.interface';
 import { deleteFileFromS3 } from '../../helper/deleteFromS3';
 import ProjectMember from '../projectMember/projectMember.model';
 import ProjectJoinRequest from '../projectJoinRequest/projectJoinRequest.model';
+import Conversation from '../conversation/conversation.model';
+import mongoose from 'mongoose';
+import { ENUM_CONVERSATION_TYPE } from '../conversation/conversation.enum';
 
 // Create Project
 const createProject = async (userId: string, payload: IProject) => {
-    const result = await Project.create({ ...payload, owner: userId });
-    return result;
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+        const result = await Project.create([{ ...payload, owner: userId }], {
+            session,
+        });
+        await Conversation.create(
+            [
+                {
+                    participants: [userId],
+                    lastMessage: null,
+                    type: ENUM_CONVERSATION_TYPE.group,
+                    institution: null,
+                    project: result[0]._id,
+                    chatGroup: null,
+                },
+            ],
+            { session }
+        );
+
+        await session.commitTransaction();
+        session.endSession();
+        return result[0];
+    } catch (error: any) {
+        await session.abortTransaction();
+        session.endSession();
+        throw new AppError(
+            httpStatus.NOT_FOUND,
+            `${error.message}` || 'Something went wrong'
+        );
+    }
 };
 
 // Get All Projects with filtering, search, pagination, etc.

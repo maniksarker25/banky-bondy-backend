@@ -32,6 +32,7 @@ import ProjectMember from './projectMember.model';
 
 import { Types } from 'mongoose';
 import NormalUser from '../normalUser/normalUser.model';
+import Conversation from '../conversation/conversation.model';
 
 const getAllProjectMember = async (
     projectId: string,
@@ -128,6 +129,11 @@ const addMember = async (
         { project: projectId, ...payload },
         { new: true, upsert: true, setDefaultsOnInsert: true }
     );
+
+    await Conversation.findOneAndUpdate(
+        { project: projectId },
+        { $addToSet: { participants: payload.user } }
+    );
     return result;
 };
 
@@ -137,6 +143,11 @@ const removeMember = async (id: string) => {
         throw new AppError(httpStatus.NOT_FOUND, 'Member not found');
     }
     const result = await ProjectMember.findByIdAndDelete(id);
+    await Conversation.findOneAndUpdate(
+        { project: member.project },
+        { $pull: { participants: member.user } },
+        { new: true }
+    );
     return result;
 };
 
