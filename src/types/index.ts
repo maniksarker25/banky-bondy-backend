@@ -23,6 +23,7 @@ declare namespace Express {
             project_cover?: File[];
             playlist_cover?: File[];
             project_ducument?: File[];
+            project_image?: File[];
         };
     }
 }
