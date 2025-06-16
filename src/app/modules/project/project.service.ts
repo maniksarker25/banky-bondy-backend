@@ -47,24 +47,265 @@ const createProject = async (userId: string, payload: IProject) => {
     }
 };
 
-// Get All Projects with filtering, search, pagination, etc.
-const getAllProjects = async (query: Record<string, unknown>) => {
-    // Let's assume we search on 'name' and 'description'
-    const projectQuery = new QueryBuilder(
-        Project.find().populate('owner'),
-        query
-    )
-        .search(['name', 'description'])
-        .filter()
-        .sort()
-        .paginate()
-        .fields();
+// const getAllProjects = async (query: Record<string, unknown>) => {
+//     const projectQuery = new QueryBuilder(
+//         Project.find().populate({
+//             path: 'owner',
+//             select: 'name profile_image',
+//         }),
+//         query
+//     )
+//         .search(['name', 'description'])
+//         .filter()
+//         .sort()
+//         .paginate()
+//         .fields();
 
-    const result = await projectQuery.modelQuery;
-    const meta = await projectQuery.countTotal();
+//     const result = await projectQuery.modelQuery;
+//     const meta = await projectQuery.countTotal();
+
+//     return {
+//         meta,
+//         result,
+//     };
+// };
+
+// const getAllProjects = async (query: Record<string, unknown>) => {
+//     const page = Number(query.page) || 1;
+//     const limit = Number(query.limit) || 10;
+//     const skip = (page - 1) * limit;
+
+//     const searchTerm = query.searchTerm || '';
+
+//     const filters: any = {};
+
+//     Object.keys(query).forEach((key) => {
+//         // Exclude `searchTerm`, `page`, and `limit` from filters
+//         if (
+//             !['searchTerm', 'page', 'limit'].includes(key) &&
+//             query[key] !== undefined
+//         ) {
+//             filters[key] = query[key];
+//         }
+//     });
+
+//     // Create the aggregation pipeline
+//     const pipeline: any[] = [
+//         {
+//             $match: {
+//                 ...filters,
+//                 $or: [
+//                     { name: { $regex: searchTerm, $options: 'i' } },
+//                     { description: { $regex: searchTerm, $options: 'i' } },
+//                 ],
+//             },
+//         },
+
+//         // Lookup to populate the owner details
+//         {
+//             $lookup: {
+//                 from: 'normalusers',
+//                 localField: 'owner',
+//                 foreignField: '_id',
+//                 as: 'owner',
+//             },
+//         },
+
+//         // Unwind the 'owner' array (since it's a single object, it will turn into a single entry)
+//         { $unwind: '$owner' },
+
+//         // Lookup to calculate the total number of participants for each project
+//         {
+//             $lookup: {
+//                 from: 'projectmembers',
+//                 localField: '_id',
+//                 foreignField: 'project',
+//                 as: 'participants',
+//             },
+//         },
+
+//         // Add a field 'totalParticipate' to count the number of participants
+//         {
+//             $addFields: {
+//                 totalParticipate: { $size: '$participants' },
+//             },
+//         },
+
+//         // Select the fields you want to return, including owner details and total participants
+//         {
+//             $project: {
+//                 _id: 1,
+//                 name: 1,
+//                 description: 1,
+//                 status: 1,
+//                 isPublic: 1,
+//                 joinControll: 1,
+//                 createdAt: 1,
+//                 updatedAt: 1,
+//                 cover_image: 1,
+//                 totalParticipate: 1,
+//                 'owner._id': 1,
+//                 'owner.name': 1,
+//                 'owner.profile_image': 1,
+//             },
+//         },
+
+//         // Sorting (default is by 'createdAt' in descending order)
+//         { $sort: { createdAt: -1 } },
+
+//         // Pagination
+//         { $skip: skip },
+//         { $limit: limit },
+
+//         // Count total projects for pagination
+//         {
+//             $facet: {
+//                 meta: [{ $count: 'total' }],
+//                 result: [],
+//             },
+//         },
+//     ];
+
+//     // Execute the aggregation pipeline
+//     const aggResult = await Project.aggregate(pipeline);
+
+//     // Get results and total count
+//     const result = aggResult[0]?.result || [];
+//     const total = aggResult[0]?.meta[0]?.total || 0;
+//     const totalPage = Math.ceil(total / limit);
+
+//     return {
+//         meta: {
+//             page,
+//             limit,
+//             total,
+//             totalPage,
+//         },
+//         result,
+//     };
+// };
+const getAllProjects = async (userId: string, query: Record<string, any>) => {
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 10;
+    const skip = (page - 1) * limit;
+    const searchTerm = query.searchTerm || '';
+
+    // Filters: Add more filters based on project fields (excluding pagination and search)
+    const filters: any = {};
+    if (query.isPublic) {
+        if (query.isPublic == 'true') {
+            query.isPublic = true;
+        } else {
+            query.isPublic = false;
+        }
+    }
+
+    Object.keys(query).forEach((key) => {
+        if (
+            ![
+                'searchTerm',
+                'page',
+                'limit',
+                'myProject',
+                'joinProject',
+            ].includes(key)
+        ) {
+            filters[key] = query[key];
+        }
+    });
+
+    // If query.myProject is passed, fetch projects owned by the user
+    const matchStage: any = {};
+    if (query.myProject) {
+        matchStage.owner = new mongoose.Types.ObjectId(userId); // Only user's owned projects
+    }
+
+    // If query.joinProject is passed, fetch projects where the user is a member
+    if (query.joinProject) {
+        const joinedProjects = await ProjectMember.find({
+            user: userId,
+        }).select('project');
+        const joinedProjectIds = joinedProjects.map((member) => member.project);
+
+        matchStage._id = { $in: joinedProjectIds }; // Only user's joined projects
+    }
+
+    // Include search term to search by name and description
+    const searchMatchStage = searchTerm
+        ? {
+              $or: [
+                  { name: { $regex: searchTerm, $options: 'i' } },
+                  { description: { $regex: searchTerm, $options: 'i' } },
+              ],
+          }
+        : {};
+
+    // Aggregation pipeline
+    const pipeline: any[] = [
+        { $match: { ...matchStage, ...filters, ...searchMatchStage } },
+
+        // Lookup to populate owner details
+        {
+            $lookup: {
+                from: 'normalusers', // Assuming 'normalusers' is the collection for users
+                localField: 'owner', // Project's 'owner' field references the user
+                foreignField: '_id',
+                as: 'owner',
+            },
+        },
+
+        // Unwind the 'owner' array (since it's a single object, it will turn into a single entry)
+        { $unwind: '$owner' },
+
+        // Select only the necessary fields
+        {
+            $project: {
+                _id: 1,
+                name: 1,
+                description: 1,
+                status: 1,
+                isPublic: 1,
+                joinControll: 1,
+                createdAt: 1,
+                updatedAt: 1,
+                cover_image: 1,
+                'owner._id': 1,
+                'owner.name': 1,
+                'owner.profile_image': 1,
+            },
+        },
+
+        // Sort by createdAt (descending by default)
+        { $sort: { createdAt: -1 } },
+
+        // Pagination (skip and limit)
+        { $skip: skip },
+        { $limit: limit },
+
+        // Count total projects for pagination
+        {
+            $facet: {
+                meta: [{ $count: 'total' }],
+                result: [],
+            },
+        },
+    ];
+
+    // Execute the aggregation pipeline
+    const aggResult = await Project.aggregate(pipeline);
+
+    // Get results and total count
+    const result = aggResult[0]?.result || [];
+    const total = aggResult[0]?.meta[0]?.total || 0;
+    const totalPage = Math.ceil(total / limit);
 
     return {
-        meta,
+        meta: {
+            page,
+            limit,
+            total,
+            totalPage,
+        },
         result,
     };
 };
