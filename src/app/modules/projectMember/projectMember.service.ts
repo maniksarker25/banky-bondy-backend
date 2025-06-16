@@ -131,5 +131,14 @@ const addMember = async (
     return result;
 };
 
-const ProjectMemberServices = { getAllProjectMember, addMember };
+const removeMember = async (id: string) => {
+    const member = await ProjectMember.findById(id);
+    if (!member) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Member not found');
+    }
+    const result = await ProjectMember.findByIdAndDelete(id);
+    return result;
+};
+
+const ProjectMemberServices = { getAllProjectMember, addMember, removeMember };
 export default ProjectMemberServices;

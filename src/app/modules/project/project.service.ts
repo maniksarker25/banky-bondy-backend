@@ -17,7 +17,7 @@ const createProject = async (userId: string, payload: IProject) => {
 const getAllProjects = async (query: Record<string, unknown>) => {
     // Let's assume we search on 'name' and 'description'
     const projectQuery = new QueryBuilder(
-        Project.find().populate('ower'),
+        Project.find().populate('owner'),
         query
     )
         .search(['name', 'description'])

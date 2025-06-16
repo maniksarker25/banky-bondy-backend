@@ -19,5 +19,10 @@ router.post(
     validateRequest(ProjectMemberValidations.addMemberValidationSchema),
     projectMemberController.addMember
 );
+router.delete(
+    '/remove-member/:id',
+    auth(USER_ROLE.user),
+    projectMemberController.removeMember
+);
 
 export const projectMemberRoutes = router;

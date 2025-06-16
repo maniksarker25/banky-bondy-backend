@@ -29,6 +29,19 @@ const addMember = catchAsync(async (req, res) => {
         data: result,
     });
 });
+const removeMember = catchAsync(async (req, res) => {
+    const result = await projectMemberServices.removeMember(req.params.id);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Member removed successfully',
+        data: result,
+    });
+});
 
-const ProjectMemberController = { getAllProjectMember, addMember };
+const ProjectMemberController = {
+    getAllProjectMember,
+    addMember,
+    removeMember,
+};
 export default ProjectMemberController;
