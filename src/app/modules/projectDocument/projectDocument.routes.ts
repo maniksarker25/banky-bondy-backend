@@ -7,7 +7,7 @@ import { uploadFile } from '../../helper/mutler-s3-uploader';
 const router = express.Router();
 
 router.post(
-    '/create-project-document',
+    '/create',
     auth(USER_ROLE.user),
     uploadFile(),
     (req: Request, res: Response, next: NextFunction) => {
@@ -19,14 +19,12 @@ router.post(
     projectDocumentController.createProjectDocument
 );
 
-router.get(
-    '/get-all-project-documents',
-    projectDocumentController.getAllProjectDocuments
-);
+router.get('/get-all', projectDocumentController.getAllProjectDocuments);
 
 router.patch(
-    '/update-project-document/:id',
-    auth(USER_ROLE.superAdmin),
+    '/update/:id',
+    auth(USER_ROLE.user),
+
     uploadFile(),
     (req: Request, res: Response, next: NextFunction) => {
         if (req.body.data) {
@@ -38,8 +36,9 @@ router.patch(
 );
 
 router.delete(
-    '/delete-project-document/:id',
-    auth(USER_ROLE.superAdmin),
+    '/delete/:id',
+    auth(USER_ROLE.user),
+
     projectDocumentController.deleteProjectDocument
 );
 
