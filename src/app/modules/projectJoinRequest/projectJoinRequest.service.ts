@@ -5,6 +5,7 @@ import Project from '../project/project.model';
 import { ENUM_PROJECT_JOIN_REQEST_STATUS } from './projectJoinRequest.enum';
 import ProjectMember from '../projectMember/projectMember.model';
 import { ENUM_PROJECT_MUMBER_TYPE } from '../projectMember/projectMumber.enum';
+import Conversation from '../conversation/conversation.model';
 
 const sendJoinRequest = async (userId: string, projectId: string) => {
     const project = await Project.exists({ _id: projectId });
@@ -44,6 +45,10 @@ const approveRejectRequest = async (
             role: 'Consumer',
         });
         await ProjectJoinRequest.findByIdAndDelete(requestId);
+        await Conversation.findOneAndUpdate(
+            { project: request.project },
+            { $addToSet: { participants: request.user } }
+        );
         return result;
     } else if (status == ENUM_PROJECT_JOIN_REQEST_STATUS.Rejected) {
         const result = await ProjectJoinRequest.findByIdAndDelete(requestId);
