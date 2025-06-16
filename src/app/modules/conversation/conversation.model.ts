@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { IConversation } from './conversation.interface'; // Importing the interface
+import { ENUM_CONVERSATION_TYPE } from './conversation.enum';
 
 const conversationSchema = new Schema<IConversation>(
     {
@@ -15,7 +16,7 @@ const conversationSchema = new Schema<IConversation>(
         },
         type: {
             type: String,
-            enum: ['one-to-one', 'group'],
+            enum: Object.values(ENUM_CONVERSATION_TYPE),
             required: true,
         },
         institution: {
@@ -37,9 +38,6 @@ const conversationSchema = new Schema<IConversation>(
     { timestamps: true }
 );
 
-const ConversationModel = model<IConversation>(
-    'Conversation',
-    conversationSchema
-);
+const Conversation = model<IConversation>('Conversation', conversationSchema);
 
-export default ConversationModel;
+export default Conversation;
