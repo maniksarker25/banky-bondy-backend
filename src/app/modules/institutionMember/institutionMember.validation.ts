@@ -1,10 +1,10 @@
-import { z } from "zod";
+import { z } from 'zod';
+import { ENUM_GROUP } from './institutionMember.enum';
 
 export const updateInstitutionMemberData = z.object({
     body: z.object({
-        name: z.string().optional(),
-        phone: z.string().optional(),
-        address: z.string().optional(),
+        group: z.enum(Object.values(ENUM_GROUP) as [string, ...string[]]),
+        designation: z.string({ required_error: 'Designation is required' }),
     }),
 });
 
