@@ -3,6 +3,16 @@ import { IInstitutionConversation } from './institutionConversation.interface';
 
 const institutionConversationSchema = new Schema<IInstitutionConversation>(
     {
+        user: {
+            type: Schema.Types.ObjectId,
+            ref: 'NormalUser',
+            required: true,
+        },
+        institution: {
+            type: Schema.Types.ObjectId,
+            ref: 'Institution',
+            required: true,
+        },
         name: { type: String, required: true },
         isPublic: { type: Boolean, required: true },
         ussers: [{ type: Schema.Types.ObjectId, ref: 'NormalUser' }],

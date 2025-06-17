@@ -16,10 +16,14 @@ router.post(
     InstitutionConversationController.create
 );
 
-router.get('/', auth(USER_ROLE.user), InstitutionConversationController.getAll);
+router.get(
+    '/get-all',
+    auth(USER_ROLE.user),
+    InstitutionConversationController.getAll
+);
 
 router.get(
-    '/:id',
+    '/get-single/:id',
     auth(USER_ROLE.user),
     InstitutionConversationController.getById
 );
