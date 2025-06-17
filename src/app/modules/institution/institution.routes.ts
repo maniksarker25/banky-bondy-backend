@@ -15,13 +15,13 @@ router.post(
 );
 
 router.get(
-    '/',
+    'get-all/',
     auth(USER_ROLE.user, USER_ROLE.admin, USER_ROLE.superAdmin),
     InstitutionController.getAllInstitutions
 );
 
 router.get(
-    '/:institutionId',
+    'get-single/:institutionId',
     auth(USER_ROLE.user, USER_ROLE.admin, USER_ROLE.superAdmin),
     InstitutionController.getInstitutionById
 );
