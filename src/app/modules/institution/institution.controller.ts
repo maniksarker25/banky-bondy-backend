@@ -1,0 +1,80 @@
+import catchAsync from '../../utilities/catchasync';
+import sendResponse from '../../utilities/sendResponse';
+import httpStatus from 'http-status';
+import InstitutionService from './institution.service';
+
+// Create
+const createInstitution = catchAsync(async (req, res) => {
+    const result = await InstitutionService.createInstitution(
+        req.user.profileId,
+        req.body
+    );
+    sendResponse(res, {
+        statusCode: httpStatus.CREATED,
+        success: true,
+        message: 'Institution created successfully',
+        data: result,
+    });
+});
+
+// Get All
+const getAllInstitutions = catchAsync(async (req, res) => {
+    const result = await InstitutionService.getAllInstitutions(req.query);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Institutions retrieved successfully',
+        data: result,
+    });
+});
+
+// Get By ID
+const getInstitutionById = catchAsync(async (req, res) => {
+    const result = await InstitutionService.getInstitutionById(
+        req.params.institutionId
+    );
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Institution retrieved successfully',
+        data: result,
+    });
+});
+
+// Update
+const updateInstitution = catchAsync(async (req, res) => {
+    const result = await InstitutionService.updateInstitution(
+        req.params.institutionId,
+        req.body
+    );
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Institution updated successfully',
+        data: result,
+    });
+});
+
+// Delete
+const deleteInstitution = catchAsync(async (req, res) => {
+    const result = await InstitutionService.deleteInstitution(
+        req.user.profileId,
+        req.params.institutionId
+    );
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Institution deleted successfully',
+        data: result,
+    });
+});
+
+const InstitutionController = {
+    createInstitution,
+    getAllInstitutions,
+    getInstitutionById,
+    updateInstitution,
+    deleteInstitution,
+};
+
+export default InstitutionController;
