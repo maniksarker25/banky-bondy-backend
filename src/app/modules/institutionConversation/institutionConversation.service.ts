@@ -84,7 +84,24 @@ const updateInstitutionConversation = async (
 };
 
 // Delete
-const deleteInstitutionConversation = async (id: string) => {
+const deleteInstitutionConversation = async (userId: string, id: string) => {
+    const conversation = await InstitutionConversation.findById(id);
+    if (!conversation) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Convsersation not found');
+    }
+    const institution = await Institution.findById(conversation.institution);
+    if (!institution) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Institution not found');
+    }
+    if (
+        institution.creator.toString() != userId &&
+        conversation.user.toString() != userId
+    ) {
+        throw new AppError(
+            httpStatus.BAD_REQUEST,
+            "You don't have permission for update this conversation"
+        );
+    }
     const result = await InstitutionConversation.findByIdAndDelete(id);
     if (!result)
         throw new AppError(httpStatus.NOT_FOUND, 'Conversation not found');

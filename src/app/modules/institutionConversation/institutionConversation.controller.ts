@@ -65,6 +65,7 @@ const update = catchAsync(async (req: Request, res: Response) => {
 const remove = catchAsync(async (req: Request, res: Response) => {
     const result =
         await InstitutionConversationService.deleteInstitutionConversation(
+            req.user.profileId,
             req.params.id
         );
     sendResponse(res, {

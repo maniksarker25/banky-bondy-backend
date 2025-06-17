@@ -16,9 +16,6 @@ const updateInstitutionConversationSchema = z.object({
             isPublic: z.boolean().optional(),
             ussers: z.array(z.string()).optional(),
             likers: z.array(z.string()).optional(),
-            institution: z
-                .string({ required_error: 'Institution id is required' })
-                .optional(),
         })
         .refine((data) => Object.keys(data).length > 0, {
             message: 'At least one field must be provided for update',
