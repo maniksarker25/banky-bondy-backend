@@ -8,6 +8,7 @@ const institutionMemberSchema = new Schema<IInstitutionMember>(
             required: true,
             ref: 'NormalUser',
         },
+        designation: { type: String, required: true },
         group: { type: String, enum: ['a', 'b'], required: true },
     },
     { timestamps: true }
