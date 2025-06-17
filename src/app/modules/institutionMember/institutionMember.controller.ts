@@ -3,18 +3,18 @@ import catchAsync from '../../utilities/catchasync';
 import sendResponse from '../../utilities/sendResponse';
 import institutionMemberServices from './institutionMember.service';
 
-const joinInstitution = catchAsync(async (req, res) => {
-    const result = await institutionMemberServices.joinInstitution(
-        req.user.profileId,
-        req.body
+const getAllInstitutionMember = catchAsync(async (req, res) => {
+    const result = await institutionMemberServices.getAllInstitutionMember(
+        req.params.id,
+        req.query
     );
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: 'Joined  successfully',
+        message: 'Institution member retrieved successfully',
         data: result,
     });
 });
 
-const InstitutionMemberController = { joinInstitution };
+const InstitutionMemberController = { getAllInstitutionMember };
 export default InstitutionMemberController;
