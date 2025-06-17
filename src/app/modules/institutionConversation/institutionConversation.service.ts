@@ -52,9 +52,27 @@ const getInstitutionConversationById = async (id: string) => {
 
 // Update
 const updateInstitutionConversation = async (
+    userId: string,
     id: string,
     payload: Partial<IInstitutionConversation>
 ) => {
+    const conversation = await InstitutionConversation.findById(id);
+    if (!conversation) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Convsersation not found');
+    }
+    const institution = await Institution.findById(conversation.institution);
+    if (!institution) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Institution not found');
+    }
+    if (
+        institution.creator.toString() != userId &&
+        conversation.user.toString() != userId
+    ) {
+        throw new AppError(
+            httpStatus.BAD_REQUEST,
+            "You don't have permission for update this conversation"
+        );
+    }
     const result = await InstitutionConversation.findByIdAndUpdate(
         id,
         payload,
@@ -62,8 +80,6 @@ const updateInstitutionConversation = async (
             new: true,
         }
     );
-    if (!result)
-        throw new AppError(httpStatus.NOT_FOUND, 'Conversation not found');
     return result;
 };
 

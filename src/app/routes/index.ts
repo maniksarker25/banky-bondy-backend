@@ -24,6 +24,7 @@ import { projectDocumentRoutes } from '../modules/projectDocument/projectDocumen
 import { projectImageRoutes } from '../modules/projectImage/projectImage.routes';
 import { institutionRoutes } from '../modules/institution/institution.routes';
 import { institutionMemberRoutes } from '../modules/institutionMember/institutionMember.routes';
+import { institutionConversationRoutes } from '../modules/institutionConversation/institutionConversation.routes';
 
 const router = Router();
 
@@ -130,6 +131,10 @@ const moduleRoutes = [
     {
         path: '/institution-member',
         router: institutionMemberRoutes,
+    },
+    {
+        path: '/institution-conversation',
+        router: institutionConversationRoutes,
     },
 ];
 

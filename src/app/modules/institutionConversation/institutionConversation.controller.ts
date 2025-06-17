@@ -49,6 +49,7 @@ const getById = catchAsync(async (req: Request, res: Response) => {
 const update = catchAsync(async (req: Request, res: Response) => {
     const result =
         await InstitutionConversationService.updateInstitutionConversation(
+            req.user.profileId,
             req.params.id,
             req.body
         );
