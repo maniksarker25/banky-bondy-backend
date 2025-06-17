@@ -1,12 +1,13 @@
 import { Schema, model } from 'mongoose';
 import { IInstitution } from './institution.interface';
+import { ENUM_GROUP } from '../institutionMember/institutionMember.enum';
 
 const institutionSchema = new Schema<IInstitution>(
     {
         name: { type: String, required: true },
         description: { type: String, required: true },
-        groupOneName: { type: String, required: true },
-        groupTwoName: { type: String, required: true },
+        groupOneName: { type: String, default: ENUM_GROUP.A },
+        groupTwoName: { type: String, default: ENUM_GROUP.B },
         facebookLink: { type: String },
         instagramLink: { type: String },
         creator: {

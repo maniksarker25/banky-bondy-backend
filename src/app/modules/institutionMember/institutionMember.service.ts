@@ -11,7 +11,7 @@ const getAllInstitutionMember = async (
     const searchTerm = query.searchTerm || '';
 
     const matchStage: any = {
-        project: new Types.ObjectId(),
+        project: new Types.ObjectId(projectId),
     };
 
     if (query.group) {
