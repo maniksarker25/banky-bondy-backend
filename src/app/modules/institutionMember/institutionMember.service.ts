@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import httpStatus from 'http-status';
+import AppError from '../../error/appError';
 import InstitutionMember from './institutionMember.model';
 import { Types } from 'mongoose';
+import Institution from '../institution/institution.model';
 const getAllInstitutionMember = async (
     projectId: string,
     query: Record<string, unknown>
@@ -88,5 +91,28 @@ const getAllInstitutionMember = async (
     };
 };
 
-const InstitutionMemberServices = { getAllInstitutionMember };
+const removeMember = async (userId: string, id: string) => {
+    const member = await InstitutionMember.findById(id);
+    if (!member) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Member not found');
+    }
+
+    const institution = await Institution.findById(member.institution).select(
+        '_id creator'
+    );
+    if (!institution) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Institution not found');
+    }
+    if (institution.creator.toString() != userId) {
+        throw new AppError(
+            httpStatus.UNAUTHORIZED,
+            "You don't have permission for remove member"
+        );
+    }
+
+    const result = await InstitutionMember.findByIdAndDelete(id);
+    return result;
+};
+
+const InstitutionMemberServices = { getAllInstitutionMember, removeMember };
 export default InstitutionMemberServices;

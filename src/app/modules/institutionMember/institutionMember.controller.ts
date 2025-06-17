@@ -15,6 +15,18 @@ const getAllInstitutionMember = catchAsync(async (req, res) => {
         data: result,
     });
 });
+const removeMember = catchAsync(async (req, res) => {
+    const result = await institutionMemberServices.removeMember(
+        req.user.profileId,
+        req.params.id
+    );
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Institution member removed successfully',
+        data: result,
+    });
+});
 
-const InstitutionMemberController = { getAllInstitutionMember };
+const InstitutionMemberController = { getAllInstitutionMember, removeMember };
 export default InstitutionMemberController;

@@ -5,10 +5,15 @@ import institutionMemberController from './institutionMember.controller';
 
 const router = express.Router();
 
-router.patch(
+router.get(
     '/all-member',
     auth(USER_ROLE.user, USER_ROLE.superAdmin, USER_ROLE.admin),
     institutionMemberController.getAllInstitutionMember
+);
+router.delete(
+    '/remove-member',
+    auth(USER_ROLE.user),
+    institutionMemberController.removeMember
 );
 
 export const institutionMemberRoutes = router;
