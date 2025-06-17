@@ -69,12 +69,26 @@ const deleteInstitution = catchAsync(async (req, res) => {
     });
 });
 
+const joinInstitution = catchAsync(async (req, res) => {
+    const result = await InstitutionService.joinInstitution(
+        req.user.profileId,
+        req.body
+    );
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Joined  successfully',
+        data: result,
+    });
+});
+
 const InstitutionController = {
     createInstitution,
     getAllInstitutions,
     getInstitutionById,
     updateInstitution,
     deleteInstitution,
+    joinInstitution,
 };
 
 export default InstitutionController;

@@ -1,15 +1,15 @@
-import express from "express";
-import auth from "../../middlewares/auth";
-import { USER_ROLE } from "../user/user.constant";
-import validateRequest from "../../middlewares/validateRequest";
-import institutionMemberValidations from "./institutionMember.validation";
-import institutionMemberController from "./institutionMember.controller";
-import { uploadFile } from "../../helper/fileUploader";
+import express from 'express';
+import auth from '../../middlewares/auth';
+import { USER_ROLE } from '../user/user.constant';
+import validateRequest from '../../middlewares/validateRequest';
+import institutionMemberValidations from './institutionMember.validation';
+import institutionMemberController from './institutionMember.controller';
+import { uploadFile } from '../../helper/fileUploader';
 
 const router = express.Router();
 
 router.patch(
-    "/update-profile",
+    '/join-institution',
     auth(USER_ROLE.user),
     uploadFile(),
     (req, res, next) => {

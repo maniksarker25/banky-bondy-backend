@@ -3,6 +3,8 @@ import AppError from '../../error/appError';
 import Institution from './institution.model';
 import { IInstitution } from './institution.interface';
 import QueryBuilder from '../../builder/QueryBuilder';
+import { IInstitutionMember } from '../institutionMember/institutionMember.interface';
+import InstitutionMember from '../institutionMember/institutionMember.model';
 
 // Create Institution
 const createInstitution = async (userId: string, payload: IInstitution) => {
@@ -77,12 +79,32 @@ const deleteInstitution = async (userId: string, institutionId: string) => {
     return deleted;
 };
 
+const joinInstitution = async (userId: string, payload: IInstitutionMember) => {
+    const institution = await Institution.exists({ _id: payload.institution });
+    if (!institution) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Institution not found');
+    }
+    const member = await InstitutionMember.findOne({
+        user: userId,
+        institution: payload.institution,
+    });
+    if (!member) {
+        throw new AppError(
+            httpStatus.NOT_FOUND,
+            'You already joined is this institution'
+        );
+    }
+    const result = await InstitutionMember.create({ ...payload, user: userId });
+    return result;
+};
+
 const InstitutionService = {
     createInstitution,
     getAllInstitutions,
     getInstitutionById,
     updateInstitution,
     deleteInstitution,
+    joinInstitution,
 };
 
 export default InstitutionService;

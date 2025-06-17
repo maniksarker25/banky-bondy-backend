@@ -39,4 +39,11 @@ router.delete(
     InstitutionController.deleteInstitution
 );
 
+router.post(
+    '/join-instituion',
+    auth(USER_ROLE.user),
+    validateRequest(InstitutionValidations.joinInstitutionValidationSchema),
+    InstitutionController.joinInstitution
+);
+
 export const institutionRoutes = router;

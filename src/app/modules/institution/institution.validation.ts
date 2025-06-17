@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ENUM_GROUP } from '../institutionMember/institutionMember.enum';
 
 export const createInstitutionValidationSchema = z.object({
     body: z.object({
@@ -30,9 +31,18 @@ export const updateInstitutionValidationSchema = z.object({
         }),
 });
 
+const joinInstitutionValidationSchema = z.object({
+    body: z.object({
+        group: z.enum(Object.values(ENUM_GROUP) as [string, ...string[]]),
+        designation: z.string({ required_error: 'Designation is required' }),
+        institution: z.string({ required_error: 'Insitution id is required' }),
+    }),
+});
+
 const InstitutionValidations = {
     createInstitutionValidationSchema,
     updateInstitutionValidationSchema,
+    joinInstitutionValidationSchema,
 };
 
 export default InstitutionValidations;
