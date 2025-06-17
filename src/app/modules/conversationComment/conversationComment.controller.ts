@@ -1,24 +1,61 @@
-import httpStatus from "http-status";
-import catchAsync from "../../utilities/catchasync";
-import sendResponse from "../../utilities/sendResponse";
-import conversationCommentServices from "./conversationComment.service";
+import { Request, Response } from 'express';
+import catchAsync from '../../utilities/catchasync';
+import sendResponse from '../../utilities/sendResponse';
+import httpStatus from 'http-status';
+import ConversationCommentService from './conversationComment.service';
 
-const updateUserProfile = catchAsync(async (req, res) => {
-    const { files } = req;
-    if (files && typeof files === "object" && "profile_image" in files) {
-        req.body.profile_image = files["profile_image"][0].path;
-    }
-    const result = await conversationCommentServices.updateUserProfile(
-        req.user.profileId,
+// Create
+const create = catchAsync(async (req: Request, res: Response) => {
+    const result = await ConversationCommentService.create(req.body);
+    sendResponse(res, {
+        statusCode: httpStatus.CREATED,
+        success: true,
+        message: 'Comment created successfully',
+        data: result,
+    });
+});
+
+// Get All
+const getAll = catchAsync(async (_req: Request, res: Response) => {
+    const result = await ConversationCommentService.getAll();
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'All comments fetched successfully',
+        data: result,
+    });
+});
+
+// Update
+const update = catchAsync(async (req: Request, res: Response) => {
+    const result = await ConversationCommentService.update(
+        req.params.id,
         req.body
     );
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: "Profile updated successfully",
+        message: 'Comment updated successfully',
         data: result,
     });
 });
 
-const ConversationCommentController = { updateUserProfile };
+// Delete
+const remove = catchAsync(async (req: Request, res: Response) => {
+    const result = await ConversationCommentService.remove(req.params.id);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Comment deleted successfully',
+        data: result,
+    });
+});
+
+const ConversationCommentController = {
+    create,
+    getAll,
+    update,
+    remove,
+};
+
 export default ConversationCommentController;
