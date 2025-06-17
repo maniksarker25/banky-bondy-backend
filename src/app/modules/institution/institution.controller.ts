@@ -69,8 +69,8 @@ const deleteInstitution = catchAsync(async (req, res) => {
     });
 });
 
-const joinInstitution = catchAsync(async (req, res) => {
-    const result = await InstitutionService.joinInstitution(
+const joinLeaveInstitution = catchAsync(async (req, res) => {
+    const result = await InstitutionService.joinLeaveInstitution(
         req.user.profileId,
         req.body
     );
@@ -88,7 +88,7 @@ const InstitutionController = {
     getInstitutionById,
     updateInstitution,
     deleteInstitution,
-    joinInstitution,
+    joinLeaveInstitution,
 };
 
 export default InstitutionController;

@@ -5,6 +5,7 @@ import { IInstitution } from './institution.interface';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { IInstitutionMember } from '../institutionMember/institutionMember.interface';
 import InstitutionMember from '../institutionMember/institutionMember.model';
+import { ENUM_GROUP } from '../institutionMember/institutionMember.enum';
 
 // Create Institution
 const createInstitution = async (userId: string, payload: IInstitution) => {
@@ -79,7 +80,10 @@ const deleteInstitution = async (userId: string, institutionId: string) => {
     return deleted;
 };
 
-const joinInstitution = async (userId: string, payload: IInstitutionMember) => {
+const joinLeaveInstitution = async (
+    userId: string,
+    payload: IInstitutionMember
+) => {
     const institution = await Institution.exists({ _id: payload.institution });
     if (!institution) {
         throw new AppError(httpStatus.NOT_FOUND, 'Institution not found');
@@ -88,10 +92,20 @@ const joinInstitution = async (userId: string, payload: IInstitutionMember) => {
         user: userId,
         institution: payload.institution,
     });
-    if (!member) {
+    if (member) {
+        const result = await InstitutionMember.findByIdAndDelete(member._id);
+        return result;
+    }
+    if (!payload.group || !payload.designation) {
         throw new AppError(
             httpStatus.NOT_FOUND,
-            'You already joined is this institution'
+            'Group and designation is required for join institution'
+        );
+    }
+    if (payload.group != ENUM_GROUP.A && payload.group != ENUM_GROUP.B) {
+        throw new AppError(
+            httpStatus.BAD_REQUEST,
+            'Invalid group type , please select A or B'
         );
     }
     const result = await InstitutionMember.create({ ...payload, user: userId });
@@ -104,7 +118,7 @@ const InstitutionService = {
     getInstitutionById,
     updateInstitution,
     deleteInstitution,
-    joinInstitution,
+    joinLeaveInstitution,
 };
 
 export default InstitutionService;

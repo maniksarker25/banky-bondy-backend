@@ -43,7 +43,7 @@ router.post(
     '/join-instituion',
     auth(USER_ROLE.user),
     validateRequest(InstitutionValidations.joinInstitutionValidationSchema),
-    InstitutionController.joinInstitution
+    InstitutionController.joinLeaveInstitution
 );
 
 export const institutionRoutes = router;
