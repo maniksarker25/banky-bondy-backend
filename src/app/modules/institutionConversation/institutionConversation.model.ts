@@ -14,7 +14,7 @@ const institutionConversationSchema = new Schema<IInstitutionConversation>(
             required: true,
         },
         name: { type: String, required: true },
-        isPublic: { type: Boolean, required: true },
+        isPublic: { type: Boolean, default: true },
         ussers: [{ type: Schema.Types.ObjectId, ref: 'NormalUser' }],
         likers: [{ type: Schema.Types.ObjectId, ref: 'NormalUser' }],
     },

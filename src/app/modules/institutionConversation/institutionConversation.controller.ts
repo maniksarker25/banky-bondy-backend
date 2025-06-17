@@ -8,6 +8,7 @@ import httpStatus from 'http-status';
 const create = catchAsync(async (req: Request, res: Response) => {
     const result =
         await InstitutionConversationService.createInstitutionConversation(
+            req.user.profileId,
             req.body
         );
     sendResponse(res, {

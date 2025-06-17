@@ -2,12 +2,35 @@ import InstitutionConversation from './institutionConversation.model';
 import httpStatus from 'http-status';
 import AppError from '../../error/appError';
 import { IInstitutionConversation } from './institutionConversation.interface';
+import Institution from '../institution/institution.model';
+import InstitutionMember from '../institutionMember/institutionMember.model';
 
 // Create
 const createInstitutionConversation = async (
+    userId: string,
     payload: IInstitutionConversation
 ) => {
-    return await InstitutionConversation.create(payload);
+    const institution = await Institution.findById(payload.institution);
+    if (!institution) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Inititution not found');
+    }
+    if (institution.creator.toString() != userId) {
+        const member = await InstitutionMember.findOne({
+            user: userId,
+            institution: payload.institution,
+        });
+        if (!member) {
+            throw new AppError(
+                httpStatus.NOT_FOUND,
+                'You are not in that institution'
+            );
+        }
+    }
+    const result = await InstitutionConversation.create({
+        ...payload,
+        user: userId,
+    });
+    return result;
 };
 
 // Get All
