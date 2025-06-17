@@ -20,6 +20,10 @@ import { playlistRoutes } from '../modules/playlist/playlist.routes';
 import { AdminRoutes } from '../modules/admin/admin.routes';
 import { projectJoinRequestRoutes } from '../modules/projectJoinRequest/projectJoinRequest.routes';
 import { projectMemberRoutes } from '../modules/projectMember/projectMember.routes';
+import { projectDocumentRoutes } from '../modules/projectDocument/projectDocument.routes';
+import { projectImageRoutes } from '../modules/projectImage/projectImage.routes';
+import { institutionRoutes } from '../modules/institution/institution.routes';
+import { institutionMemberRoutes } from '../modules/institutionMember/institutionMember.routes';
 
 const router = Router();
 
@@ -110,6 +114,22 @@ const moduleRoutes = [
     {
         path: '/project-member',
         router: projectMemberRoutes,
+    },
+    {
+        path: '/project-document',
+        router: projectDocumentRoutes,
+    },
+    {
+        path: '/project-image',
+        router: projectImageRoutes,
+    },
+    {
+        path: '/institution',
+        router: institutionRoutes,
+    },
+    {
+        path: '/institution-member',
+        router: institutionMemberRoutes,
     },
 ];
 
