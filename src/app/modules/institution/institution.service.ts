@@ -6,6 +6,7 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import { IInstitutionMember } from '../institutionMember/institutionMember.interface';
 import InstitutionMember from '../institutionMember/institutionMember.model';
 import { ENUM_GROUP } from '../institutionMember/institutionMember.enum';
+import { deleteFileFromS3 } from '../../helper/deleteFromS3';
 
 // Create Institution
 const createInstitution = async (userId: string, payload: IInstitution) => {
@@ -63,6 +64,9 @@ const updateInstitution = async (
             new: true,
         }
     );
+    if (payload.cover_image && institution.cover_image) {
+        deleteFileFromS3(institution.cover_image);
+    }
     return updated;
 };
 
@@ -77,6 +81,9 @@ const deleteInstitution = async (userId: string, institutionId: string) => {
     }
 
     const deleted = await Institution.findByIdAndDelete(institutionId);
+    if (institution.cover_image) {
+        deleteFileFromS3(institution.cover_image);
+    }
     return deleted;
 };
 

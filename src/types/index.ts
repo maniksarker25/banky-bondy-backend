@@ -24,6 +24,7 @@ declare namespace Express {
             playlist_cover?: File[];
             project_ducument?: File[];
             project_image?: File[];
+            institution_cover?: File[];
         };
     }
 }

@@ -5,6 +5,7 @@ import { ENUM_GROUP } from '../institutionMember/institutionMember.enum';
 const institutionSchema = new Schema<IInstitution>(
     {
         name: { type: String, required: true },
+        cover_image: { type: String, required: true },
         description: { type: String, required: true },
         groupOneName: { type: String, default: ENUM_GROUP.A },
         groupTwoName: { type: String, default: ENUM_GROUP.B },

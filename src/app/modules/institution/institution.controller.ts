@@ -1,10 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import catchAsync from '../../utilities/catchasync';
 import sendResponse from '../../utilities/sendResponse';
 import httpStatus from 'http-status';
 import InstitutionService from './institution.service';
+import { getCloudFrontUrl } from '../../helper/mutler-s3-uploader';
 
 // Create
 const createInstitution = catchAsync(async (req, res) => {
+    const file: any = req.files?.institution_cover;
+    if (req.files?.institution_cover) {
+        req.body.cover_image = getCloudFrontUrl(file[0].key);
+    }
     const result = await InstitutionService.createInstitution(
         req.user.profileId,
         req.body
@@ -43,6 +49,10 @@ const getInstitutionById = catchAsync(async (req, res) => {
 
 // Update
 const updateInstitution = catchAsync(async (req, res) => {
+    const file: any = req.files?.institution_cover;
+    if (req.files?.institution_cover) {
+        req.body.cover_image = getCloudFrontUrl(file[0].key);
+    }
     const result = await InstitutionService.updateInstitution(
         req.params.institutionId,
         req.body
