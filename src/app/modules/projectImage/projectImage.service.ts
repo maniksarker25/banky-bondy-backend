@@ -8,32 +8,48 @@ import Project from '../project/project.model';
 import ProjectMember from '../projectMember/projectMember.model';
 import { deleteFileFromS3 } from '../../helper/deleteFromS3';
 
-const createProjectImage = async (userId: string, payload: IProjectImage) => {
-    const project = await Project.findById(payload.project);
+const createProjectImage = async (
+    userId: string,
+    projectId: string,
+    payload: IProjectImage
+) => {
+    const project = await Project.findById(projectId);
     if (!project) {
         throw new AppError(httpStatus.NOT_FOUND, 'Project not found');
     }
 
-    const member = await ProjectMember.exists({
-        user: userId,
-        project: payload.project,
-    });
-    if (!member) {
-        throw new AppError(
-            httpStatus.NOT_FOUND,
-            'You are not a member of that project'
-        );
+    if (userId != project.owner.toString()) {
+        const member = await ProjectMember.exists({
+            user: userId,
+            project: projectId,
+        });
+        if (!member) {
+            throw new AppError(
+                httpStatus.NOT_FOUND,
+                'You are not a member of that project'
+            );
+        }
     }
 
     const result = await ProjectImage.create({
         ...payload,
+        project: projectId,
         addedBy: userId,
     });
     return result;
 };
 
-const getAllProjectImages = async (query: Record<string, unknown>) => {
-    const resultQuery = new QueryBuilder(ProjectImage.find(), query)
+const getAllProjectImages = async (
+    projectId: string,
+    query: Record<string, unknown>
+) => {
+    const resultQuery = new QueryBuilder(
+        ProjectImage.find({ project: projectId }).populate({
+            path: 'addedBy',
+            select: 'name',
+        }),
+        query
+    )
         .fields()
         .filter()
         .paginate()
@@ -79,7 +95,7 @@ const deleteProjectImage = async (userId: string, id: string) => {
     if (!image) {
         throw new AppError(httpStatus.NOT_FOUND, 'Project Image not found');
     }
-    if (image.addedBy != image.project.owner && image.addedBy != userId) {
+    if (userId != image.project.owner && image.addedBy != userId) {
         throw new AppError(
             httpStatus.NOT_FOUND,
             "You don't have permission to delete this image"

@@ -12,6 +12,7 @@ const createProjectImage = catchAsync(async (req, res) => {
     }
     const result = await projectImageServices.createProjectImage(
         req.user.profileId,
+        req.params.projectId,
         req.body
     );
     sendResponse(res, {
@@ -23,7 +24,10 @@ const createProjectImage = catchAsync(async (req, res) => {
 });
 
 const getAllProjectImages = catchAsync(async (req, res) => {
-    const result = await projectImageServices.getAllProjectImages(req.query);
+    const result = await projectImageServices.getAllProjectImages(
+        req.params.id,
+        req.query
+    );
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,

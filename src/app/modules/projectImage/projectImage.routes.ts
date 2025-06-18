@@ -7,7 +7,7 @@ import { uploadFile } from '../../helper/mutler-s3-uploader';
 const router = express.Router();
 
 router.post(
-    '/create',
+    '/create/:projectId',
     auth(USER_ROLE.user),
     uploadFile(),
     (req: Request, res: Response, next: NextFunction) => {
@@ -19,7 +19,11 @@ router.post(
     projectImageController.createProjectImage
 );
 
-router.get('/get-all', projectImageController.getAllProjectImages);
+router.get(
+    '/get-all/:id',
+    auth(USER_ROLE.user, USER_ROLE.superAdmin, USER_ROLE.admin),
+    projectImageController.getAllProjectImages
+);
 
 router.patch(
     '/update/:id',
