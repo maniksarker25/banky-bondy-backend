@@ -14,7 +14,11 @@ router.post(
     ConversationCommentController.create
 );
 
-router.get('/', auth(USER_ROLE.user), ConversationCommentController.getAll);
+router.get(
+    'get-all/',
+    auth(USER_ROLE.user),
+    ConversationCommentController.getAll
+);
 
 router.patch(
     '/update/:id',
