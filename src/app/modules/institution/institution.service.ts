@@ -151,7 +151,13 @@ const getInstitutionById = async (institutionId: string) => {
     if (!institution) {
         throw new AppError(httpStatus.NOT_FOUND, 'Institution not found');
     }
-    return institution;
+    const totalParticipate = await InstitutionMember.countDocuments({
+        project: institutionId,
+    });
+    return {
+        ...institution.toObject(),
+        totalParticipate,
+    };
 };
 
 // Update Institution
