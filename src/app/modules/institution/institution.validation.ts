@@ -37,9 +37,15 @@ export const updateInstitutionValidationSchema = z.object({
 
 const joinInstitutionValidationSchema = z.object({
     body: z.object({
-        group: z.enum(Object.values(ENUM_GROUP) as [string, ...string[]]),
-        designation: z.string({ required_error: 'Designation is required' }),
-        institution: z.string({ required_error: 'Insitution id is required' }),
+        group: z
+            .enum(Object.values(ENUM_GROUP) as [string, ...string[]])
+            .optional(),
+        designation: z
+            .string({ required_error: 'Designation is required' })
+            .optional(),
+        institution: z
+            .string({ required_error: 'Insitution id is required' })
+            .optional(),
     }),
 });
 

@@ -152,7 +152,7 @@ const getInstitutionById = async (institutionId: string) => {
         throw new AppError(httpStatus.NOT_FOUND, 'Institution not found');
     }
     const totalParticipate = await InstitutionMember.countDocuments({
-        project: institutionId,
+        institution: institutionId,
     });
     return {
         ...institution.toObject(),
