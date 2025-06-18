@@ -5,12 +5,16 @@ export const createInstitutionValidationSchema = z.object({
     body: z.object({
         name: z.string({ required_error: 'Name is required' }),
         description: z.string({ required_error: 'Description is required' }),
-        groupOneName: z.string({
-            required_error: 'Group one name is required',
-        }),
-        groupTwoName: z.string({
-            required_error: 'Group two name is required',
-        }),
+        groupOneName: z
+            .string({
+                required_error: 'Group one name is required',
+            })
+            .optional(),
+        groupTwoName: z
+            .string({
+                required_error: 'Group two name is required',
+            })
+            .optional(),
         facebookLink: z.string().url().optional(),
         instagramLink: z.string().url().optional(),
     }),

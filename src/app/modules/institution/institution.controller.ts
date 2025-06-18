@@ -54,6 +54,7 @@ const updateInstitution = catchAsync(async (req, res) => {
         req.body.cover_image = getCloudFrontUrl(file[0].key);
     }
     const result = await InstitutionService.updateInstitution(
+        req.user.profileId,
         req.params.institutionId,
         req.body
     );

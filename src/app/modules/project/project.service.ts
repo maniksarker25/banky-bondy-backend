@@ -217,7 +217,7 @@ const getAllProjects = async (userId: string, query: Record<string, any>) => {
     // If query.myProject is passed, fetch projects owned by the user
     const matchStage: any = {};
     if (query.myProject) {
-        matchStage.owner = new mongoose.Types.ObjectId(userId); // Only user's owned projects
+        matchStage.owner = new mongoose.Types.ObjectId(userId);
     }
 
     // If query.joinProject is passed, fetch projects where the user is a member
@@ -256,6 +256,20 @@ const getAllProjects = async (userId: string, query: Record<string, any>) => {
 
         // Unwind the 'owner' array (since it's a single object, it will turn into a single entry)
         { $unwind: '$owner' },
+        // Lookup to count total participants in ProjectMember collection
+        {
+            $lookup: {
+                from: 'projectmembers', // must match the actual collection name in MongoDB
+                localField: '_id',
+                foreignField: 'project',
+                as: 'participants',
+            },
+        },
+        {
+            $addFields: {
+                totalParticipants: { $size: '$participants' },
+            },
+        },
 
         // Select only the necessary fields
         {
@@ -269,6 +283,7 @@ const getAllProjects = async (userId: string, query: Record<string, any>) => {
                 createdAt: 1,
                 updatedAt: 1,
                 cover_image: 1,
+                totalParticipants: 1,
                 'owner._id': 1,
                 'owner.name': 1,
                 'owner.profile_image': 1,

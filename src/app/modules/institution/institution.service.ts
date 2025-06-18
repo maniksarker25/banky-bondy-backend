@@ -49,10 +49,14 @@ const getInstitutionById = async (institutionId: string) => {
 
 // Update Institution
 const updateInstitution = async (
+    userId: string,
     institutionId: string,
     payload: Partial<IInstitution>
 ) => {
-    const institution = await Institution.findById(institutionId);
+    const institution = await Institution.findOne({
+        _id: institutionId,
+        creator: userId,
+    });
     if (!institution) {
         throw new AppError(httpStatus.NOT_FOUND, 'Institution not found');
     }

@@ -76,7 +76,8 @@ export const uploadFile = () => {
                 file.mimetype === 'audio/flac' ||
                 file.mimetype === 'audio/x-m4a' ||
                 file.mimetype === 'audio/mp4' ||
-                file.mimetype === 'application/pdf'
+                file.mimetype === 'application/pdf' ||
+                file.mimetype === 'image/avif'
             ) {
                 cb(null, true);
             } else {
