@@ -5,7 +5,7 @@ import InstitutionMember from './institutionMember.model';
 import { Types } from 'mongoose';
 import Institution from '../institution/institution.model';
 const getAllInstitutionMember = async (
-    projectId: string,
+    institutionId: string,
     query: Record<string, unknown>
 ) => {
     const page = Number(query.page) || 1;
@@ -14,7 +14,7 @@ const getAllInstitutionMember = async (
     const searchTerm = query.searchTerm || '';
 
     const matchStage: any = {
-        project: new Types.ObjectId(projectId),
+        institution: new Types.ObjectId(institutionId),
     };
 
     if (query.group) {
@@ -27,7 +27,7 @@ const getAllInstitutionMember = async (
 
     const searchMatchStage = searchTerm
         ? {
-              'user.name': { $regix: searchTerm, $options: 'i' },
+              'user.name': { $regex: searchTerm, $options: 'i' },
           }
         : {};
 
@@ -39,7 +39,7 @@ const getAllInstitutionMember = async (
             $lookup: {
                 from: 'normalusers',
                 localField: 'user',
-                foreignFeild: '_id',
+                foreignField: '_id',
                 as: 'user',
             },
         },
@@ -52,6 +52,7 @@ const getAllInstitutionMember = async (
         {
             $facet: {
                 meta: [{ $count: 'total' }],
+
                 result: [
                     {
                         $project: {
@@ -78,7 +79,8 @@ const getAllInstitutionMember = async (
 
     const aggResult = await InstitutionMember.aggregate(pipeline);
     const result = aggResult[0]?.result || [];
-    const total = aggResult[0]?.meta[0].total || 0;
+    const total = aggResult[0]?.meta?.[0]?.total ?? 0;
+
     const totalPage = Math.ceil(total / limit);
     return {
         meta: {

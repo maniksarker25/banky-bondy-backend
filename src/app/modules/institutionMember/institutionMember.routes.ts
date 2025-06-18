@@ -6,12 +6,12 @@ import institutionMemberController from './institutionMember.controller';
 const router = express.Router();
 
 router.get(
-    '/all-member',
+    '/all-member/:id',
     auth(USER_ROLE.user, USER_ROLE.superAdmin, USER_ROLE.admin),
     institutionMemberController.getAllInstitutionMember
 );
 router.delete(
-    '/remove-member',
+    '/remove-member/:id',
     auth(USER_ROLE.user),
     institutionMemberController.removeMember
 );

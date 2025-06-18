@@ -49,9 +49,9 @@ const getAllInstitutions = async (
     if (query.joinedInstitution) {
         const joinedInstitutions = await InstitutionMember.find({
             user: userId,
-        }).select('project');
+        }).select('institution');
         const joinedInstitutionIds = joinedInstitutions.map(
-            (member: any) => member.project
+            (member: any) => member.institution
         );
         matchStage._id = { $in: joinedInstitutionIds };
     }
@@ -81,6 +81,20 @@ const getAllInstitutions = async (
             $unwind: '$creator',
         },
 
+        // {
+        //     $lookup: {
+        //         from: 'institutionmembers',
+        //         localField: '_id',
+        //         foreignField: 'institution',
+        //         as: 'participants',
+        //     },
+        // },
+        // {
+        //     $addFields: {
+        //         totalParticipants: { $size: '$participants' },
+        //     },
+        // },
+
         {
             $lookup: {
                 from: 'institutionmembers',
@@ -91,7 +105,25 @@ const getAllInstitutions = async (
         },
         {
             $addFields: {
-                totalParticipants: { $size: '$participants' },
+                // totalParticipants: { $size: '$participants' },
+                participantOfGroupA: {
+                    $size: {
+                        $filter: {
+                            input: '$participants',
+                            as: 'participant',
+                            cond: { $eq: ['$$participant.group', 'A'] },
+                        },
+                    },
+                },
+                participantOfGroupB: {
+                    $size: {
+                        $filter: {
+                            input: '$participants',
+                            as: 'participant',
+                            cond: { $eq: ['$$participant.group', 'B'] },
+                        },
+                    },
+                },
             },
         },
 
@@ -103,7 +135,9 @@ const getAllInstitutions = async (
                 createdAt: 1,
                 updatedAt: 1,
                 cover_image: 1,
-                totalParticipants: 1,
+                // totalParticipants: 1,
+                participantOfGroupA: 1,
+                participantOfGroupB: 1,
                 'creator._id': 1,
                 'creator.name': 1,
                 'creator.profile_image': 1,
@@ -151,12 +185,18 @@ const getInstitutionById = async (institutionId: string) => {
     if (!institution) {
         throw new AppError(httpStatus.NOT_FOUND, 'Institution not found');
     }
-    const totalParticipate = await InstitutionMember.countDocuments({
+    const participantOfGroupA = await InstitutionMember.countDocuments({
         institution: institutionId,
+        group: ENUM_GROUP.A,
+    });
+    const participantOfGroupB = await InstitutionMember.countDocuments({
+        institution: institutionId,
+        group: ENUM_GROUP.B,
     });
     return {
         ...institution.toObject(),
-        totalParticipate,
+        participantOfGroupA,
+        participantOfGroupB,
     };
 };
 
