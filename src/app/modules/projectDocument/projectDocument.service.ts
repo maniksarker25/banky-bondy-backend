@@ -98,12 +98,12 @@ const deleteProjectDocument = async (userId: string, id: string) => {
         throw new AppError(httpStatus.NOT_FOUND, 'Project Document not found');
     }
     if (
-        document.addedBy != document.project.owner &&
-        document.addedBy != userId
+        document.project.owner != userId &&
+        document.addedBy.toString() != userId
     ) {
         throw new AppError(
             httpStatus.NOT_FOUND,
-            "You don't have permission to update this document"
+            "You don't have permission to delete this document"
         );
     }
     const result = await ProjectDocument.findByIdAndDelete(id);
