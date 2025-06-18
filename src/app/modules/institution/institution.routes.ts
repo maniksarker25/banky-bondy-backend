@@ -23,7 +23,7 @@ router.post(
 );
 
 router.get(
-    'get-all/',
+    '/get-all',
     auth(USER_ROLE.user, USER_ROLE.admin, USER_ROLE.superAdmin),
     InstitutionController.getAllInstitutions
 );

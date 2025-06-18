@@ -1,12 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import AppError from '../../error/appError';
 import Institution from './institution.model';
 import { IInstitution } from './institution.interface';
-import QueryBuilder from '../../builder/QueryBuilder';
 import { IInstitutionMember } from '../institutionMember/institutionMember.interface';
 import InstitutionMember from '../institutionMember/institutionMember.model';
 import { ENUM_GROUP } from '../institutionMember/institutionMember.enum';
 import { deleteFileFromS3 } from '../../helper/deleteFromS3';
+import mongoose from 'mongoose';
 
 // Create Institution
 const createInstitution = async (userId: string, payload: IInstitution) => {
@@ -15,22 +16,128 @@ const createInstitution = async (userId: string, payload: IInstitution) => {
 };
 
 // Get All Institutions
-const getAllInstitutions = async (query: Record<string, unknown>) => {
-    const institutionQuery = new QueryBuilder(
-        Institution.find().populate('creator', 'name profile_image'),
-        query
-    )
-        .search(['name', 'description'])
-        .filter()
-        .sort()
-        .paginate()
-        .fields();
+const getAllInstitutions = async (
+    userId: string,
+    query: Record<string, unknown>
+) => {
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 10;
+    const skip = (page - 1) * limit;
+    const searchTerm = query.searchTerm || '';
 
-    const result = await institutionQuery.modelQuery;
-    const meta = await institutionQuery.countTotal();
+    // filters
+    const filters: any = {};
+    Object.keys(query).forEach((key) => {
+        if (
+            ![
+                'searchTerm',
+                'page',
+                'limit',
+                'myInstitution',
+                'joinedInstitution',
+            ].includes(key)
+        ) {
+            filters[key] = query[key];
+        }
+    });
+
+    const matchStage: any = {};
+
+    if (query.myInstitution) {
+        matchStage.creator = new mongoose.Types.ObjectId(userId);
+    }
+    if (query.joinedInstitution) {
+        const joinedInstitutions = await InstitutionMember.find({
+            user: userId,
+        }).select('project');
+        const joinedInstitutionIds = joinedInstitutions.map(
+            (member: any) => member.project
+        );
+        matchStage._id = { $in: joinedInstitutionIds };
+    }
+
+    const searchMatchStage: any = searchTerm
+        ? {
+              $or: [
+                  { name: { $regex: searchTerm, options: 'i' } },
+                  { description: { $regex: searchTerm, options: 'i' } },
+              ],
+          }
+        : {};
+
+    const pipeline: any[] = [
+        {
+            $match: { ...matchStage, ...filters, ...searchMatchStage },
+        },
+        {
+            $lookup: {
+                from: 'normalusers',
+                localField: 'creator',
+                foreignField: '_id',
+                as: 'creator',
+            },
+        },
+        {
+            $unwind: '$creator',
+        },
+
+        {
+            $lookup: {
+                from: 'institutionmembers',
+                localField: '_id',
+                foreignField: 'institution',
+                as: 'participants',
+            },
+        },
+        {
+            $addFields: {
+                totalParticipants: { $size: '$participants' },
+            },
+        },
+
+        {
+            $project: {
+                _id: 1,
+                name: 1,
+                description: 1,
+                createdAt: 1,
+                updatedAt: 1,
+                cover_image: 1,
+                totalParticipants: 1,
+                'creator._id': 1,
+                'creator.name': 1,
+                'creator.profile_image': 1,
+            },
+        },
+        {
+            $sort: { createdAt: -1 },
+        },
+        {
+            $skip: skip,
+        },
+        {
+            $limit: limit,
+        },
+        {
+            $facet: {
+                meta: [{ $count: 'total' }],
+                result: [],
+            },
+        },
+    ];
+
+    const aggResult = await Institution.aggregate(pipeline);
+    const result = aggResult[0]?.result || [];
+    const total = aggResult[0]?.meta[0]?.total || 0;
+    const totalPage = Math.ceil(total / limit);
 
     return {
-        meta,
+        meta: {
+            page,
+            limit,
+            total,
+            totalPage,
+        },
         result,
     };
 };

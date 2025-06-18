@@ -25,7 +25,10 @@ const createInstitution = catchAsync(async (req, res) => {
 
 // Get All
 const getAllInstitutions = catchAsync(async (req, res) => {
-    const result = await InstitutionService.getAllInstitutions(req.query);
+    const result = await InstitutionService.getAllInstitutions(
+        req.user.profileId,
+        req.query
+    );
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
