@@ -17,7 +17,7 @@ router.post(
 );
 
 router.get(
-    '/get-all',
+    '/get-all/:id',
     auth(USER_ROLE.user),
     InstitutionConversationController.getAll
 );

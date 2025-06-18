@@ -34,16 +34,18 @@ const createInstitutionConversation = async (
 };
 
 // Get All
-const getAllInstitutionConversations = async () => {
-    return await InstitutionConversation.find()
-        .populate('ussers')
+const getAllInstitutionConversations = async (instituionId: string) => {
+    return await InstitutionConversation.find({ institution: instituionId })
+        .populate({ path: 'user', select: 'name' })
+        // .populate('ussers')
         .populate('likers');
 };
 
 // Get Single
 const getInstitutionConversationById = async (id: string) => {
     const result = await InstitutionConversation.findById(id)
-        .populate('ussers')
+        .populate({ path: 'user', select: 'name' })
+        // .populate('ussers')
         .populate('likers');
     if (!result)
         throw new AppError(httpStatus.NOT_FOUND, 'Conversation not found');

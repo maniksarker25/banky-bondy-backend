@@ -20,9 +20,11 @@ const create = catchAsync(async (req: Request, res: Response) => {
 });
 
 // Get All
-const getAll = catchAsync(async (_req: Request, res: Response) => {
+const getAll = catchAsync(async (req: Request, res: Response) => {
     const result =
-        await InstitutionConversationService.getAllInstitutionConversations();
+        await InstitutionConversationService.getAllInstitutionConversations(
+            req.params.id
+        );
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
