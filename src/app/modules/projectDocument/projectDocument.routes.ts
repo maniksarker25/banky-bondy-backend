@@ -7,7 +7,7 @@ import { uploadFile } from '../../helper/mutler-s3-uploader';
 const router = express.Router();
 
 router.post(
-    '/create',
+    '/create/:projectId',
     auth(USER_ROLE.user),
     uploadFile(),
     (req: Request, res: Response, next: NextFunction) => {
@@ -19,7 +19,7 @@ router.post(
     projectDocumentController.createProjectDocument
 );
 
-router.get('/get-all', projectDocumentController.getAllProjectDocuments);
+router.get('/get-all/:id', projectDocumentController.getAllProjectDocuments);
 
 router.patch(
     '/update/:id',

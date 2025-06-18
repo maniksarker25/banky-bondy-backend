@@ -12,6 +12,7 @@ const createProjectDocument = catchAsync(async (req, res) => {
     }
     const result = await projectDocumentServices.createProjectDocument(
         req.user.profileId,
+        req.params.projectId,
         req.body
     );
     sendResponse(res, {
@@ -24,6 +25,7 @@ const createProjectDocument = catchAsync(async (req, res) => {
 
 const getAllProjectDocuments = catchAsync(async (req, res) => {
     const result = await projectDocumentServices.getAllProjectDocuments(
+        req.params.id,
         req.query
     );
     sendResponse(res, {

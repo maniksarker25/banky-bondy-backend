@@ -10,32 +10,45 @@ import { deleteFileFromS3 } from '../../helper/deleteFromS3';
 
 const createProjectDocument = async (
     userId: string,
+    projectId: string,
     payload: IProjectDocument
 ) => {
-    const project = await Project.findById(payload.project);
+    const project = await Project.findById(projectId);
     if (!project) {
         throw new AppError(httpStatus.NOT_FOUND, 'Project not found');
     }
-    const member = await ProjectMember.exists({
-        user: userId,
-        project: payload.project,
-    });
-    if (!member) {
-        throw new AppError(
-            httpStatus.NOT_FOUND,
-            'You are not that project member'
-        );
+    if (project.owner.toString() != userId) {
+        const member = await ProjectMember.exists({
+            user: userId,
+            project: projectId,
+        });
+        if (!member) {
+            throw new AppError(
+                httpStatus.NOT_FOUND,
+                'You are not that project member'
+            );
+        }
     }
 
     const result = await ProjectDocument.create({
         ...payload,
+        project: projectId,
         addedBy: userId,
     });
     return result;
 };
 
-const getAllProjectDocuments = async (query: Record<string, unknown>) => {
-    const resultQuery = new QueryBuilder(ProjectDocument.find(), query)
+const getAllProjectDocuments = async (
+    projectId: string,
+    query: Record<string, unknown>
+) => {
+    const resultQuery = new QueryBuilder(
+        ProjectDocument.find({ project: projectId }).populate({
+            path: 'addedBy',
+            select: 'name ',
+        }),
+        query
+    )
         .fields()
         .filter()
         .paginate()

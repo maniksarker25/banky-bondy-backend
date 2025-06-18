@@ -41,6 +41,7 @@ export const uploadFile = () => {
             'banner',
             'playlist_cover',
             'topic_image',
+            'project_ducument',
         ];
 
         if (file.fieldname === undefined) {
@@ -72,7 +73,8 @@ export const uploadFile = () => {
                 file.mimetype === 'audio/aac' ||
                 file.mimetype === 'audio/flac' ||
                 file.mimetype === 'audio/x-m4a' ||
-                file.mimetype === 'audio/mp4'
+                file.mimetype === 'audio/mp4' ||
+                file.mimetype === 'application/pdf'
             ) {
                 cb(null, true);
             } else {
@@ -120,6 +122,8 @@ export const uploadFile = () => {
                 uploadPath = 'uploads/images/audio_topic';
             } else if (file.fieldname === 'project_cover') {
                 uploadPath = 'uploads/images/project_cover';
+            } else if (file.fieldname === 'project_ducument') {
+                uploadPath = 'uploads/documents/project_ducument';
             } else {
                 uploadPath = 'uploads';
             }
@@ -163,6 +167,7 @@ export const uploadFile = () => {
         { name: 'topic_image', maxCount: 1 },
         { name: 'playlist_cover', maxCount: 1 },
         { name: 'project_cover', maxCount: 1 },
+        { name: 'project_ducument', maxCount: 1 },
     ]);
 
     return upload;
