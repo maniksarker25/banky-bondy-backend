@@ -1,25 +1,36 @@
-import express from "express";
-import auth from "../../middlewares/auth";
-import { USER_ROLE } from "../user/user.constant";
-import validateRequest from "../../middlewares/validateRequest";
-import bondRequestValidations from "./bondRequest.validation";
-import bondRequestController from "./bondRequest.controller";
-import { uploadFile } from "../../helper/fileUploader";
+import express from 'express';
+import validateRequest from '../../middlewares/validateRequest';
+import bondRequestValidation from './bondRequest.validation';
+import bondRequestController from './bondRequest.controller';
+import auth from '../../middlewares/auth';
+import { USER_ROLE } from '../user/user.constant';
 
 const router = express.Router();
 
+router.post(
+    '/create-bond-request',
+    auth(USER_ROLE.superAdmin),
+    validateRequest(bondRequestValidation.createBondRequestValidationSchema),
+    bondRequestController.createBondRequest
+);
+
+router.get('/all-bond-requests', bondRequestController.getAllBondRequests);
+router.get(
+    '/get-single-bond-request/:id',
+    bondRequestController.getSingleBondRequest
+);
+
 router.patch(
-    "/update-profile",
-    auth(USER_ROLE.user),
-    uploadFile(),
-    (req, res, next) => {
-        if (req.body.data) {
-            req.body = JSON.parse(req.body.data);
-        }
-        next();
-    },
-    validateRequest(bondRequestValidations.updateBondRequestData),
-    bondRequestController.updateUserProfile
+    '/update-bond-request/:id',
+    auth(USER_ROLE.superAdmin),
+    validateRequest(bondRequestValidation.updateBondRequestValidationSchema),
+    bondRequestController.updateBondRequest
+);
+
+router.delete(
+    '/delete-bond-request/:id',
+    auth(USER_ROLE.superAdmin),
+    bondRequestController.deleteBondRequest
 );
 
 export const bondRequestRoutes = router;

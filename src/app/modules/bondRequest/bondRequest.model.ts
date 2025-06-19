@@ -8,8 +8,8 @@ const BondRequestSchema = new Schema<IBondRequest>(
             ref: 'NormalUser',
             required: true,
         },
-        give: { type: String, required: true },
-        get: { type: String, required: true },
+        offer: { type: String, required: true },
+        want: { type: String, required: true },
         location: {
             type: {
                 type: String,
@@ -19,7 +19,7 @@ const BondRequestSchema = new Schema<IBondRequest>(
             },
             coordinates: { type: [Number], required: true, index: '2dsphere' },
         },
-        radius: { type: Number, required: true },
+        radius: { type: Number },
     },
     {
         timestamps: true,

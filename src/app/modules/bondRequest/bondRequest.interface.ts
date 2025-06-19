@@ -2,13 +2,13 @@ import { Types } from 'mongoose';
 
 export interface IBondRequest {
     user: Types.ObjectId;
-    give: string;
-    get: string;
-    location: {
+    offer: string;
+    want: string;
+    location?: {
         type: 'Point';
         coordinates: [number, number];
     };
-    radius: number;
+    radius?: number;
     createdAt?: Date;
     updatedAt?: Date;
 }
