@@ -4,7 +4,10 @@ import sendResponse from '../../utilities/sendResponse';
 import bondRequestService from './bondRequest.service';
 
 const createBondRequest = catchAsync(async (req, res) => {
-    const result = await bondRequestService.createBondRequestIntoDB(req.body);
+    const result = await bondRequestService.createBondRequestIntoDB(
+        req.user.profileId,
+        req.body
+    );
     sendResponse(res, {
         statusCode: httpStatus.CREATED,
         success: true,
@@ -15,6 +18,19 @@ const createBondRequest = catchAsync(async (req, res) => {
 
 const getAllBondRequests = catchAsync(async (req, res) => {
     const result = await bondRequestService.getAllBondRequests(req.query);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'BondRequests retrieved successfully',
+        data: result,
+    });
+});
+
+const getMyBondRequests = catchAsync(async (req, res) => {
+    const result = await bondRequestService.myBondRequests(
+        req.user.profileId,
+        req.query
+    );
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
@@ -35,6 +51,7 @@ const getSingleBondRequest = catchAsync(async (req, res) => {
 
 const updateBondRequest = catchAsync(async (req, res) => {
     const result = await bondRequestService.updateBondRequestIntoDB(
+        req.user.profileId,
         req.params.id,
         req.body
     );
@@ -48,6 +65,7 @@ const updateBondRequest = catchAsync(async (req, res) => {
 
 const deleteBondRequest = catchAsync(async (req, res) => {
     const result = await bondRequestService.deleteBondRequestFromDB(
+        req.user.profileId,
         req.params.id
     );
     sendResponse(res, {
@@ -64,6 +82,7 @@ const bondRequestController = {
     getSingleBondRequest,
     updateBondRequest,
     deleteBondRequest,
+    getMyBondRequests,
 };
 
 export default bondRequestController;

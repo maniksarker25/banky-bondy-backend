@@ -15,6 +15,7 @@ router.post(
 );
 
 router.get('/all-bond-requests', bondRequestController.getAllBondRequests);
+router.get('/my-bond-requests', bondRequestController.getAllBondRequests);
 router.get(
     '/get-single-bond-request/:id',
     bondRequestController.getSingleBondRequest
