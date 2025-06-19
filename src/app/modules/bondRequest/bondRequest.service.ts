@@ -51,7 +51,7 @@ const myBondRequests = async (
 };
 
 const getSingleBondRequest = async (id: string) => {
-    const bondRequest = await BondRequest.findById(id).populate('user');
+    const bondRequest = await BondRequest.findById(id);
     if (!bondRequest)
         throw new AppError(httpStatus.NOT_FOUND, 'BondRequest not found');
     return bondRequest;

@@ -8,29 +8,33 @@ import { USER_ROLE } from '../user/user.constant';
 const router = express.Router();
 
 router.post(
-    '/create-bond-request',
-    auth(USER_ROLE.superAdmin),
+    '/create',
+    auth(USER_ROLE.user),
     validateRequest(bondRequestValidation.createBondRequestValidationSchema),
     bondRequestController.createBondRequest
 );
 
 router.get('/all-bond-requests', bondRequestController.getAllBondRequests);
-router.get('/my-bond-requests', bondRequestController.getAllBondRequests);
+router.get(
+    '/my-bond-requests',
+    auth(USER_ROLE.user),
+    bondRequestController.getMyBondRequests
+);
 router.get(
     '/get-single-bond-request/:id',
     bondRequestController.getSingleBondRequest
 );
 
 router.patch(
-    '/update-bond-request/:id',
-    auth(USER_ROLE.superAdmin),
+    '/update/:id',
+    auth(USER_ROLE.user),
     validateRequest(bondRequestValidation.updateBondRequestValidationSchema),
     bondRequestController.updateBondRequest
 );
 
 router.delete(
-    '/delete-bond-request/:id',
-    auth(USER_ROLE.superAdmin),
+    '/delete/:id',
+    auth(USER_ROLE.user),
     bondRequestController.deleteBondRequest
 );
 
