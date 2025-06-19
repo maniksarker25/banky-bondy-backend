@@ -167,7 +167,7 @@ const cancelSentRequest = async (sender: string, receiver: string) => {
     return await FriendRequest.findOneAndDelete({
         sender,
         receiver,
-        status: 'pending',
+        status: ENUM_FRIEND_REQUEST_STATUS.Pending,
     });
 };
 
