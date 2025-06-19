@@ -1,24 +1,69 @@
-import httpStatus from "http-status";
-import catchAsync from "../../utilities/catchasync";
-import sendResponse from "../../utilities/sendResponse";
-import bondRequestServices from "./bondRequest.service";
+import httpStatus from 'http-status';
+import catchAsync from '../../utilities/catchasync';
+import sendResponse from '../../utilities/sendResponse';
+import bondRequestService from './bondRequest.service';
 
-const updateUserProfile = catchAsync(async (req, res) => {
-    const { files } = req;
-    if (files && typeof files === "object" && "profile_image" in files) {
-        req.body.profile_image = files["profile_image"][0].path;
-    }
-    const result = await bondRequestServices.updateUserProfile(
-        req.user.profileId,
+const createBondRequest = catchAsync(async (req, res) => {
+    const result = await bondRequestService.createBondRequestIntoDB(req.body);
+    sendResponse(res, {
+        statusCode: httpStatus.CREATED,
+        success: true,
+        message: 'BondRequest created successfully',
+        data: result,
+    });
+});
+
+const getAllBondRequests = catchAsync(async (req, res) => {
+    const result = await bondRequestService.getAllBondRequests(req.query);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'BondRequests retrieved successfully',
+        data: result,
+    });
+});
+
+const getSingleBondRequest = catchAsync(async (req, res) => {
+    const result = await bondRequestService.getSingleBondRequest(req.params.id);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'BondRequest retrieved successfully',
+        data: result,
+    });
+});
+
+const updateBondRequest = catchAsync(async (req, res) => {
+    const result = await bondRequestService.updateBondRequestIntoDB(
+        req.params.id,
         req.body
     );
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: "Profile updated successfully",
+        message: 'BondRequest updated successfully',
         data: result,
     });
 });
 
-const BondRequestController = { updateUserProfile };
-export default BondRequestController;
+const deleteBondRequest = catchAsync(async (req, res) => {
+    const result = await bondRequestService.deleteBondRequestFromDB(
+        req.params.id
+    );
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'BondRequest deleted successfully',
+        data: result,
+    });
+});
+
+const bondRequestController = {
+    createBondRequest,
+    getAllBondRequests,
+    getSingleBondRequest,
+    updateBondRequest,
+    deleteBondRequest,
+};
+
+export default bondRequestController;

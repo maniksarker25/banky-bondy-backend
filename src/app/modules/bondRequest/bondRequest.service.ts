@@ -1,21 +1,62 @@
-import httpStatus from "http-status";
-import AppError from "../../error/appError";
-import { IBondRequest } from "./bondRequest.interface";
-import bondRequestModel from "./bondRequest.model";
+import httpStatus from 'http-status';
+import AppError from '../../error/appError';
+import BondRequest from './bondRequest.model';
+import { IBondRequest } from './bondRequest.interface';
+import QueryBuilder from '../../builder/QueryBuilder';
 
-const updateUserProfile = async (id: string, payload: Partial<IBondRequest>) => {
-    if (payload.email || payload.username) {
-        throw new AppError(httpStatus.BAD_REQUEST, "You cannot change the email or username");
-    }
-    const user = await bondRequestModel.findById(id);
-    if (!user) {
-        throw new AppError(httpStatus.NOT_FOUND, "Profile not found");
-    }
-    return await bondRequestModel.findByIdAndUpdate(id, payload, {
-        new: true,
-        runValidators: true,
-    });
+const createBondRequestIntoDB = async (payload: IBondRequest) => {
+    return await BondRequest.create(payload);
 };
 
-const BondRequestServices = { updateUserProfile };
-export default BondRequestServices;
+const getAllBondRequests = async (query: Record<string, unknown>) => {
+    const resultQuery = new QueryBuilder(BondRequest.find(), query)
+        .search(['give', 'get', 'location'])
+        .fields()
+        .filter()
+        .paginate()
+        .sort();
+
+    const result = await resultQuery.modelQuery;
+    const meta = await resultQuery.countTotal();
+
+    return {
+        meta,
+        result,
+    };
+};
+
+const getSingleBondRequest = async (id: string) => {
+    const bondRequest = await BondRequest.findById(id).populate('user');
+    if (!bondRequest)
+        throw new AppError(httpStatus.NOT_FOUND, 'BondRequest not found');
+    return bondRequest;
+};
+
+const updateBondRequestIntoDB = async (
+    id: string,
+    payload: Partial<IBondRequest>
+) => {
+    const bondRequest = await BondRequest.findById(id);
+    if (!bondRequest)
+        throw new AppError(httpStatus.NOT_FOUND, 'BondRequest not found');
+
+    return await BondRequest.findByIdAndUpdate(id, payload, { new: true });
+};
+
+const deleteBondRequestFromDB = async (id: string) => {
+    const bondRequest = await BondRequest.findById(id);
+    if (!bondRequest)
+        throw new AppError(httpStatus.NOT_FOUND, 'BondRequest not found');
+
+    return await BondRequest.findByIdAndDelete(id);
+};
+
+const bondRequestService = {
+    createBondRequestIntoDB,
+    getAllBondRequests,
+    getSingleBondRequest,
+    updateBondRequestIntoDB,
+    deleteBondRequestFromDB,
+};
+
+export default bondRequestService;
