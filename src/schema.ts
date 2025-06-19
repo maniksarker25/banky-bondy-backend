@@ -69,6 +69,15 @@
 
 // }
 
+// Table FriendRequest {
+//     id ObjectId [pk]
+//     sender ObjectId [ref:> normalusers.id]
+//     receiver ObjectId [ref:> normalusers.id]
+//     status enum("accepted","pending","rejected")
+//     createdAt Date
+//     updatedAt Date
+// }
+
 // Table Relatives  {
 //   id ObjectId [pk]
 //   relative ObjectId [ref:> normalusers.id]
@@ -385,7 +394,7 @@
 
 // Table InstitutionMumber {
 //   id ObjectId [pk]
-//   group enum(1,2)
+//   group enum('a','b')
 //   user OjbectId [ref:> normalusers.id]
 //   createdAt Date
 //   updatedAt Date
@@ -427,7 +436,7 @@
 //   type enum("one-to-one","group")
 //   institution ObjectId [ref: > Institution.id] // nullable
 //   project OjbectId [ref:> Project.id] // nullable
-//   chatGroup OjbectId [ref:> ChatGroup.id]
+//   chatGroup OjbectId [ref:> ChatGroup.id] // nullable
 //   createdAt Date
 //   updatedAt Date
 // }
@@ -450,6 +459,17 @@
 //   name string
 //   coverImage string
 //   mumbers ObjectId[] [ref:> normalusers.id]
+//   createdAt Date
+//   updatedAt Date
+// }
+
+// Table Bonding {
+//   id ObjectId [pk]
+//   name string
+//   coverImage string
+//   joinControll string
+//   isPublic boolean
+//   creator ObjectId [ref:> normalusers.id]
 //   createdAt Date
 //   updatedAt Date
 // }
