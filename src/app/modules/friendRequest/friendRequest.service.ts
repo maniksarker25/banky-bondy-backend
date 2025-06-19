@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import AppError from '../../error/appError';
 import FriendRequest from './friendRequest.model';
 import { ENUM_FRIEND_REQUEST_STATUS } from './friendRequest.enum';
-
+import mongoose from 'mongoose';
+type ENUM_FRIEND_REQUEST_STATUS = keyof typeof ENUM_FRIEND_REQUEST_STATUS;
 const sendFriendRequest = async (sender: string, receiver: string) => {
     if (sender === receiver)
         throw new AppError(
@@ -17,9 +19,9 @@ const sendFriendRequest = async (sender: string, receiver: string) => {
     return await FriendRequest.create({ sender, receiver });
 };
 
-const updateFriendRequestStatus = async (
+const acceptRejectRequest = async (
     requestId: string,
-    status: 'accepted' | 'rejected'
+    status: ENUM_FRIEND_REQUEST_STATUS
 ) => {
     const request = await FriendRequest.findById(requestId);
     if (!request || request.status !== ENUM_FRIEND_REQUEST_STATUS.Pending) {
@@ -33,13 +35,119 @@ const updateFriendRequestStatus = async (
     return await request.save();
 };
 
-const getMyFriends = async (userId: string) => {
-    return await FriendRequest.find({
+const getMyFriends = async (userId: string, query: Record<string, any>) => {
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 10;
+    const skip = (page - 1) * limit;
+    const searchTerm = query.searchTerm || '';
+    const matchStage: any = {
         $or: [
-            { sender: userId, status: 'accepted' },
-            { receiver: userId, status: 'accepted' },
+            {
+                sender: new mongoose.Types.ObjectId(userId),
+                status: ENUM_FRIEND_REQUEST_STATUS.Accepted,
+            },
+            {
+                receiver: new mongoose.Types.ObjectId(userId),
+                status: ENUM_FRIEND_REQUEST_STATUS.Accepted,
+            },
         ],
-    }).populate('sender receiver');
+    };
+
+    const searchMatchStage = searchTerm
+        ? {
+              $or: [
+                  { 'senderInfo.name': { $regex: searchTerm, $options: 'i' } },
+                  {
+                      'receiverInfo.name': {
+                          $regex: searchTerm,
+                          $options: 'i',
+                      },
+                  },
+              ],
+              $nor: [{ sender: userId }, { receiver: userId }],
+          }
+        : { $nor: [{ sender: userId }, { receiver: userId }] };
+
+    const pipeline: any[] = [
+        { $match: matchStage },
+        {
+            $lookup: {
+                from: 'normalusers',
+                localField: 'sender',
+                foreignField: '_id',
+                as: 'senderInfo',
+            },
+        },
+        {
+            $lookup: {
+                from: 'normalusers',
+                localField: 'receiver',
+                foreignField: '_id',
+                as: 'receiverInfo',
+            },
+        },
+        { $unwind: { path: '$senderInfo', preserveNullAndEmptyArrays: true } },
+        {
+            $unwind: {
+                path: '$receiverInfo',
+                preserveNullAndEmptyArrays: true,
+            },
+        },
+        { $match: searchMatchStage },
+        {
+            $facet: {
+                meta: [{ $count: 'total' }],
+                result: [
+                    {
+                        $project: {
+                            _id: 1,
+                            status: 1,
+                            createdAt: 1,
+                            updatedAt: 1,
+                            friendInfo: {
+                                $cond: {
+                                    if: { $eq: ['$sender', userId] },
+                                    then: {
+                                        _id: '$receiverInfo._id',
+                                        name: '$receiverInfo.name',
+                                        profile_image:
+                                            '$receiverInfo.profile_image',
+                                    },
+                                    else: {
+                                        _id: '$senderInfo._id',
+                                        name: '$senderInfo.name',
+                                        profile_image:
+                                            '$senderInfo.profile_image',
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    { $sort: { createdAt: -1 } },
+                    { $skip: skip },
+                    { $limit: limit },
+                ],
+            },
+        },
+    ];
+
+    const aggResult = await FriendRequest.aggregate(pipeline);
+    const result = aggResult[0]?.result || [];
+    const total = aggResult[0]?.meta[0]?.total || 0;
+    const totalPage = Math.ceil(total / limit);
+    return {
+        success: true,
+        message: 'Friends retrieved successfully',
+        data: {
+            meta: {
+                page,
+                limit,
+                total,
+                totalPage,
+            },
+            result,
+        },
+    };
 };
 
 const getMyFollowers = async (userId: string) => {
@@ -82,7 +190,7 @@ const unfriend = async (userId: string, friendId: string) => {
 
 const friendRequestService = {
     sendFriendRequest,
-    updateFriendRequestStatus,
+    acceptRejectRequest,
     getMyFriends,
     getMyFollowers,
     getMyFollowing,

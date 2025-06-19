@@ -5,7 +5,7 @@ import friendRequestService from './friendRequest.service';
 
 const sendFriendRequest = catchAsync(async (req, res) => {
     const result = await friendRequestService.sendFriendRequest(
-        req.user._id,
+        req.user.profileId,
         req.body.receiver
     );
     sendResponse(res, {
@@ -16,8 +16,8 @@ const sendFriendRequest = catchAsync(async (req, res) => {
     });
 });
 
-const updateRequestStatus = catchAsync(async (req, res) => {
-    const result = await friendRequestService.updateFriendRequestStatus(
+const acceptRejectRequest = catchAsync(async (req, res) => {
+    const result = await friendRequestService.acceptRejectRequest(
         req.params.id,
         req.body.status
     );
@@ -30,7 +30,10 @@ const updateRequestStatus = catchAsync(async (req, res) => {
 });
 
 const getFriends = catchAsync(async (req, res) => {
-    const result = await friendRequestService.getMyFriends(req.user._id);
+    const result = await friendRequestService.getMyFriends(
+        req.user.profileId,
+        req.query
+    );
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
@@ -40,7 +43,9 @@ const getFriends = catchAsync(async (req, res) => {
 });
 
 const getFollowers = catchAsync(async (req, res) => {
-    const result = await friendRequestService.getMyFollowers(req.user._id);
+    const result = await friendRequestService.getMyFollowers(
+        req.user.profileId
+    );
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
@@ -50,7 +55,9 @@ const getFollowers = catchAsync(async (req, res) => {
 });
 
 const getFollowing = catchAsync(async (req, res) => {
-    const result = await friendRequestService.getMyFollowing(req.user._id);
+    const result = await friendRequestService.getMyFollowing(
+        req.user.profileId
+    );
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
@@ -61,7 +68,7 @@ const getFollowing = catchAsync(async (req, res) => {
 
 const cancelRequest = catchAsync(async (req, res) => {
     const result = await friendRequestService.cancelSentRequest(
-        req.user._id,
+        req.user.profileId,
         req.params.receiverId
     );
     sendResponse(res, {
@@ -74,7 +81,7 @@ const cancelRequest = catchAsync(async (req, res) => {
 
 const unfriend = catchAsync(async (req, res) => {
     const result = await friendRequestService.unfriend(
-        req.user._id,
+        req.user.profileId,
         req.params.friendId
     );
     sendResponse(res, {
@@ -87,7 +94,7 @@ const unfriend = catchAsync(async (req, res) => {
 
 const friendRequestController = {
     sendFriendRequest,
-    updateRequestStatus,
+    acceptRejectRequest,
     getFriends,
     getFollowers,
     getFollowing,

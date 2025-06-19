@@ -15,12 +15,12 @@ router.post(
 );
 
 router.patch(
-    '/update-status/:id',
+    '/accept-reject/:id',
     auth(USER_ROLE.user),
     validateRequest(
         friendRequestValidation.updateFriendRequestStatusValidation
     ),
-    friendRequestController.updateRequestStatus
+    friendRequestController.acceptRejectRequest
 );
 
 router.get(

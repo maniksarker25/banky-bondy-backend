@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ENUM_FRIEND_REQUEST_STATUS } from './friendRequest.enum';
 
 const createFriendRequestValidation = z.object({
     body: z.object({
@@ -8,7 +9,9 @@ const createFriendRequestValidation = z.object({
 
 const updateFriendRequestStatusValidation = z.object({
     body: z.object({
-        status: z.enum(['accepted', 'rejected']),
+        status: z.enum(
+            Object.values(ENUM_FRIEND_REQUEST_STATUS) as [string, ...string[]]
+        ),
     }),
 });
 

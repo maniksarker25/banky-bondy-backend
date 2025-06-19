@@ -28,6 +28,7 @@ import { institutionConversationRoutes } from '../modules/institutionConversatio
 import { commentRoutes } from '../modules/comment/comment.routes';
 import { bondRoutes } from '../modules/bond/bond.routes';
 import { bondRequestRoutes } from '../modules/bondRequest/bondRequest.routes';
+import { friendRequestRoutes } from '../modules/friendRequest/friendRequest.routes';
 
 const router = Router();
 
@@ -150,6 +151,10 @@ const moduleRoutes = [
     {
         path: '/bond-request',
         router: bondRequestRoutes,
+    },
+    {
+        path: '/friend-request',
+        router: friendRequestRoutes,
     },
 ];
 
