@@ -4,7 +4,10 @@ import sendResponse from '../../utilities/sendResponse';
 import bondService from './bond.service';
 
 const createBond = catchAsync(async (req, res) => {
-    const result = await bondService.createBondIntoDB(req.body);
+    const result = await bondService.createBondIntoDB(
+        req.user.profileId,
+        req.body
+    );
     sendResponse(res, {
         statusCode: httpStatus.CREATED,
         success: true,

@@ -3,8 +3,8 @@ import AppError from '../../error/appError';
 import httpStatus from 'http-status';
 import { IBond } from './bond.interface';
 
-const createBondIntoDB = async (payload: IBond) => {
-    return await Bond.create(payload);
+const createBondIntoDB = async (userId: string, payload: IBond) => {
+    return await Bond.create({ ...payload, user: userId });
 };
 
 const getAllBonds = async () => {

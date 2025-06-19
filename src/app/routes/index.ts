@@ -26,6 +26,7 @@ import { institutionRoutes } from '../modules/institution/institution.routes';
 import { institutionMemberRoutes } from '../modules/institutionMember/institutionMember.routes';
 import { institutionConversationRoutes } from '../modules/institutionConversation/institutionConversation.routes';
 import { commentRoutes } from '../modules/comment/comment.routes';
+import { bondRoutes } from '../modules/bond/bond.routes';
 
 const router = Router();
 
@@ -140,6 +141,10 @@ const moduleRoutes = [
     {
         path: '/comment',
         router: commentRoutes,
+    },
+    {
+        path: '/bond',
+        router: bondRoutes,
     },
 ];
 

@@ -8,8 +8,8 @@ import { USER_ROLE } from '../user/user.constant';
 const router = express.Router();
 
 router.post(
-    '/create-bond',
-    auth(USER_ROLE.superAdmin),
+    '/create',
+    auth(USER_ROLE.user),
     validateRequest(bondValidation.createBondValidationSchema),
     bondController.createBond
 );
