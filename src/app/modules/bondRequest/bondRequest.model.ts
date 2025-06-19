@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { IBondRequest } from './bondRequest.interface';
+import { ENUM_BOND_REQUEST_STATUS } from './bondRequest.enum';
 
 const BondRequestSchema = new Schema<IBondRequest>(
     {
@@ -18,6 +19,11 @@ const BondRequestSchema = new Schema<IBondRequest>(
                 default: 'Point',
             },
             coordinates: { type: [Number], required: true, index: '2dsphere' },
+        },
+        status: {
+            type: String,
+            enum: Object.values(ENUM_BOND_REQUEST_STATUS),
+            default: ENUM_BOND_REQUEST_STATUS.WAITING_FOR_LINK,
         },
         radius: { type: Number },
     },
