@@ -14,20 +14,16 @@ router.post(
     bondController.createBond
 );
 
-router.get('/all-bonds', bondController.getAllBonds);
+router.get('/my-bonds', auth(USER_ROLE.user), bondController.getAllBonds);
 router.get('/get-single-bond/:id', bondController.getSingleBond);
 
 router.patch(
-    '/update-bond/:id',
-    auth(USER_ROLE.superAdmin),
+    '/update/:id',
+    auth(USER_ROLE.user),
     validateRequest(bondValidation.updateBondValidationSchema),
     bondController.updateBond
 );
 
-router.delete(
-    '/delete-bond/:id',
-    auth(USER_ROLE.superAdmin),
-    bondController.deleteBond
-);
+router.delete('/delete/:id', auth(USER_ROLE.user), bondController.deleteBond);
 
 export const bondRoutes = router;

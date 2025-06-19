@@ -16,12 +16,12 @@ const createBond = catchAsync(async (req, res) => {
     });
 });
 
-const getAllBonds = catchAsync(async (_req, res) => {
-    const result = await bondService.getAllBonds();
+const getAllBonds = catchAsync(async (req, res) => {
+    const result = await bondService.getMyBonds(req.user.profileId, req.query);
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: 'All bonds retrieved successfully',
+        message: 'Your bonds retrieved successfully',
         data: result,
     });
 });
@@ -37,7 +37,11 @@ const getSingleBond = catchAsync(async (req, res) => {
 });
 
 const updateBond = catchAsync(async (req, res) => {
-    const result = await bondService.updateBondIntoDB(req.params.id, req.body);
+    const result = await bondService.updateBondIntoDB(
+        req.user.profileId,
+        req.params.id,
+        req.body
+    );
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
@@ -47,7 +51,10 @@ const updateBond = catchAsync(async (req, res) => {
 });
 
 const deleteBond = catchAsync(async (req, res) => {
-    const result = await bondService.deleteBondFromDB(req.params.id);
+    const result = await bondService.deleteBondFromDB(
+        req.user.profileId,
+        req.params.id
+    );
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
