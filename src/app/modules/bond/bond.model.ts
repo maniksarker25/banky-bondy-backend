@@ -5,7 +5,7 @@ const BondSchema = new Schema<IBond>(
     {
         user: {
             type: Schema.Types.ObjectId,
-            ref: 'normalusers',
+            ref: 'NormalUser',
             required: true,
         },
         offer: { type: String, required: true },
