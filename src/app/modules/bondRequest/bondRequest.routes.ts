@@ -37,5 +37,10 @@ router.delete(
     auth(USER_ROLE.user),
     bondRequestController.deleteBondRequest
 );
+router.get(
+    '/matching-bond',
+    auth(USER_ROLE.user),
+    bondRequestController.getMatchingBondRequest
+);
 
 export const bondRequestRoutes = router;

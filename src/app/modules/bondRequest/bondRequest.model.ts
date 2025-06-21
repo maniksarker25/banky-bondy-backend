@@ -32,5 +32,10 @@ const BondRequestSchema = new Schema<IBondRequest>(
     }
 );
 
+BondRequestSchema.index({ status: 1 });
+BondRequestSchema.index({ offer: 1 });
+BondRequestSchema.index({ want: 1 });
+BondRequestSchema.index({ user: 1 });
+
 const BondRequest = model<IBondRequest>('BondRequest', BondRequestSchema);
 export default BondRequest;
