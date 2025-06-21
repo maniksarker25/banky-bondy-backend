@@ -1,5 +1,11 @@
 import QueryBuilder from '../../builder/QueryBuilder';
+import { IBondLink } from './bondLink.interface';
 import { BondLink } from './bondLink.model';
+
+const createBondLink = async (payload: IBondLink) => {
+    const result = await BondLink.create(payload);
+    return result;
+};
 
 const getMyBondLinks = async (
     userId: string,
@@ -26,5 +32,5 @@ const getMyBondLinks = async (
     };
 };
 
-const BondLinkServices = { getMyBondLinks };
+const BondLinkServices = { getMyBondLinks, createBondLink };
 export default BondLinkServices;

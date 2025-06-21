@@ -3,6 +3,15 @@ import catchAsync from '../../utilities/catchasync';
 import sendResponse from '../../utilities/sendResponse';
 import bondLinkServices from './bondLink.service';
 
+const createBondLink = catchAsync(async (req, res) => {
+    const result = await bondLinkServices.createBondLink(req.body);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Bond links created successfully',
+        data: result,
+    });
+});
 const getMyBondLinks = catchAsync(async (req, res) => {
     const result = await bondLinkServices.getMyBondLinks(
         req.user.profileId,
@@ -16,5 +25,5 @@ const getMyBondLinks = catchAsync(async (req, res) => {
     });
 });
 
-const BondLinkController = { getMyBondLinks };
+const BondLinkController = { getMyBondLinks, createBondLink };
 export default BondLinkController;
