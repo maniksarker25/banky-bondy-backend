@@ -1,24 +1,20 @@
-import httpStatus from "http-status";
-import catchAsync from "../../utilities/catchasync";
-import sendResponse from "../../utilities/sendResponse";
-import bondLinkServices from "./bondLink.service";
+import httpStatus from 'http-status';
+import catchAsync from '../../utilities/catchasync';
+import sendResponse from '../../utilities/sendResponse';
+import bondLinkServices from './bondLink.service';
 
-const updateUserProfile = catchAsync(async (req, res) => {
-    const { files } = req;
-    if (files && typeof files === "object" && "profile_image" in files) {
-        req.body.profile_image = files["profile_image"][0].path;
-    }
-    const result = await bondLinkServices.updateUserProfile(
+const getMyBondLinks = catchAsync(async (req, res) => {
+    const result = await bondLinkServices.getMyBondLinks(
         req.user.profileId,
-        req.body
+        req.query
     );
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: "Profile updated successfully",
+        message: 'Bond links retrieved successfully',
         data: result,
     });
 });
 
-const BondLinkController = { updateUserProfile };
+const BondLinkController = { getMyBondLinks };
 export default BondLinkController;
