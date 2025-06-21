@@ -8,6 +8,7 @@ export interface IConversation {
     type: (typeof ENUM_CONVERSATION_TYPE)[keyof typeof ENUM_CONVERSATION_TYPE];
     institution: ObjectId | null;
     project: ObjectId | null;
+    bondLink: ObjectId | null;
     chatGroup: ObjectId | null;
     createdAt: Date;
     updatedAt: Date;

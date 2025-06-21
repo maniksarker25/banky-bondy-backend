@@ -29,6 +29,11 @@ const conversationSchema = new Schema<IConversation>(
             ref: 'Project',
             default: null,
         },
+        bondLink: {
+            type: Schema.Types.ObjectId,
+            ref: 'BondLink',
+            default: null,
+        },
         chatGroup: {
             type: Schema.Types.ObjectId,
             ref: 'ChatGroup',
