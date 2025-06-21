@@ -1,9 +1,16 @@
 import QueryBuilder from '../../builder/QueryBuilder';
+import { ENUM_CONVERSATION_TYPE } from '../conversation/conversation.enum';
+import Conversation from '../conversation/conversation.model';
 import { IBondLink } from './bondLink.interface';
 import { BondLink } from './bondLink.model';
 
 const createBondLink = async (payload: IBondLink) => {
     const result = await BondLink.create(payload);
+    await Conversation.create({
+        participants: payload.participants,
+        type: ENUM_CONVERSATION_TYPE.group,
+        bondLink: result._id,
+    });
     return result;
 };
 
