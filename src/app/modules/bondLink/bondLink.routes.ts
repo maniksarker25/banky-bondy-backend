@@ -5,10 +5,9 @@ import bondLinkController from './bondLink.controller';
 
 const router = express.Router();
 
-router.patch(
+router.get(
     '/my-bond-links',
     auth(USER_ROLE.user),
-
     bondLinkController.getMyBondLinks
 );
 
