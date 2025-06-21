@@ -29,6 +29,7 @@ import { commentRoutes } from '../modules/comment/comment.routes';
 import { bondRoutes } from '../modules/bond/bond.routes';
 import { bondRequestRoutes } from '../modules/bondRequest/bondRequest.routes';
 import { friendRequestRoutes } from '../modules/friendRequest/friendRequest.routes';
+import { bondLinkRoutes } from '../modules/bondLink/bondLink.routes';
 
 const router = Router();
 
@@ -155,6 +156,10 @@ const moduleRoutes = [
     {
         path: '/friend-request',
         router: friendRequestRoutes,
+    },
+    {
+        path: '/bond-link',
+        router: bondLinkRoutes,
     },
 ];
 
