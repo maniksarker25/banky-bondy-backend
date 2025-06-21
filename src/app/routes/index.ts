@@ -30,6 +30,7 @@ import { bondRoutes } from '../modules/bond/bond.routes';
 import { bondRequestRoutes } from '../modules/bondRequest/bondRequest.routes';
 import { friendRequestRoutes } from '../modules/friendRequest/friendRequest.routes';
 import { bondLinkRoutes } from '../modules/bondLink/bondLink.routes';
+import { DonateRoutes } from '../modules/donate/donate.routes';
 
 const router = Router();
 
@@ -160,6 +161,10 @@ const moduleRoutes = [
     {
         path: '/bond-link',
         router: bondLinkRoutes,
+    },
+    {
+        path: '/donate',
+        router: DonateRoutes,
     },
 ];
 

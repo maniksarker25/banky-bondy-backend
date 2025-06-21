@@ -23,6 +23,8 @@ export default {
     stripe: {
         stripe_secret_key: process.env.STRIPE_SECRET_KEY,
         webhook_endpoint_secret: process.env.WEBHOOK_ENDPOINT_SECRET,
+        stripe_payment_success_url: process.env.STRIPE_PAYMENT_SUCCESS_URL,
+        stripe_payment_cancel_url: process.env.STRIPE_PAYMENT_CANCEL_URL,
     },
     twilio: {
         accountSid: process.env.TWILIO_ACCOUNT_SID,
