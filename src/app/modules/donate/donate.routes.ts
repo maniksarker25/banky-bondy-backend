@@ -1,25 +1,15 @@
-import express from "express";
-import auth from "../../middlewares/auth";
-import { USER_ROLE } from "../user/user.constant";
-import validateRequest from "../../middlewares/validateRequest";
-import donateValidations from "./donate.validation";
-import donateController from "./donate.controller";
-import { uploadFile } from "../../helper/fileUploader";
+import express from 'express';
+import { createDonate, getAllDonates } from './donate.controller';
+import validateRequest from '../../middlewares/validateRequest';
+import { DonateValidations } from './donate.validation';
 
 const router = express.Router();
 
-router.patch(
-    "/update-profile",
-    auth(USER_ROLE.user),
-    uploadFile(),
-    (req, res, next) => {
-        if (req.body.data) {
-            req.body = JSON.parse(req.body.data);
-        }
-        next();
-    },
-    validateRequest(donateValidations.updateDonateData),
-    donateController.updateUserProfile
+router.post(
+    '/donate',
+    validateRequest(DonateValidations.createDonateSchema),
+    createDonate
 );
+router.get('/get-all-donner', getAllDonates);
 
-export const donateRoutes = router;
+export const DonateRoutes = router;

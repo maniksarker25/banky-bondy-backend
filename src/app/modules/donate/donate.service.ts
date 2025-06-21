@@ -1,21 +1,51 @@
-import httpStatus from "http-status";
-import AppError from "../../error/appError";
-import { IDonate } from "./donate.interface";
-import donateModel from "./donate.model";
+import QueryBuilder from '../../builder/QueryBuilder';
+import { stripe } from '../../utilities/stripe';
+import { Donate } from './donate.model';
 
-const updateUserProfile = async (id: string, payload: Partial<IDonate>) => {
-    if (payload.email || payload.username) {
-        throw new AppError(httpStatus.BAD_REQUEST, "You cannot change the email or username");
-    }
-    const user = await donateModel.findById(id);
-    if (!user) {
-        throw new AppError(httpStatus.NOT_FOUND, "Profile not found");
-    }
-    return await donateModel.findByIdAndUpdate(id, payload, {
-        new: true,
-        runValidators: true,
+const donate = async (userId: string, amount: number) => {
+    const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [
+            {
+                price_data: {
+                    currency: 'nzd',
+                    product_data: {
+                        name: 'Donation',
+                    },
+                    unit_amount: Math.round(amount * 100),
+                },
+                quantity: 1,
+            },
+        ],
+        mode: 'payment',
+        metadata: {
+            userId: userId.toString(),
+            paymentPurpose: 'Donate',
+        },
+        success_url: `${process.env.CLIENT_BASE_URL}/donation-success`,
+        cancel_url: `${process.env.CLIENT_BASE_URL}/donation-cancel`,
     });
+
+    return { url: session.url };
 };
 
-const DonateServices = { updateUserProfile };
-export default DonateServices;
+const getAllDonner = async (query: Record<string, unknown>) => {
+    const resultQuery = new QueryBuilder(Donate.find(), query)
+        .search(['name'])
+        .fields()
+        .filter()
+        .paginate()
+        .sort();
+
+    const result = await resultQuery.modelQuery;
+    const meta = await resultQuery.countTotal();
+    return {
+        meta,
+        result,
+    };
+};
+
+export const DonateService = {
+    donate,
+    getAllDonner,
+};

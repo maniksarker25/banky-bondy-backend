@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const createDonorSchema = z.object({
+const createDonateSchema = z.object({
     body: z.object({
         user: z.string({ required_error: 'User is required' }),
         amount: z
@@ -9,6 +9,6 @@ const createDonorSchema = z.object({
     }),
 });
 
-export const DonorValidations = {
-    createDonorSchema,
+export const DonateValidations = {
+    createDonateSchema,
 };

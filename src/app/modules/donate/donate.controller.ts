@@ -1,24 +1,28 @@
-import httpStatus from "http-status";
-import catchAsync from "../../utilities/catchasync";
-import sendResponse from "../../utilities/sendResponse";
-import donateServices from "./donate.service";
+import { Request, Response } from 'express';
+import httpStatus from 'http-status';
+import catchAsync from '../../utilities/catchasync';
+import { DonateService } from './donate.service';
+import sendResponse from '../../utilities/sendResponse';
 
-const updateUserProfile = catchAsync(async (req, res) => {
-    const { files } = req;
-    if (files && typeof files === "object" && "profile_image" in files) {
-        req.body.profile_image = files["profile_image"][0].path;
-    }
-    const result = await donateServices.updateUserProfile(
+export const createDonate = catchAsync(async (req: Request, res: Response) => {
+    const result = await DonateService.donate(
         req.user.profileId,
-        req.body
+        req.body.amount
     );
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: "Profile updated successfully",
+        message: 'Stripe checkout session created',
         data: result,
     });
 });
 
-const DonateController = { updateUserProfile };
-export default DonateController;
+export const getAllDonates = catchAsync(async (req: Request, res: Response) => {
+    const result = await DonateService.getAllDonner(req.query);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Donations retrieved successfully',
+        data: result,
+    });
+});

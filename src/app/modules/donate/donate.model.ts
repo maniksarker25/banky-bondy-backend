@@ -1,16 +1,22 @@
-import { model, Schema } from 'mongoose';
-import { IDonor } from './donate.interface';
+import { Schema, model } from 'mongoose';
+import { IDonate } from './donate.interface';
+import { ENUM_DONATE_STATUS } from './donate.enum';
 
-const DonorSchema = new Schema<IDonor>(
+const DonateSchema = new Schema<IDonate>(
     {
         user: {
             type: Schema.Types.ObjectId,
             ref: 'NormalUser',
             required: true,
         },
+        status: {
+            type: String,
+            enum: Object.values(ENUM_DONATE_STATUS),
+            default: ENUM_DONATE_STATUS.Unpaid,
+        },
         amount: { type: Number, required: true },
     },
     { timestamps: true }
 );
 
-export const Donor = model<IDonor>('Donor', DonorSchema);
+export const Donate = model<IDonate>('Donate', DonateSchema);
