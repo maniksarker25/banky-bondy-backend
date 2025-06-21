@@ -1,12 +1,14 @@
-import { z } from "zod";
+import { z } from 'zod';
 
-export const updateDonateData = z.object({
+const createDonorSchema = z.object({
     body: z.object({
-        name: z.string().optional(),
-        phone: z.string().optional(),
-        address: z.string().optional(),
+        user: z.string({ required_error: 'User is required' }),
+        amount: z
+            .number({ required_error: 'Amount is required' })
+            .positive({ message: 'Amount must be positive' }),
     }),
 });
 
-const DonateValidations = { updateDonateData };
-export default DonateValidations;
+export const DonorValidations = {
+    createDonorSchema,
+};
