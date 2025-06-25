@@ -1,4 +1,4 @@
-# Project Name
+# Banky Bondy
 
 A comprehensive **Node.js** application built with **Express** and **TypeScript** that offers several functionalities including **audio sharing**, **project management**, **real-time chat**, **institution management**, and **bond sharing**. This project provides an all-in-one platform to manage tasks, share resources, and improve communication within organizations or groups.
 
