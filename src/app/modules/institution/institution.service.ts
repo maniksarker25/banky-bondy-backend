@@ -266,10 +266,14 @@ const joinLeaveInstitution = async (
             'Group and designation is required for join institution'
         );
     }
-    if (payload.group != ENUM_GROUP.A && payload.group != ENUM_GROUP.B) {
+    if (
+        payload.group != ENUM_GROUP.A &&
+        payload.group != ENUM_GROUP.B &&
+        payload.group != ENUM_GROUP.Mediator
+    ) {
         throw new AppError(
             httpStatus.BAD_REQUEST,
-            'Invalid group type , please select A or B'
+            'Invalid group type , please select A or B or Mediator'
         );
     }
     const result = await InstitutionMember.create({ ...payload, user: userId });

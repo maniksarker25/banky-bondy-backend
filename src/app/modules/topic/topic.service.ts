@@ -1,8 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import AppError from '../../error/appError';
 import { ITopic } from './topic.interface';
 import { Topic } from './topic.model';
-import QueryBuilder from '../../builder/QueryBuilder';
 import { deleteFileFromS3 } from '../../helper/deleteFromS3';
 
 // Create Topic
@@ -12,19 +12,75 @@ const createTopic = async (payload: ITopic) => {
 };
 
 // Get All Topics
-const getAllTopics = async (query: Record<string, unknown>) => {
-    const topicQuery = new QueryBuilder(Topic.find({ isDeleted: false }), query)
-        .search(['name'])
-        .fields()
-        .filter()
-        .paginate()
-        .sort();
+// const getAllTopics = async (query: Record<string, unknown>) => {
+//     const topicQuery = new QueryBuilder(Topic.find({ isDeleted: false }), query)
+//         .search(['name'])
+//         .fields()
+//         .filter()
+//         .paginate()
+//         .sort();
 
-    const result = await topicQuery.modelQuery;
-    const meta = await topicQuery.countTotal();
+//     const result = await topicQuery.modelQuery;
+//     const meta = await topicQuery.countTotal();
+//     return {
+//         meta,
+//         result,
+//     };
+// };
+
+const getAllTopics = async (query: Record<string, unknown>) => {
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 10;
+    const skip = (page - 1) * limit;
+    const searchTerm = query.searchTerm || '';
+
+    const filters: any = {};
+    Object.keys(query).forEach((key) => {
+        if (!['searchTerm', 'page', 'limit'].includes(key)) {
+            filters[key] = query[key];
+        }
+    });
+
+    const matchStage: any = { isDeleted: false };
+
+    if (searchTerm) {
+        matchStage.$or = [
+            { name: { $regex: searchTerm, $options: 'i' } },
+            { description: { $regex: searchTerm, $options: 'i' } },
+        ];
+    }
+
+    const topics = await Topic.aggregate([
+        { $match: matchStage },
+        {
+            $lookup: {
+                from: 'audios',
+                localField: '_id',
+                foreignField: 'audioTopic',
+                as: 'audios',
+            },
+        },
+        {
+            $addFields: {
+                totalAudios: { $size: '$audios' },
+            },
+        },
+        { $project: { audios: 0 } },
+        { $skip: skip },
+        { $limit: limit },
+        { $sort: { createdAt: -1 } },
+    ]);
+
+    const totalCount = await Topic.countDocuments(matchStage);
+
     return {
-        meta,
-        result,
+        meta: {
+            page,
+            limit,
+            totalCount,
+            totalPages: Math.ceil(totalCount / limit),
+        },
+        result: topics,
     };
 };
 

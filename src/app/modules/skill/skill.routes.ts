@@ -19,14 +19,14 @@ router.post(
 // Route to get all skills
 router.get(
     '/all-skills',
-    auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
+    // auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
     SkillController.getAllSkills
 );
 
 // Route to get a skill by ID
 router.get(
     '/single-skill/:skillId',
-    auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
+    // auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
     SkillController.getSkillById
 );
 
