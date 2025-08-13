@@ -5,6 +5,7 @@ import Audio, { AudioRating } from './audio.model';
 import { IAudio } from './audio.interface';
 import { deleteFileFromS3 } from '../../helper/deleteFromS3';
 import mongoose from 'mongoose';
+import AudioBookmark from '../audioBookmark/audio.bookmark.model';
 
 // Create Audio
 const createAudio = async (userId: string, payload: IAudio) => {
@@ -93,6 +94,8 @@ const deleteAudio = async (userId: string, audioId: string) => {
         throw new AppError(httpStatus.NOT_FOUND, 'Audio not found');
     }
     const result = await Audio.findByIdAndDelete(audioId);
+    await AudioRating.deleteMany({ audio: audioId });
+    await AudioBookmark.deleteMany({ audio: audioId });
     if (audio.audio_url) {
         deleteFileFromS3(audio.audio_url);
     }
