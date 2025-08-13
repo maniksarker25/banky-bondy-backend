@@ -8,6 +8,7 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import NormalUser from '../normalUser/normalUser.model';
 import Institution from '../institution/institution.model';
 import InstitutionConversation from '../institutionConversation/institutionConversation.model';
+import { deleteFileFromS3 } from '../../helper/deleteFromS3';
 
 const getComments = async (
     profileId: string,
@@ -215,6 +216,9 @@ const deleteComment = async (profileId: string, id: string) => {
     await Comment.deleteMany({ parentCommentId: comment._id });
 
     const result = await Comment.findByIdAndDelete(id);
+    if (comment.image) {
+        deleteFileFromS3(comment.image);
+    }
     return result;
 };
 
@@ -233,6 +237,9 @@ const updateComment = async (
         new: true,
         runValidators: true,
     });
+    if (payload.image && comment.image) {
+        deleteFileFromS3(comment.image);
+    }
     return result;
 };
 

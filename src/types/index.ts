@@ -25,6 +25,7 @@ declare namespace Express {
             project_ducument?: File[];
             project_image?: File[];
             institution_cover?: File[];
+            comment_image?: File[];
         };
     }
 }
