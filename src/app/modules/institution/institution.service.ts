@@ -138,6 +138,8 @@ const getAllInstitutions = async (
                 // totalParticipants: 1,
                 participantOfGroupA: 1,
                 participantOfGroupB: 1,
+                facebookLink: 1,
+                instagramLink: 1,
                 'creator._id': 1,
                 'creator.name': 1,
                 'creator.profile_image': 1,
