@@ -12,7 +12,7 @@ const conversationSchema = new Schema<IConversation>(
         lastMessage: {
             type: Schema.Types.ObjectId,
             ref: 'Message',
-            required: true,
+            default: null,
         },
         type: {
             type: String,
