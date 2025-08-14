@@ -30,7 +30,7 @@ import ProjectMember from './projectMember.model';
 //     };
 // };
 
-import { Types } from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import NormalUser from '../normalUser/normalUser.model';
 import Conversation from '../conversation/conversation.model';
 
@@ -116,13 +116,16 @@ const addMember = async (
     projectId: string,
     payload: any
 ) => {
-    const project = await Project.findOne({ ower: profileId, _id: projectId });
+    const project = await Project.findOne({
+        owner: new mongoose.Types.ObjectId(profileId),
+        _id: new mongoose.Types.ObjectId(projectId),
+    });
     if (!project) {
         throw new AppError(httpStatus.NOT_FOUND, 'This is not your project');
     }
     const userExist = await NormalUser.exists({ _id: payload.user });
     if (!userExist) {
-        throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+        throw new AppError(httpStatus.NOT_FOUND, 'This user not found');
     }
     const result = await ProjectMember.findOneAndUpdate(
         { project: projectId, user: payload.user },
