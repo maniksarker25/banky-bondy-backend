@@ -1,50 +1,81 @@
-import { z } from 'zod';
-import { Types } from 'mongoose';
+import express, { Request, Response, NextFunction } from 'express';
+import auth from '../../middlewares/auth';
+import { USER_ROLE } from '../user/user.constant';
+import validateRequest from '../../middlewares/validateRequest';
+import commentValidations from './comment.validation';
+import commentController from './comment.controller';
+import { uploadFile } from '../../helper/mutler-s3-uploader';
 
-const ObjectIdSchema = (fieldName: string) =>
-    z
-        .string({ required_error: `${fieldName} is required` })
-        .min(1, `${fieldName} cannot be empty`)
-        .refine((val) => Types.ObjectId.isValid(val), {
-            message: `${fieldName} must be a valid ObjectId`,
-        });
+const router = express.Router();
 
-const createCommentSchema = z.object({
-    body: z.object({
-        podcast: ObjectIdSchema('Podcast id'),
-        text: z
-            .string()
-            .trim()
-            .min(1, { message: 'Text is required' })
-            .max(500, { message: 'Text cannot exceed 500 characters' }),
-    }),
-});
-const updateCommentValidationSchema = z.object({
-    body: z.object({
-        text: z
-            .string()
-            .trim()
-            .min(1, { message: 'Text is required' })
-            .max(500, { message: 'Text cannot exceed 500 characters' })
-            .optional(),
-    }),
-});
+router.post(
+    '/create',
+    auth(USER_ROLE.user),
+    uploadFile(),
+    (req: Request, res: Response, next: NextFunction) => {
+        if (req.body.data) {
+            req.body = JSON.parse(req.body.data);
+        }
+        next();
+    },
+    validateRequest(commentValidations.createCommentSchema),
+    commentController.createComment
+);
+router.post(
+    '/create-reply',
+    auth(USER_ROLE.user),
+    uploadFile(),
+    (req: Request, res: Response, next: NextFunction) => {
+        if (req.body.data) {
+            req.body = JSON.parse(req.body.data);
+        }
+        next();
+    },
+    validateRequest(commentValidations.createReplySchema),
+    commentController.createReply
+);
+router.patch(
+    '/update-comment/:id',
+    auth(USER_ROLE.user),
+    uploadFile(),
+    (req: Request, res: Response, next: NextFunction) => {
+        if (req.body.data) {
+            req.body = JSON.parse(req.body.data);
+        }
+        next();
+    },
+    validateRequest(commentValidations.updateCommentValidationSchema),
+    commentController.updateComment
+);
+router.delete(
+    '/delete-comment/:id',
+    auth(USER_ROLE.user),
 
-const createReplySchema = z.object({
-    body: z.object({
-        parent: ObjectIdSchema('Parent comment id'),
-        text: z
-            .string()
-            .trim()
-            .min(1, { message: 'Text is required' })
-            .max(500, { message: 'Text cannot exceed 500 characters' }),
-    }),
-});
+    commentController.deleteComment
+);
 
-const CommentValidations = {
-    createCommentSchema,
-    createReplySchema,
-    updateCommentValidationSchema,
-};
+router.post(
+    '/like-unlike/:id',
+    auth(USER_ROLE.user),
+    commentController.likeUnlikeComment
+);
 
-export default CommentValidations;
+router.get(
+    '/get-conversation-comments/:id',
+    auth(USER_ROLE.user),
+
+    commentController.getPodcastComments
+);
+
+router.get(
+    '/get-replies/:id',
+    auth(USER_ROLE.user),
+    commentController.getReplies
+);
+router.get(
+    '/get-likers/:id',
+    auth(USER_ROLE.user),
+    commentController.getAllLikersForComment
+);
+
+export const commentRoutes = router;

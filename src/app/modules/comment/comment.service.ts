@@ -73,21 +73,20 @@ const likeUnlikeComment = async (commentId: string, user: JwtPayload) => {
     }
 
     const userObjectId = new mongoose.Types.ObjectId(user.profileId);
-    const alreadyLiked = comment.likers.some((l: any) =>
-        l.likerId.equals(userObjectId)
-    );
+
+    const alreadyLiked = comment.likers.some((l) => l.equals(userObjectId));
 
     let updatedComment: any;
     if (alreadyLiked) {
         updatedComment = await Comment.findByIdAndUpdate(
             commentId,
-            { $pull: { likers: { likerId: userObjectId } } },
+            { $pull: { likers: userObjectId } },
             { new: true }
         ).select('likers');
     } else {
         updatedComment = await Comment.findByIdAndUpdate(
             commentId,
-            { $push: { likers: { likerId: userObjectId } } },
+            { $push: { likers: userObjectId } },
             { new: true }
         ).select('likers');
     }
@@ -275,6 +274,21 @@ const getReplies = async (
     return response;
 };
 
+const getAllLikersForComment = async (commentId: string) => {
+    const comment = await Comment.findById(commentId).populate(
+        'likers',
+        'name profile_image'
+    );
+
+    if (!comment) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Comment not found');
+    }
+
+    const likers = comment.likers;
+
+    return likers;
+};
+
 const CommentServices = {
     createComment,
     createReply,
@@ -283,5 +297,6 @@ const CommentServices = {
     likeUnlikeComment,
     getInstitutionConversationComments,
     getReplies,
+    getAllLikersForComment,
 };
 export default CommentServices;

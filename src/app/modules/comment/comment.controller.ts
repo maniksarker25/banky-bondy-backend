@@ -1,9 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import catchAsync from '../../utilities/catchasync';
 import sendResponse from '../../utilities/sendResponse';
 import commentServices from './comment.service';
+import { getCloudFrontUrl } from '../../helper/mutler-s3-uploader';
 
 const createComment = catchAsync(async (req, res) => {
+    const file: any = req.files?.comment_image;
+    if (req.files?.comment_image) {
+        req.body.image = getCloudFrontUrl(file[0].key);
+    }
     const result = await commentServices.createComment(req.user, req.body);
     sendResponse(res, {
         statusCode: httpStatus.OK,
@@ -14,6 +20,10 @@ const createComment = catchAsync(async (req, res) => {
 });
 
 const createReply = catchAsync(async (req, res) => {
+    const file: any = req.files?.comment_image;
+    if (req.files?.comment_image) {
+        req.body.image = getCloudFrontUrl(file[0].key);
+    }
     const result = await commentServices.createReply(req.user, req.body);
     sendResponse(res, {
         statusCode: httpStatus.OK,
@@ -23,6 +33,10 @@ const createReply = catchAsync(async (req, res) => {
     });
 });
 const updateComment = catchAsync(async (req, res) => {
+    const file: any = req.files?.comment_image;
+    if (req.files?.comment_image) {
+        req.body.image = getCloudFrontUrl(file[0].key);
+    }
     const result = await commentServices.updateComment(
         req.user,
         req.params.id,
@@ -85,6 +99,15 @@ const getReplies = catchAsync(async (req, res) => {
         data: result,
     });
 });
+const getAllLikersForComment = catchAsync(async (req, res) => {
+    const result = await commentServices.getAllLikersForComment(req.params.id);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Likers retrieved  successfully',
+        data: result,
+    });
+});
 
 const CommentController = {
     createComment,
@@ -94,5 +117,6 @@ const CommentController = {
     getPodcastComments,
     likeUnlikeComment,
     getReplies,
+    getAllLikersForComment,
 };
 export default CommentController;
