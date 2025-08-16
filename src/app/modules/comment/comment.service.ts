@@ -26,7 +26,7 @@ const createReply = async (user: JwtPayload, payload: IComment) => {
         ...payload,
         commentor: user.profileId,
         likers: [],
-        podcast: comment.institutionConversation,
+        institutionConversation: comment.institutionConversation,
     };
     const result = await Comment.create(replyData);
     return result;
