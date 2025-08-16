@@ -8,7 +8,7 @@ const commentSchema = new mongoose.Schema<IComment>(
             ref: 'InstitutionConversation',
             required: true,
         },
-        userId: {
+        commentor: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'NormalUser',
             required: true,
@@ -16,7 +16,7 @@ const commentSchema = new mongoose.Schema<IComment>(
         text: { type: String, required: true },
         image: { type: String, default: '' },
         likers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'NormalUser' }],
-        parentCommentId: {
+        parent: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Comment',
             default: null,
