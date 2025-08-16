@@ -124,6 +124,15 @@ const getAllInstitutions = async (
                         },
                     },
                 },
+                isJoined: {
+                    $in: [
+                        new mongoose.Types.ObjectId(userId),
+                        '$participants.user',
+                    ],
+                },
+                isCreator: {
+                    $eq: [new mongoose.Types.ObjectId(userId), '$creator._id'],
+                },
             },
         },
 
@@ -143,6 +152,8 @@ const getAllInstitutions = async (
                 'creator._id': 1,
                 'creator.name': 1,
                 'creator.profile_image': 1,
+                isJoined: 1,
+                isCreator: 1,
             },
         },
         {

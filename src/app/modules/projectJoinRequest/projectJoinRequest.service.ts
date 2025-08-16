@@ -12,6 +12,13 @@ const sendJoinRequest = async (userId: string, projectId: string) => {
     if (!project) {
         throw new AppError(httpStatus.NOT_FOUND, 'Project not found');
     }
+    const existingRequest = await ProjectJoinRequest.findOne({
+        user: userId,
+        project: projectId,
+    });
+    if (existingRequest) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Join request already sent');
+    }
     const result = await ProjectJoinRequest.create({
         user: userId,
         project: projectId,

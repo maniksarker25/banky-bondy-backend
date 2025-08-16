@@ -277,6 +277,24 @@ const getAllProjects = async (userId: string, query: Record<string, any>) => {
                 },
             },
         },
+        {
+            $lookup: {
+                from: 'projectjoinrequests',
+                localField: '_id',
+                foreignField: 'project',
+                as: 'joinRequests',
+            },
+        },
+        {
+            $addFields: {
+                isJoinRequestSent: {
+                    $in: [
+                        new mongoose.Types.ObjectId(userId),
+                        '$joinRequests.user',
+                    ],
+                },
+            },
+        },
 
         // Select only the necessary fields
         {
@@ -296,6 +314,7 @@ const getAllProjects = async (userId: string, query: Record<string, any>) => {
                 'owner.profile_image': 1,
                 isJoined: 1,
                 isOwner: 1,
+                isJoinRequestSent: 1,
             },
         },
 
