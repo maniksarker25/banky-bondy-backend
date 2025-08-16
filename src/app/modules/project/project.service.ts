@@ -294,6 +294,8 @@ const getAllProjects = async (userId: string, query: Record<string, any>) => {
                 'owner._id': 1,
                 'owner.name': 1,
                 'owner.profile_image': 1,
+                isJoined: 1,
+                isOwner: 1,
             },
         },
 
