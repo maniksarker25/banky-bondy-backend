@@ -100,7 +100,7 @@ const likeUnlikeComment = async (commentId: string, user: JwtPayload) => {
 
 const getInstitutionConversationComments = async (
     profileId: string,
-    podcastId: string,
+    institutionConversation: string,
     query: Record<string, any>
 ) => {
     const page = parseInt(query.page as string) || 1;
@@ -110,7 +110,9 @@ const getInstitutionConversationComments = async (
     const comments = await Comment.aggregate([
         {
             $match: {
-                podcast: new mongoose.Types.ObjectId(podcastId),
+                institutionConversation: new mongoose.Types.ObjectId(
+                    institutionConversation
+                ),
                 parent: null,
             },
         },
