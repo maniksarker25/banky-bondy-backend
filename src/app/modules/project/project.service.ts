@@ -247,19 +247,17 @@ const getAllProjects = async (userId: string, query: Record<string, any>) => {
         // Lookup to populate owner details
         {
             $lookup: {
-                from: 'normalusers', // Assuming 'normalusers' is the collection for users
-                localField: 'owner', // Project's 'owner' field references the user
+                from: 'normalusers',
+                localField: 'owner',
                 foreignField: '_id',
                 as: 'owner',
             },
         },
 
-        // Unwind the 'owner' array (since it's a single object, it will turn into a single entry)
         { $unwind: '$owner' },
-        // Lookup to count total participants in ProjectMember collection
         {
             $lookup: {
-                from: 'projectmembers', // must match the actual collection name in MongoDB
+                from: 'projectmembers',
                 localField: '_id',
                 foreignField: 'project',
                 as: 'participants',
@@ -268,6 +266,15 @@ const getAllProjects = async (userId: string, query: Record<string, any>) => {
         {
             $addFields: {
                 totalParticipants: { $size: '$participants' },
+                isJoined: {
+                    $in: [
+                        new mongoose.Types.ObjectId(userId),
+                        '$participants.user',
+                    ],
+                },
+                isOwner: {
+                    $eq: [new mongoose.Types.ObjectId(userId), '$owner._id'],
+                },
             },
         },
 
@@ -290,14 +297,11 @@ const getAllProjects = async (userId: string, query: Record<string, any>) => {
             },
         },
 
-        // Sort by createdAt (descending by default)
         { $sort: { createdAt: -1 } },
 
-        // Pagination (skip and limit)
         { $skip: skip },
         { $limit: limit },
 
-        // Count total projects for pagination
         {
             $facet: {
                 meta: [{ $count: 'total' }],
