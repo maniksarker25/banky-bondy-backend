@@ -81,20 +81,6 @@ const getAllInstitutions = async (
             $unwind: '$creator',
         },
 
-        // {
-        //     $lookup: {
-        //         from: 'institutionmembers',
-        //         localField: '_id',
-        //         foreignField: 'institution',
-        //         as: 'participants',
-        //     },
-        // },
-        // {
-        //     $addFields: {
-        //         totalParticipants: { $size: '$participants' },
-        //     },
-        // },
-
         {
             $lookup: {
                 from: 'institutionmembers',
@@ -105,7 +91,6 @@ const getAllInstitutions = async (
         },
         {
             $addFields: {
-                // totalParticipants: { $size: '$participants' },
                 participantOfGroupA: {
                     $size: {
                         $filter: {
@@ -144,7 +129,6 @@ const getAllInstitutions = async (
                 createdAt: 1,
                 updatedAt: 1,
                 cover_image: 1,
-                // totalParticipants: 1,
                 participantOfGroupA: 1,
                 participantOfGroupB: 1,
                 facebookLink: 1,
