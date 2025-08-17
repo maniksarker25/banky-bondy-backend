@@ -7,6 +7,7 @@ import { emitError } from './helper';
 import { Types } from 'mongoose';
 import Project from '../modules/project/project.model';
 import { BondLink } from '../modules/bondLink/bondLink.model';
+import ChatGroup from '../modules/chatGroup/chatGroup.model';
 
 const handleChat = async (
     io: IOServer,
@@ -179,7 +180,7 @@ const handleChat = async (
                 });
                 return;
             }
-            const chatGroup = await Project.findById(data?.groupId);
+            const chatGroup = await ChatGroup.findById(data?.groupId);
             if (!chatGroup) {
                 emitError(socket, {
                     code: 400,

@@ -15,5 +15,5 @@ const chatGroupSchema = new Schema<IChatGroup>(
     { timestamps: true }
 );
 
-const chatGroupModel = model<IChatGroup>('ChatGroup', chatGroupSchema);
-export default chatGroupModel;
+const ChatGroup = model<IChatGroup>('ChatGroup', chatGroupSchema);
+export default ChatGroup;
