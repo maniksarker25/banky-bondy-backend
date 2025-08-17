@@ -15,5 +15,11 @@ export const createChatGroupData = z.object({
     }),
 });
 
-const ChatGroupValidations = { createChatGroupData };
+const addMemberValidationSchema = z.object({
+    body: z.object({
+        memberId: z.string({ required_error: 'Member id is required' }),
+    }),
+});
+
+const ChatGroupValidations = { createChatGroupData, addMemberValidationSchema };
 export default ChatGroupValidations;

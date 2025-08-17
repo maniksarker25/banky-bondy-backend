@@ -17,10 +17,23 @@ const createGroupChat = catchAsync(async (req, res) => {
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: 'Profile updated successfully',
+        message: 'Chat group created successfully',
+        data: result,
+    });
+});
+const addMember = catchAsync(async (req, res) => {
+    const result = await chatGroupServices.addMember(
+        req.user.profileId,
+        req.params.id,
+        req.body.memberId
+    );
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Member added successfully',
         data: result,
     });
 });
 
-const ChatGroupController = { createGroupChat };
+const ChatGroupController = { createGroupChat, addMember };
 export default ChatGroupController;

@@ -21,5 +21,12 @@ router.post(
     validateRequest(chatGroupValidations.createChatGroupData),
     chatGroupController.createGroupChat
 );
+router.post(
+    '/add-member/:id',
+    auth(USER_ROLE.user),
+
+    validateRequest(chatGroupValidations.addMemberValidationSchema),
+    chatGroupController.addMember
+);
 
 export const chatGroupRoutes = router;
