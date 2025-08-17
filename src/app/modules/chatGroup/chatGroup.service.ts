@@ -11,9 +11,15 @@ const createGroupChat = async (
     payload: Partial<IChatGroup>
 ) => {
     const result = await ChatGroup.create({ ...payload, creator: profileId });
+    if (!payload.participants || payload.participants?.length < 2) {
+        throw new AppError(
+            httpStatus.BAD_REQUEST,
+            'At least 2 member need to create a group'
+        );
+    }
     await Conversation.create({
         chatGroup: result._id,
-        participants: payload.participants,
+        participants: [...payload.participants, profileId],
     });
     return result;
 };
