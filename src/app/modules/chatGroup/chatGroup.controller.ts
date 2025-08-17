@@ -1,24 +1,26 @@
-import httpStatus from "http-status";
-import catchAsync from "../../utilities/catchasync";
-import sendResponse from "../../utilities/sendResponse";
-import chatGroupServices from "./chatGroup.service";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import httpStatus from 'http-status';
+import catchAsync from '../../utilities/catchasync';
+import sendResponse from '../../utilities/sendResponse';
+import chatGroupServices from './chatGroup.service';
+import { getCloudFrontUrl } from '../../helper/mutler-s3-uploader';
 
-const updateUserProfile = catchAsync(async (req, res) => {
-    const { files } = req;
-    if (files && typeof files === "object" && "profile_image" in files) {
-        req.body.profile_image = files["profile_image"][0].path;
+const createGroupChat = catchAsync(async (req, res) => {
+    const file: any = req.files?.group_chat_image;
+    if (req.files?.group_chat_image) {
+        req.body.image = getCloudFrontUrl(file[0].key);
     }
-    const result = await chatGroupServices.updateUserProfile(
+    const result = await chatGroupServices.createGroupChat(
         req.user.profileId,
         req.body
     );
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: "Profile updated successfully",
+        message: 'Profile updated successfully',
         data: result,
     });
 });
 
-const ChatGroupController = { updateUserProfile };
+const ChatGroupController = { createGroupChat };
 export default ChatGroupController;

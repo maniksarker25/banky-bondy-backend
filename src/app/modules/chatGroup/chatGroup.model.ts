@@ -16,6 +16,10 @@ const chatGroupSchema = new Schema<IChatGroup>(
             ref: 'NomralUser',
             required: true,
         },
+        image: {
+            type: String,
+            default: '',
+        },
     },
     { timestamps: true }
 );

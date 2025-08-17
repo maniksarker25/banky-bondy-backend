@@ -1,15 +1,15 @@
-import express from "express";
-import auth from "../../middlewares/auth";
-import { USER_ROLE } from "../user/user.constant";
-import validateRequest from "../../middlewares/validateRequest";
-import chatGroupValidations from "./chatGroup.validation";
-import chatGroupController from "./chatGroup.controller";
-import { uploadFile } from "../../helper/fileUploader";
+import express from 'express';
+import auth from '../../middlewares/auth';
+import { USER_ROLE } from '../user/user.constant';
+import validateRequest from '../../middlewares/validateRequest';
+import chatGroupValidations from './chatGroup.validation';
+import chatGroupController from './chatGroup.controller';
+import { uploadFile } from '../../helper/mutler-s3-uploader';
 
 const router = express.Router();
 
-router.patch(
-    "/update-profile",
+router.post(
+    '/create',
     auth(USER_ROLE.user),
     uploadFile(),
     (req, res, next) => {
@@ -18,8 +18,8 @@ router.patch(
         }
         next();
     },
-    validateRequest(chatGroupValidations.updateChatGroupData),
-    chatGroupController.updateUserProfile
+    validateRequest(chatGroupValidations.createChatGroupData),
+    chatGroupController.createGroupChat
 );
 
 export const chatGroupRoutes = router;

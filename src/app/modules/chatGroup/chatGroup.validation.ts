@@ -1,12 +1,19 @@
-import { z } from "zod";
-
-export const updateChatGroupData = z.object({
+import { z } from 'zod';
+const ObjectIdSchema = z
+    .string()
+    .refine((val) => /^[0-9a-fA-F]{24}$/.test(val), {
+        message: 'Invalid ObjectId format',
+    });
+export const createChatGroupData = z.object({
     body: z.object({
-        name: z.string().optional(),
-        phone: z.string().optional(),
-        address: z.string().optional(),
+        name: z.string().min(1, 'Name is required'),
+        participants: z
+            .array(ObjectIdSchema)
+            .min(2, 'A chat group must have at least 2 participants'),
+        creator: ObjectIdSchema,
+        image: z.string().default(''),
     }),
 });
 
-const ChatGroupValidations = { updateChatGroupData };
+const ChatGroupValidations = { createChatGroupData };
 export default ChatGroupValidations;
