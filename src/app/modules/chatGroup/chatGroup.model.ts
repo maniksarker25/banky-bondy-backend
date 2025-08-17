@@ -11,6 +11,11 @@ const chatGroupSchema = new Schema<IChatGroup>(
             ref: 'NormalUser',
             required: true,
         },
+        creator: {
+            type: Schema.Types.ObjectId,
+            ref: 'NomralUser',
+            required: true,
+        },
     },
     { timestamps: true }
 );
