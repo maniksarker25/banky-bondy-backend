@@ -34,6 +34,19 @@ const addMember = catchAsync(async (req, res) => {
         data: result,
     });
 });
+const removeMember = catchAsync(async (req, res) => {
+    const result = await chatGroupServices.removeMember(
+        req.user.profileId,
+        req.params.id,
+        req.body.memberId
+    );
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Member removed successfully',
+        data: result,
+    });
+});
 
-const ChatGroupController = { createGroupChat, addMember };
+const ChatGroupController = { createGroupChat, addMember, removeMember };
 export default ChatGroupController;

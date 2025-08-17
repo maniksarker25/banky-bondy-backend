@@ -64,5 +64,41 @@ const addMember = async (
     return group;
 };
 
-const ChatGroupServices = { createGroupChat, addMember };
+const removeMember = async (
+    profileId: string,
+    groupId: string,
+    memberId: string
+) => {
+    const group = await ChatGroup.findById(groupId);
+    if (!group) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Invalid group id');
+    }
+
+    if (group.creator.toString() != profileId) {
+        throw new AppError(
+            httpStatus.BAD_REQUEST,
+            'You are not authorized for remove member'
+        );
+    }
+
+    if (!group.participants.includes(new mongoose.Types.ObjectId(memberId))) {
+        throw new AppError(
+            httpStatus.NOT_FOUND,
+            'This member not include in that group'
+        );
+    }
+
+    const result = await ChatGroup.findByIdAndUpdate(
+        groupId,
+        { $pull: { participants: memberId } },
+        { new: true, runValidators: true }
+    );
+    await Conversation.findOneAndUpdate(
+        { chatGroup: groupId },
+        { $pull: { participants: memberId } }
+    );
+    return result;
+};
+
+const ChatGroupServices = { createGroupChat, addMember, removeMember };
 export default ChatGroupServices;

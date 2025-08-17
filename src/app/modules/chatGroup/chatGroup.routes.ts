@@ -28,5 +28,12 @@ router.post(
     validateRequest(chatGroupValidations.addMemberValidationSchema),
     chatGroupController.addMember
 );
+router.post(
+    '/remove-member/:id',
+    auth(USER_ROLE.user),
+
+    validateRequest(chatGroupValidations.addMemberValidationSchema),
+    chatGroupController.addMember
+);
 
 export const chatGroupRoutes = router;
