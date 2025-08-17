@@ -24,6 +24,30 @@ const createGroupChat = async (
     return result;
 };
 
+const updateGroupData = async (
+    profileId: string,
+    id: string,
+    payload: Partial<IChatGroup>
+) => {
+    const group = await ChatGroup.findById(id);
+    if (!group) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Group not found');
+    }
+
+    if (group.creator.toString() != profileId) {
+        throw new AppError(
+            httpStatus.BAD_REQUEST,
+            'You are not authorized for update group'
+        );
+    }
+
+    const result = await ChatGroup.findByIdAndUpdate(id, payload, {
+        new: true,
+        runValidators: true,
+    });
+    return result;
+};
+
 const addMember = async (
     profileId: string,
     groupId: string,
@@ -100,5 +124,10 @@ const removeMember = async (
     return result;
 };
 
-const ChatGroupServices = { createGroupChat, addMember, removeMember };
+const ChatGroupServices = {
+    createGroupChat,
+    addMember,
+    removeMember,
+    updateGroupData,
+};
 export default ChatGroupServices;

@@ -21,6 +21,23 @@ const createGroupChat = catchAsync(async (req, res) => {
         data: result,
     });
 });
+const updateGroupData = catchAsync(async (req, res) => {
+    const file: any = req.files?.group_chat_image;
+    if (req.files?.group_chat_image) {
+        req.body.image = getCloudFrontUrl(file[0].key);
+    }
+    const result = await chatGroupServices.updateGroupData(
+        req.params.id,
+        req.user.profileId,
+        req.body
+    );
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Chat group updated successfully',
+        data: result,
+    });
+});
 const addMember = catchAsync(async (req, res) => {
     const result = await chatGroupServices.addMember(
         req.user.profileId,
@@ -48,5 +65,10 @@ const removeMember = catchAsync(async (req, res) => {
     });
 });
 
-const ChatGroupController = { createGroupChat, addMember, removeMember };
+const ChatGroupController = {
+    createGroupChat,
+    addMember,
+    removeMember,
+    updateGroupData,
+};
 export default ChatGroupController;

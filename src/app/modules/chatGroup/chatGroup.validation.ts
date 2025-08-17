@@ -10,8 +10,13 @@ export const createChatGroupData = z.object({
         participants: z
             .array(ObjectIdSchema)
             .min(2, 'A chat group must have at least 2 participants'),
-        creator: ObjectIdSchema,
-        image: z.string().default(''),
+        image: z.string(),
+    }),
+});
+export const updateChatGroupData = z.object({
+    body: z.object({
+        name: z.string().optional(),
+        image: z.string(),
     }),
 });
 
@@ -21,5 +26,9 @@ const addMemberValidationSchema = z.object({
     }),
 });
 
-const ChatGroupValidations = { createChatGroupData, addMemberValidationSchema };
+const ChatGroupValidations = {
+    createChatGroupData,
+    addMemberValidationSchema,
+    updateChatGroupData,
+};
 export default ChatGroupValidations;

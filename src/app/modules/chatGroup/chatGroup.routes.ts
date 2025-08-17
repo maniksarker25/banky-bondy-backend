@@ -21,6 +21,19 @@ router.post(
     validateRequest(chatGroupValidations.createChatGroupData),
     chatGroupController.createGroupChat
 );
+router.patch(
+    '/update/:id',
+    auth(USER_ROLE.user),
+    uploadFile(),
+    (req, res, next) => {
+        if (req.body.data) {
+            req.body = JSON.parse(req.body.data);
+        }
+        next();
+    },
+    validateRequest(chatGroupValidations.updateChatGroupData),
+    chatGroupController.createGroupChat
+);
 router.post(
     '/add-member/:id',
     auth(USER_ROLE.user),
