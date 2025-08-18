@@ -16,8 +16,6 @@ const handleChat = async (
 ): Promise<void> => {
     // new message -----------------------------------
     socket.on('new-message', async (data) => {
-        console.log('ncidjdkfjd');
-
         if (!data.receiver && !data.projectId) {
             emitError(socket, {
                 code: 400,

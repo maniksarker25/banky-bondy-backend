@@ -44,6 +44,7 @@ export const uploadFile = () => {
             'project_ducument',
             'project_image',
             'institution_cover',
+            'comment_image',
         ];
 
         if (file.fieldname === undefined) {
@@ -131,6 +132,8 @@ export const uploadFile = () => {
                 uploadPath = 'uploads/images/institution_cover';
             } else if (file.fieldname === 'project_image') {
                 uploadPath = 'uploads/images/project_image';
+            } else if (file.fieldname === 'comment_image') {
+                uploadPath = 'uploads/images/comment_image';
             } else {
                 uploadPath = 'uploads';
             }
@@ -177,6 +180,7 @@ export const uploadFile = () => {
         { name: 'project_ducument', maxCount: 1 },
         { name: 'project_image', maxCount: 1 },
         { name: 'institution_cover', maxCount: 1 },
+        { name: 'comment_image', maxCount: 1 },
     ]);
 
     return upload;
