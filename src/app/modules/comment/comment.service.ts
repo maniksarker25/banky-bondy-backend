@@ -131,6 +131,9 @@ const getInstitutionConversationComments = async (
                     $eq: ['$commentor', new mongoose.Types.ObjectId(profileId)],
                 },
                 totalLike: { $size: '$likers' },
+                isMyLike: {
+                    $ed: ['$likers', new mongoose.Types.ObjectId(profileId)],
+                },
             },
         },
         { $unwind: '$commentorDetails' },
@@ -159,6 +162,7 @@ const getInstitutionConversationComments = async (
                 totalReplies: 1,
                 totalLike: 1,
                 isMyComment: 1,
+                isMyLike: 1,
             },
         },
         {
