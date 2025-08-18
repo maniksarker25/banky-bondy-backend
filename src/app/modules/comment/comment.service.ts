@@ -132,7 +132,7 @@ const getInstitutionConversationComments = async (
                 },
                 totalLike: { $size: '$likers' },
                 isMyLike: {
-                    $ed: ['$likers', new mongoose.Types.ObjectId(profileId)],
+                    $in: [new mongoose.Types.ObjectId(profileId), '$likers'],
                 },
             },
         },
