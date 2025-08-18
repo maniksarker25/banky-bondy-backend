@@ -144,22 +144,28 @@ const getAllInstitutions = async (
             $sort: { createdAt: -1 },
         },
         {
+            $facet: {
+                result: [{ $skip: skip }, { $limit: limit }],
+                totalCount: [{ $count: 'total' }],
+            },
+        },
+        {
             $skip: skip,
         },
         {
             $limit: limit,
         },
-        {
-            $facet: {
-                meta: [{ $count: 'total' }],
-                result: [],
-            },
-        },
+        // {
+        //     $facet: {
+        //         meta: [{ $count: 'total' }],
+        //         result: [],
+        //     },
+        // },
     ];
 
     const aggResult = await Institution.aggregate(pipeline);
     const result = aggResult[0]?.result || [];
-    const total = aggResult[0]?.meta[0]?.total || 0;
+    const total = aggResult[0]?.totalCount[0]?.total || 0;
     const totalPage = Math.ceil(total / limit);
 
     return {
