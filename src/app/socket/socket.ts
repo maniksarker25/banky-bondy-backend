@@ -2,7 +2,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Server as IOServer, Socket } from 'socket.io';
 import { Server as HTTPServer } from 'http';
-import NormalUser from '../modules/normalUser/normalUser.model';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import config from '../config';
+import handleChat from './handleChat';
 let io: IOServer;
 
 const initializeSocket = (server: HTTPServer) => {
@@ -20,21 +22,29 @@ const initializeSocket = (server: HTTPServer) => {
         // online user
         const onlineUser = new Set();
         io.on('connection', async (socket: Socket) => {
-            const userId = socket.handshake.query.id as string;
-            if (!userId) {
-                return;
-            }
-            const currentUser = await NormalUser.findById(userId);
-            if (!currentUser) {
-                return;
-            }
-            const currentUserId = currentUser?._id.toString();
+            // const userId = socket.handshake.query.id as string;
+            // if (!userId) {
+            //     return;
+            // }
+            // const currentUser = await NormalUser.findById(userId);
+            // if (!currentUser) {
+            //     return;
+            // }
+            // const currentUserId = currentUser?._id.toString();
+            const token = socket.handshake.auth.token;
+            const decode = (await jwt.verify(
+                token,
+                config.jwt_access_secret as string
+            )) as JwtPayload;
+            const currentUserId = decode.profileId;
             // create a room-------------------------
             socket.join(currentUserId as string);
             // set online user
             onlineUser.add(currentUserId);
             // send to the client
             io.emit('onlineUser', Array.from(onlineUser));
+            // handle caht
+            await handleChat(io, socket, currentUserId as string);
             socket.on('disconnect', () => {
                 console.log('A user disconnected:', socket.id);
             });
