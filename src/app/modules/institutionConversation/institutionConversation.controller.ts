@@ -23,7 +23,9 @@ const create = catchAsync(async (req: Request, res: Response) => {
 const getAll = catchAsync(async (req: Request, res: Response) => {
     const result =
         await InstitutionConversationService.getAllInstitutionConversations(
-            req.params.id
+            req.params.id,
+            req.user.profileId,
+            req.query
         );
     sendResponse(res, {
         statusCode: httpStatus.OK,
