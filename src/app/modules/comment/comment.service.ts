@@ -155,6 +155,7 @@ const getInstitutionConversationComments = async (
             $project: {
                 _id: 1,
                 text: 1,
+                image: 1,
                 createdAt: 1,
                 updatedAt: 1,
                 commentorName: '$commentorDetails.name',
