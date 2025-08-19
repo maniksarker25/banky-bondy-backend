@@ -62,6 +62,12 @@ const getAllInstitutionConversations = async (
                 isMyConversation: {
                     $eq: ['$user', new mongoose.Types.ObjectId(profileId)],
                 },
+                totalUser: {
+                    $size: '$ussers',
+                },
+                totalLiker: {
+                    $size: '$likers',
+                },
             },
         },
 

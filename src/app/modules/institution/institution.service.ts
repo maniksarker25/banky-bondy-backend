@@ -174,7 +174,7 @@ const getAllInstitutions = async (
 };
 
 // Get Institution by ID
-const getInstitutionById = async (institutionId: string) => {
+const getInstitutionById = async (institutionId: string, profileId: string) => {
     const institution = await Institution.findById(institutionId).populate(
         'creator',
         'name profile_image'
@@ -194,6 +194,9 @@ const getInstitutionById = async (institutionId: string) => {
         ...institution.toObject(),
         participantOfGroupA,
         participantOfGroupB,
+        isCreator:
+            institution.creator._id.toString() ==
+            new mongoose.Types.ObjectId(profileId).toString(),
     };
 };
 

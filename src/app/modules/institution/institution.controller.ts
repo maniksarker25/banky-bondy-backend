@@ -40,7 +40,8 @@ const getAllInstitutions = catchAsync(async (req, res) => {
 // Get By ID
 const getInstitutionById = catchAsync(async (req, res) => {
     const result = await InstitutionService.getInstitutionById(
-        req.params.institutionId
+        req.params.institutionId,
+        req.user.profileId
     );
     sendResponse(res, {
         statusCode: httpStatus.OK,
