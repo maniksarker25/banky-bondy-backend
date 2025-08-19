@@ -319,16 +319,14 @@ const getAllProjects = async (userId: string, query: Record<string, any>) => {
         },
 
         { $sort: { createdAt: -1 } },
-
-        { $skip: skip },
-        { $limit: limit },
-
         {
             $facet: {
                 meta: [{ $count: 'total' }],
                 result: [],
             },
         },
+        { $skip: skip },
+        { $limit: limit },
     ];
 
     // Execute the aggregation pipeline
