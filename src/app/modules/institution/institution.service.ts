@@ -55,12 +55,11 @@ const getAllInstitutions = async (
         );
         matchStage._id = { $in: joinedInstitutionIds };
     }
-
     const searchMatchStage: any = searchTerm
         ? {
               $or: [
-                  { name: { $regex: searchTerm, options: 'i' } },
-                  { description: { $regex: searchTerm, options: 'i' } },
+                  { name: { $regex: searchTerm, $options: 'i' } },
+                  { description: { $regex: searchTerm, $options: 'i' } },
               ],
           }
         : {};
