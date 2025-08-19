@@ -53,7 +53,10 @@ const getMyProjects = catchAsync(async (req, res) => {
 // Get Project by ID
 const getProjectById = catchAsync(async (req, res) => {
     const { projectId } = req.params;
-    const result = await ProjectService.getProjectById(projectId);
+    const result = await ProjectService.getProjectById(
+        req.user.profileId,
+        projectId
+    );
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,

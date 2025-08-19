@@ -367,22 +367,109 @@ const getMyProjects = async (
 };
 
 // Get Project by ID
-const getProjectById = async (projectId: string) => {
-    const project = await Project.findById(projectId).populate({
-        path: 'owner',
-        select: 'name profile_image',
-    });
-    if (!project) {
+// const getProjectById = async (projectId: string) => {
+//     const project = await Project.findById(projectId).populate({
+//         path: 'owner',
+//         select: 'name profile_image',
+//     });
+//     if (!project) {
+//         throw new AppError(httpStatus.NOT_FOUND, 'Project not found');
+//     }
+//     const totalParticipate = await ProjectMember.countDocuments({
+//         project: projectId,
+//     });
+
+//     return {
+//         ...project.toObject(),
+//         totalParticipate,
+//     };
+// };
+const getProjectById = async (userId: string, projectId: string) => {
+    // Fetch the project details
+    const project = await Project.aggregate([
+        {
+            $match: { _id: new mongoose.Types.ObjectId(projectId) },
+        },
+        // Lookup to populate owner details
+        {
+            $lookup: {
+                from: 'normalusers',
+                localField: 'owner',
+                foreignField: '_id',
+                as: 'owner',
+            },
+        },
+        { $unwind: '$owner' },
+        // Lookup to populate participants (Project Members)
+        {
+            $lookup: {
+                from: 'projectmembers',
+                localField: '_id',
+                foreignField: 'project',
+                as: 'participants',
+            },
+        },
+        {
+            $addFields: {
+                totalParticipants: { $size: '$participants' },
+                isJoined: {
+                    $in: [
+                        new mongoose.Types.ObjectId(userId),
+                        '$participants.user',
+                    ],
+                },
+                isOwner: {
+                    $eq: [new mongoose.Types.ObjectId(userId), '$owner._id'],
+                },
+            },
+        },
+        // Lookup to check if the join request exists
+        {
+            $lookup: {
+                from: 'projectjoinrequests',
+                localField: '_id',
+                foreignField: 'project',
+                as: 'joinRequests',
+            },
+        },
+        {
+            $addFields: {
+                isJoinRequestSent: {
+                    $in: [
+                        new mongoose.Types.ObjectId(userId),
+                        '$joinRequests.user',
+                    ],
+                },
+            },
+        },
+        // Project select (only necessary fields)
+        {
+            $project: {
+                _id: 1,
+                name: 1,
+                description: 1,
+                status: 1,
+                isPublic: 1,
+                joinControll: 1,
+                createdAt: 1,
+                updatedAt: 1,
+                cover_image: 1,
+                totalParticipants: 1,
+                'owner._id': 1,
+                'owner.name': 1,
+                'owner.profile_image': 1,
+                isJoined: 1,
+                isOwner: 1,
+                isJoinRequestSent: 1,
+            },
+        },
+    ]);
+
+    if (!project || project.length === 0) {
         throw new AppError(httpStatus.NOT_FOUND, 'Project not found');
     }
-    const totalParticipate = await ProjectMember.countDocuments({
-        project: projectId,
-    });
 
-    return {
-        ...project.toObject(),
-        totalParticipate,
-    };
+    return project[0];
 };
 
 // Update Project
