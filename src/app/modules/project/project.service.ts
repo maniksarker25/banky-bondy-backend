@@ -321,12 +321,10 @@ const getAllProjects = async (userId: string, query: Record<string, any>) => {
         { $sort: { createdAt: -1 } },
         {
             $facet: {
-                meta: [{ $count: 'total' }],
-                result: [],
+                result: [{ $skip: skip }, { $limit: limit }],
+                totalCount: [{ $count: 'total' }],
             },
         },
-        { $skip: skip },
-        { $limit: limit },
     ];
 
     // Execute the aggregation pipeline
@@ -334,7 +332,7 @@ const getAllProjects = async (userId: string, query: Record<string, any>) => {
 
     // Get results and total count
     const result = aggResult[0]?.result || [];
-    const total = aggResult[0]?.meta[0]?.total || 0;
+    const total = aggResult[0]?.totalCount[0]?.total || 0;
     const totalPage = Math.ceil(total / limit);
 
     return {
