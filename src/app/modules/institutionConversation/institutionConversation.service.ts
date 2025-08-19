@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import InstitutionConversation from './institutionConversation.model';
 import httpStatus from 'http-status';
 import AppError from '../../error/appError';
 import { IInstitutionConversation } from './institutionConversation.interface';
 import Institution from '../institution/institution.model';
 import InstitutionMember from '../institutionMember/institutionMember.model';
+import mongoose from 'mongoose';
 
 // Create
 const createInstitutionConversation = async (
@@ -34,11 +36,57 @@ const createInstitutionConversation = async (
 };
 
 // Get All
-const getAllInstitutionConversations = async (instituionId: string) => {
-    return await InstitutionConversation.find({ institution: instituionId })
-        .populate({ path: 'user', select: 'name' })
-        // .populate('ussers')
-        .populate('likers');
+// const getAllInstitutionConversations = async (instituionId: string) => {
+//     return await InstitutionConversation.find({ institution: instituionId })
+//         .populate({ path: 'user', select: 'name' })
+//         // .populate('ussers')
+//         .populate('likers');
+// };
+const getAllInstitutionConversations = async (
+    instituionId: string,
+    profileId: string,
+    query: Record<string, unknown>
+) => {
+    const page = Number(query?.page) || 1;
+    const limit = Number(query?.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const aggResult: any = await InstitutionConversation.aggregate([
+        {
+            $match: {
+                institution: new mongoose.Types.ObjectId(instituionId),
+            },
+        },
+        {
+            $addFields: {
+                isMyConversation: {
+                    $eq: ['$user', new mongoose.Types.ObjectId(profileId)],
+                },
+            },
+        },
+
+        { $sort: { createdAt: -1 } },
+        {
+            $facet: {
+                result: [{ $skip: skip }, { $limit: limit }],
+                totalCount: [{ $count: 'total' }],
+            },
+        },
+    ]);
+
+    const result = aggResult[0]?.result || [];
+    const total = aggResult[0]?.totalCount[0]?.total || 0;
+    const totalPage = Math.ceil(total / limit);
+
+    return {
+        meta: {
+            page,
+            limit,
+            total,
+            totalPage,
+        },
+        result,
+    };
 };
 
 // Get Single
