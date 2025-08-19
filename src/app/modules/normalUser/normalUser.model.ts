@@ -48,6 +48,10 @@ const NormalUserSchema = new Schema<INormalUser>(
         skills: {
             type: [Schema.Types.ObjectId],
         },
+        socialLinks: {
+            type: [String],
+            default: [],
+        },
     },
     {
         timestamps: true,
