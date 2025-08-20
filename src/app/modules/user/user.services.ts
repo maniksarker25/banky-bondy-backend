@@ -186,7 +186,7 @@ const getMyProfile = async (userData: JwtPayload) => {
     return result;
 };
 
-// all cron jobs for users
+// all cron jobs for users---
 
 cron.schedule('*/2 * * * *', async () => {
     try {
