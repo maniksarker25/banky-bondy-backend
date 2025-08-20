@@ -10,6 +10,12 @@ const createRelative = async (userId: string, payload: IRelative) => {
         user: userId,
         relative: payload.relative,
     });
+    if (userId == payload.relative.toString()) {
+        throw new AppError(
+            httpStatus.BAD_REQUEST,
+            'You can not add yourself as a relative'
+        );
+    }
     if (isExists) {
         throw new AppError(
             httpStatus.BAD_REQUEST,
