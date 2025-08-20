@@ -31,6 +31,7 @@ const NormalUserSchema = new Schema<INormalUser>(
         },
         cover_image: {
             type: String,
+            default: '',
         },
         gender: {
             type: String,
