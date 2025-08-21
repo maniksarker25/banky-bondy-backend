@@ -174,17 +174,13 @@ const getMyFriends = async (userId: string, query: Record<string, any>) => {
     const total = aggResult[0]?.meta[0]?.total || 0;
     const totalPage = Math.ceil(total / limit);
     return {
-        success: true,
-        message: 'Friends retrieved successfully',
-        data: {
-            meta: {
-                page,
-                limit,
-                total,
-                totalPage,
-            },
-            result,
+        meta: {
+            page,
+            limit,
+            total,
+            totalPage,
         },
+        result,
     };
 };
 
