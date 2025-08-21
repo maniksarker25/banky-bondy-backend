@@ -46,9 +46,12 @@ const NormalUserSchema = new Schema<INormalUser>(
         bio: {
             type: String,
         },
-        skills: {
-            type: [Schema.Types.ObjectId],
-        },
+        skills: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'Skill',
+            },
+        ],
         socialLinks: {
             type: [String],
             default: [],

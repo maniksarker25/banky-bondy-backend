@@ -35,121 +35,6 @@ const acceptRejectRequest = async (
     return await request.save();
 };
 
-// const getMyFriends = async (userId: string, query: Record<string, any>) => {
-//     const page = Number(query.page) || 1;
-//     const limit = Number(query.limit) || 10;
-//     const skip = (page - 1) * limit;
-//     const searchTerm = query.searchTerm || '';
-//     const matchStage: any = {
-//         $or: [
-//             {
-//                 sender: new mongoose.Types.ObjectId(userId),
-//                 status: ENUM_FRIEND_REQUEST_STATUS.Accepted,
-//             },
-//             {
-//                 receiver: new mongoose.Types.ObjectId(userId),
-//                 status: ENUM_FRIEND_REQUEST_STATUS.Accepted,
-//             },
-//         ],
-//     };
-
-//     const searchMatchStage = searchTerm
-//         ? {
-//               $or: [
-//                   { 'senderInfo.name': { $regex: searchTerm, $options: 'i' } },
-//                   {
-//                       'receiverInfo.name': {
-//                           $regex: searchTerm,
-//                           $options: 'i',
-//                       },
-//                   },
-//               ],
-//               $nor: [{ sender: userId }, { receiver: userId }],
-//           }
-//         : { $nor: [{ sender: userId }, { receiver: userId }] };
-
-//     const pipeline: any[] = [
-//         { $match: matchStage },
-//         {
-//             $lookup: {
-//                 from: 'normalusers',
-//                 localField: 'sender',
-//                 foreignField: '_id',
-//                 as: 'senderInfo',
-//             },
-//         },
-//         {
-//             $lookup: {
-//                 from: 'normalusers',
-//                 localField: 'receiver',
-//                 foreignField: '_id',
-//                 as: 'receiverInfo',
-//             },
-//         },
-//         { $unwind: { path: '$senderInfo', preserveNullAndEmptyArrays: true } },
-//         {
-//             $unwind: {
-//                 path: '$receiverInfo',
-//                 preserveNullAndEmptyArrays: true,
-//             },
-//         },
-//         { $match: searchMatchStage },
-//         {
-//             $facet: {
-//                 meta: [{ $count: 'total' }],
-//                 result: [
-//                     {
-//                         $project: {
-//                             _id: 1,
-//                             status: 1,
-//                             createdAt: 1,
-//                             updatedAt: 1,
-//                             friendInfo: {
-//                                 $cond: {
-//                                     if: { $eq: ['$sender', userId] },
-//                                     then: {
-//                                         _id: '$receiverInfo._id',
-//                                         name: '$receiverInfo.name',
-//                                         profile_image:
-//                                             '$receiverInfo.profile_image',
-//                                     },
-//                                     else: {
-//                                         _id: '$senderInfo._id',
-//                                         name: '$senderInfo.name',
-//                                         profile_image:
-//                                             '$senderInfo.profile_image',
-//                                     },
-//                                 },
-//                             },
-//                         },
-//                     },
-//                     { $sort: { createdAt: -1 } },
-//                     { $skip: skip },
-//                     { $limit: limit },
-//                 ],
-//             },
-//         },
-//     ];
-
-//     const aggResult = await FriendRequest.aggregate(pipeline);
-//     const result = aggResult[0]?.result || [];
-//     const total = aggResult[0]?.meta[0]?.total || 0;
-//     const totalPage = Math.ceil(total / limit);
-//     return {
-//         success: true,
-//         message: 'Friends retrieved successfully',
-//         data: {
-//             meta: {
-//                 page,
-//                 limit,
-//                 total,
-//                 totalPage,
-//             },
-//             result,
-//         },
-//     };
-// };
-
 const getMyFriends = async (userId: string, query: Record<string, any>) => {
     const page = Number(query.page) || 1;
     const limit = Number(query.limit) || 10;
@@ -209,7 +94,7 @@ const getMyFriends = async (userId: string, query: Record<string, any>) => {
             },
         },
 
-        // ✅ populate skills for sender
+        // populate sender skills
         {
             $lookup: {
                 from: 'skills',
@@ -218,8 +103,7 @@ const getMyFriends = async (userId: string, query: Record<string, any>) => {
                 as: 'senderInfo.skills',
             },
         },
-
-        // ✅ populate skills for receiver
+        // populate receiver skills
         {
             $lookup: {
                 from: 'skills',
@@ -228,7 +112,6 @@ const getMyFriends = async (userId: string, query: Record<string, any>) => {
                 as: 'receiverInfo.skills',
             },
         },
-
         { $match: searchMatchStage },
         {
             $facet: {
@@ -242,25 +125,32 @@ const getMyFriends = async (userId: string, query: Record<string, any>) => {
                             updatedAt: 1,
                             friendInfo: {
                                 $cond: {
-                                    if: {
-                                        $eq: [
-                                            '$sender',
-                                            new mongoose.Types.ObjectId(userId),
-                                        ],
-                                    },
+                                    if: { $eq: ['$sender', userId] },
                                     then: {
                                         _id: '$receiverInfo._id',
                                         name: '$receiverInfo.name',
                                         profile_image:
                                             '$receiverInfo.profile_image',
-                                        skills: '$receiverInfo.skills', // ✅ include skills
+                                        skills: {
+                                            $map: {
+                                                input: '$receiverInfo.skills',
+                                                as: 's',
+                                                in: '$$s.name',
+                                            },
+                                        },
                                     },
                                     else: {
                                         _id: '$senderInfo._id',
                                         name: '$senderInfo.name',
                                         profile_image:
                                             '$senderInfo.profile_image',
-                                        skills: '$senderInfo.skills', // ✅ include skills
+                                        skills: {
+                                            $map: {
+                                                input: '$senderInfo.skills',
+                                                as: 's',
+                                                in: '$$s.name',
+                                            },
+                                        },
                                     },
                                 },
                             },
@@ -279,13 +169,17 @@ const getMyFriends = async (userId: string, query: Record<string, any>) => {
     const total = aggResult[0]?.meta[0]?.total || 0;
     const totalPage = Math.ceil(total / limit);
     return {
-        meta: {
-            page,
-            limit,
-            total,
-            totalPage,
+        success: true,
+        message: 'Friends retrieved successfully',
+        data: {
+            meta: {
+                page,
+                limit,
+                total,
+                totalPage,
+            },
+            result,
         },
-        result,
     };
 };
 
