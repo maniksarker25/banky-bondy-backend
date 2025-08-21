@@ -103,7 +103,7 @@ const getMyFriends = async (userId: string, query: Record<string, any>) => {
                 as: 'senderInfo.skills',
             },
         },
-        // populate receiver skills
+        // populate receiver skills--
         {
             $lookup: {
                 from: 'skills',
