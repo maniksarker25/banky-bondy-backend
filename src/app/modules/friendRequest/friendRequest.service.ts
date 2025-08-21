@@ -183,18 +183,191 @@ const getMyFriends = async (userId: string, query: Record<string, any>) => {
     };
 };
 
-const getMyFollowers = async (userId: string) => {
-    return await FriendRequest.find({
-        receiver: userId,
+// const getMyFollowers = async (userId: string) => {
+//     return await FriendRequest.find({
+//         receiver: userId,
+//         status: ENUM_FRIEND_REQUEST_STATUS.Pending,
+//     }).populate('sender');
+// };
+
+const getMyFollowers = async (userId: string, query: Record<string, any>) => {
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 10;
+    const skip = (page - 1) * limit;
+    const searchTerm = query.searchTerm || '';
+
+    const matchStage: any = {
+        receiver: new mongoose.Types.ObjectId(userId),
         status: ENUM_FRIEND_REQUEST_STATUS.Pending,
-    }).populate('sender');
+    };
+
+    const searchMatchStage = searchTerm
+        ? {
+              'senderInfo.name': { $regex: searchTerm, $options: 'i' },
+          }
+        : {};
+
+    const pipeline: any[] = [
+        { $match: matchStage },
+        {
+            $lookup: {
+                from: 'normalusers',
+                localField: 'sender',
+                foreignField: '_id',
+                as: 'senderInfo',
+            },
+        },
+        { $unwind: { path: '$senderInfo', preserveNullAndEmptyArrays: true } },
+        {
+            $lookup: {
+                from: 'skills',
+                localField: 'senderInfo.skills',
+                foreignField: '_id',
+                as: 'senderInfo.skills',
+            },
+        },
+        { $match: searchMatchStage },
+        {
+            $facet: {
+                meta: [{ $count: 'total' }],
+                result: [
+                    {
+                        $project: {
+                            _id: 1,
+                            status: 1,
+                            createdAt: 1,
+                            updatedAt: 1,
+                            followerInfo: {
+                                _id: '$senderInfo._id',
+                                name: '$senderInfo.name',
+                                profile_image: '$senderInfo.profile_image',
+                                skills: {
+                                    $map: {
+                                        input: '$senderInfo.skills',
+                                        as: 's',
+                                        in: '$$s.name',
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    { $sort: { createdAt: -1 } },
+                    { $skip: skip },
+                    { $limit: limit },
+                ],
+            },
+        },
+    ];
+
+    const aggResult = await FriendRequest.aggregate(pipeline);
+    const result = aggResult[0]?.result || [];
+    const total = aggResult[0]?.meta[0]?.total || 0;
+    const totalPage = Math.ceil(total / limit);
+
+    return {
+        meta: {
+            page,
+            limit,
+            total,
+            totalPage,
+        },
+        result,
+    };
 };
 
-const getMyFollowing = async (userId: string) => {
-    return await FriendRequest.find({
-        sender: userId,
+// const getMyFollowing = async (userId: string) => {
+//     return await FriendRequest.find({
+//         sender: userId,
+//         status: ENUM_FRIEND_REQUEST_STATUS.Pending,
+//     }).populate('receiver');
+// };
+
+const getMyFollowing = async (userId: string, query: Record<string, any>) => {
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 10;
+    const skip = (page - 1) * limit;
+    const searchTerm = query.searchTerm || '';
+
+    const matchStage: any = {
+        sender: new mongoose.Types.ObjectId(userId),
         status: ENUM_FRIEND_REQUEST_STATUS.Pending,
-    }).populate('receiver');
+    };
+
+    const searchMatchStage = searchTerm
+        ? { 'receiverInfo.name': { $regex: searchTerm, $options: 'i' } }
+        : {};
+
+    const pipeline: any[] = [
+        { $match: matchStage },
+        {
+            $lookup: {
+                from: 'normalusers',
+                localField: 'receiver',
+                foreignField: '_id',
+                as: 'receiverInfo',
+            },
+        },
+        {
+            $unwind: {
+                path: '$receiverInfo',
+                preserveNullAndEmptyArrays: true,
+            },
+        },
+        {
+            $lookup: {
+                from: 'skills',
+                localField: 'receiverInfo.skills',
+                foreignField: '_id',
+                as: 'receiverInfo.skills',
+            },
+        },
+        { $match: searchMatchStage },
+        {
+            $facet: {
+                meta: [{ $count: 'total' }],
+                result: [
+                    {
+                        $project: {
+                            _id: 1,
+                            status: 1,
+                            createdAt: 1,
+                            updatedAt: 1,
+                            followingInfo: {
+                                _id: '$receiverInfo._id',
+                                name: '$receiverInfo.name',
+                                profile_image: '$receiverInfo.profile_image',
+                                skills: {
+                                    $map: {
+                                        input: '$receiverInfo.skills',
+                                        as: 's',
+                                        in: '$$s.name',
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    { $sort: { createdAt: -1 } },
+                    { $skip: skip },
+                    { $limit: limit },
+                ],
+            },
+        },
+    ];
+
+    const aggResult = await FriendRequest.aggregate(pipeline);
+    const result = aggResult[0]?.result || [];
+    const total = aggResult[0]?.meta[0]?.total || 0;
+    const totalPage = Math.ceil(total / limit);
+
+    return {
+        meta: {
+            page,
+            limit,
+            total,
+            totalPage,
+        },
+        result,
+    };
 };
 
 const cancelSentRequest = async (sender: string, receiver: string) => {

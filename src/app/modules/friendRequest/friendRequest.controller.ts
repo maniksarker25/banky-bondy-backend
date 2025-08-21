@@ -44,7 +44,8 @@ const getFriends = catchAsync(async (req, res) => {
 
 const getFollowers = catchAsync(async (req, res) => {
     const result = await friendRequestService.getMyFollowers(
-        req.user.profileId
+        req.user.profileId,
+        req.query
     );
     sendResponse(res, {
         statusCode: httpStatus.OK,
@@ -56,7 +57,8 @@ const getFollowers = catchAsync(async (req, res) => {
 
 const getFollowing = catchAsync(async (req, res) => {
     const result = await friendRequestService.getMyFollowing(
-        req.user.profileId
+        req.user.profileId,
+        req.query
     );
     sendResponse(res, {
         statusCode: httpStatus.OK,
