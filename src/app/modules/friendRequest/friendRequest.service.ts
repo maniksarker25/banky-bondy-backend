@@ -125,7 +125,12 @@ const getMyFriends = async (userId: string, query: Record<string, any>) => {
                             updatedAt: 1,
                             friendInfo: {
                                 $cond: {
-                                    if: { $eq: ['$sender', userId] },
+                                    if: {
+                                        $eq: [
+                                            '$sender',
+                                            new mongoose.Types.ObjectId(userId),
+                                        ],
+                                    },
                                     then: {
                                         _id: '$receiverInfo._id',
                                         name: '$receiverInfo.name',
@@ -379,6 +384,7 @@ const cancelSentRequest = async (sender: string, receiver: string) => {
 };
 
 const unfriend = async (userId: string, friendId: string) => {
+    console.log('userid', userId, friendId);
     return await FriendRequest.findOneAndDelete({
         $or: [
             {
