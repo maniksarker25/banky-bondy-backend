@@ -153,6 +153,7 @@ const getMyFriends = async (userId: string, query: Record<string, any>) => {
 const getMyFollowers = async (userId: string) => {
     return await FriendRequest.find({
         receiver: userId,
+        status: ENUM_FRIEND_REQUEST_STATUS.Pending,
     }).populate('sender');
 };
 
