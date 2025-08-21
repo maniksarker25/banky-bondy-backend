@@ -45,6 +45,7 @@ export const uploadFile = () => {
             'project_image',
             'institution_cover',
             'comment_image',
+            'profile_cover',
         ];
 
         if (file.fieldname === undefined) {
@@ -134,6 +135,8 @@ export const uploadFile = () => {
                 uploadPath = 'uploads/images/project_image';
             } else if (file.fieldname === 'comment_image') {
                 uploadPath = 'uploads/images/comment_image';
+            } else if (file.fieldname === 'profile_cover') {
+                uploadPath = 'uploads/images/profile_cover';
             } else {
                 uploadPath = 'uploads';
             }
