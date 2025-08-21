@@ -24,7 +24,7 @@ router.patch(
 
 router.get(
     '/get-all-user',
-    // auth(USER_ROLE.superAdmin),
+    auth(USER_ROLE.superAdmin, USER_ROLE.user),
     NormalUserController.getAllUser
 );
 
