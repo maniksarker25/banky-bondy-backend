@@ -300,17 +300,13 @@ const getAllUser = async (
         ]);
 
         return {
-            success: true,
-            message: 'Users retrieved successfully',
-            data: {
-                meta: aggResult[0]?.meta || {
-                    page,
-                    limit,
-                    total: 0,
-                    totalPage: 0,
-                },
-                result: aggResult[0]?.data || [],
+            meta: aggResult[0]?.meta || {
+                page,
+                limit,
+                total: 0,
+                totalPage: 0,
             },
+            result: aggResult[0]?.data || [],
         };
     }
 };
