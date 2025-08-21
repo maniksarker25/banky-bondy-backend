@@ -184,6 +184,7 @@ export const uploadFile = () => {
         { name: 'project_image', maxCount: 1 },
         { name: 'institution_cover', maxCount: 1 },
         { name: 'comment_image', maxCount: 1 },
+        { name: 'profile_cover', maxCount: 1 },
     ]);
 
     return upload;
