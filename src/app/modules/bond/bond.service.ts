@@ -3,6 +3,7 @@ import AppError from '../../error/appError';
 import httpStatus from 'http-status';
 import { IBond } from './bond.interface';
 import QueryBuilder from '../../builder/QueryBuilder';
+import mongoose from 'mongoose';
 
 const createBondIntoDB = async (userId: string, payload: IBond) => {
     return await Bond.create({ ...payload, user: userId });
@@ -48,12 +49,42 @@ const deleteBondFromDB = async (userId: string, id: string) => {
     return await Bond.findByIdAndDelete(id);
 };
 
+const getFilterItemsForMatchingBond = async (userId: string) => {
+    const result = await Bond.aggregate([
+        {
+            $match: {
+                user: new mongoose.Types.ObjectId(userId),
+            },
+        },
+        {
+            $group: {
+                _id: null,
+                wantItems: { $addToSet: '$want' },
+                offerItems: { $addToSet: '$offer' },
+            },
+        },
+    ]);
+
+    if (result.length > 0) {
+        return {
+            wantItems: result[0].wantItems,
+            offerItems: result[0].offerItems,
+        };
+    } else {
+        return {
+            wantItems: [],
+            offerItems: [],
+        };
+    }
+};
+
 const bondService = {
     createBondIntoDB,
     getMyBonds,
     getSingleBond,
     updateBondIntoDB,
     deleteBondFromDB,
+    getFilterItemsForMatchingBond,
 };
 
 export default bondService;

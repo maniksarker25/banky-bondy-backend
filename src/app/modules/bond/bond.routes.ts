@@ -16,6 +16,11 @@ router.post(
 
 router.get('/my-bonds', auth(USER_ROLE.user), bondController.getAllBonds);
 router.get('/get-single-bond/:id', bondController.getSingleBond);
+router.get(
+    '/get-filter-items',
+    auth(USER_ROLE.user),
+    bondController.getFilterItemsForMatchingBond
+);
 
 router.patch(
     '/update/:id',

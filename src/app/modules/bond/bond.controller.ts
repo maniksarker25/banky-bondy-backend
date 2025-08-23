@@ -62,6 +62,17 @@ const deleteBond = catchAsync(async (req, res) => {
         data: result,
     });
 });
+const getFilterItemsForMatchingBond = catchAsync(async (req, res) => {
+    const result = await bondService.getFilterItemsForMatchingBond(
+        req.user.profileId
+    );
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Bond filter items retrieved successfully',
+        data: result,
+    });
+});
 
 const bondController = {
     createBond,
@@ -69,6 +80,7 @@ const bondController = {
     getSingleBond,
     updateBond,
     deleteBond,
+    getFilterItemsForMatchingBond,
 };
 
 export default bondController;
