@@ -138,7 +138,7 @@ const handleChat = async (
 
             chat.participants.forEach(async (participantId: Types.ObjectId) => {
                 io.to(participantId.toString()).emit(
-                    `message-${projectId}-${chat.type}`,
+                    `message-${projectId}`,
                     populatedMessage
                 );
                 const singleConversation = await getSingleConversation(
@@ -211,7 +211,7 @@ const handleChat = async (
 
             chat.participants.forEach(async (participantId: Types.ObjectId) => {
                 io.to(participantId.toString()).emit(
-                    `message-${groupId}-${chat.type}`,
+                    `message-${groupId}`,
                     populatedMessage
                 );
                 const singleConversation = await getSingleConversation(
@@ -284,7 +284,7 @@ const handleChat = async (
 
             chat.participants.forEach(async (participantId: Types.ObjectId) => {
                 io.to(participantId.toString()).emit(
-                    `message-${bondLinkId}-${chat.type}`,
+                    `message-${bondLinkId}`,
                     populatedMessage
                 );
                 const singleConversation = await getSingleConversation(
