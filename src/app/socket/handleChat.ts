@@ -43,7 +43,7 @@ const handleChat = async (
                 text: data.text,
                 imageUrl: data.imageUrl || [],
                 videoUrl: data.videoUrl || [],
-                msgByUserId: data?.sender,
+                msgByUserId: currentUserId,
                 conversationId: conversation?._id,
             };
             const saveMessage = await Message.create(messageData);
@@ -121,7 +121,7 @@ const handleChat = async (
                 text: data.text,
                 imageUrl: data.imageUrl || [],
                 videoUrl: data.videoUrl || [],
-                msgByUserId: data?.sender,
+                msgByUserId: currentUserId,
                 conversationId: chat?._id,
             };
             const saveMessage = await Message.create(messageData);
@@ -194,7 +194,7 @@ const handleChat = async (
                 text: data.text,
                 imageUrl: data.imageUrl || [],
                 videoUrl: data.videoUrl || [],
-                msgByUserId: data?.sender,
+                msgByUserId: currentUserId,
                 conversationId: chat?._id,
             };
             const saveMessage = await Message.create(messageData);
@@ -267,7 +267,7 @@ const handleChat = async (
                 text: data.text,
                 imageUrl: data.imageUrl || [],
                 videoUrl: data.videoUrl || [],
-                msgByUserId: data?.sender,
+                msgByUserId: currentUserId,
                 conversationId: chat?._id,
             };
             const saveMessage = await Message.create(messageData);

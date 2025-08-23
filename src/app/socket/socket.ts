@@ -31,7 +31,8 @@ const initializeSocket = (server: HTTPServer) => {
             //     return;
             // }
             // const currentUserId = currentUser?._id.toString();
-            const token = socket.handshake.auth.token;
+            const token =
+                socket.handshake.auth?.token || socket.handshake.query?.token;
             const decode = (await jwt.verify(
                 token,
                 config.jwt_access_secret as string
