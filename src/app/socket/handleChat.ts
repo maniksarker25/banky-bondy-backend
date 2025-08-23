@@ -15,7 +15,7 @@ const handleChat = async (
     currentUserId: string
 ): Promise<void> => {
     // new message -----------------------------------
-    socket.on('new-message', async (data) => {
+    socket.on('send-message', async (data) => {
         if (!data.receiver && !data.projectId) {
             emitError(socket, {
                 code: 400,
@@ -39,6 +39,7 @@ const handleChat = async (
                     participants: [data.sender, data.receiver],
                 });
             }
+            console.log('conversation', conversation);
             const messageData = {
                 text: data.text,
                 imageUrl: data.imageUrl || [],
@@ -54,12 +55,12 @@ const handleChat = async (
                 }
             );
             // send to the frontend only new message data ---------------
-            io.to(data?.sender.toString()).emit(
+            io.to(currentUserId.toString()).emit(
                 `message-${data?.receiver}`,
                 saveMessage
             );
             io.to(data?.receiver.toString()).emit(
-                `message-${data?.sender}`,
+                `message-${currentUserId}`,
                 saveMessage
             );
 

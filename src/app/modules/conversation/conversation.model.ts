@@ -17,6 +17,7 @@ const conversationSchema = new Schema<IConversation>(
         type: {
             type: String,
             enum: Object.values(ENUM_CONVERSATION_TYPE),
+            default: ENUM_CONVERSATION_TYPE.oneToOne,
             required: true,
         },
         institution: {

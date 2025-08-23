@@ -79,7 +79,7 @@ const deleteBondRequest = catchAsync(async (req, res) => {
 const getMatchingBondRequest = catchAsync(async (req, res) => {
     const result = await bondRequestService.getMatchingBondRequest(
         req.user.profileId,
-        req.body.bondRequest
+        req.query.bondRequest as string
     );
     sendResponse(res, {
         statusCode: httpStatus.OK,
