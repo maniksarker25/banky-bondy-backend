@@ -149,7 +149,6 @@ const handleChat = async (
                     'conversation',
                     singleConversation
                 );
-                // }
             });
         } else if (data?.groupId) {
             const groupId = data?.groupId;
