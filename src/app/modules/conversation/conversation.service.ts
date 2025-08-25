@@ -33,18 +33,32 @@ const getConversation = async (
     }
 
     // search condition------------
+    // const searchConditions = [];
+    // if (searchTerm) {
+    //     searchConditions.push({
+    //         $or: [
+    //             'user.name',
+    //             'user.email',
+    //             'project.title',
+    //             'project.name',
+    //             'chatGroup.name',
+    //         ].map((field) => ({
+    //             [field]: { $regex: searchTerm, $options: 'i' },
+    //         })),
+    //     });
+    // }
+
     const searchConditions = [];
     if (searchTerm) {
         searchConditions.push({
             $or: [
-                'user.name',
-                'user.email',
-                'project.title',
-                'project.name',
-                'chatGroup.name',
-            ].map((field) => ({
-                [field]: { $regex: searchTerm, $options: 'i' },
-            })),
+                { 'userData.name': { $regex: searchTerm, $options: 'i' } },
+                { 'userData.email': { $regex: searchTerm, $options: 'i' } },
+                { 'project.title': { $regex: searchTerm, $options: 'i' } },
+                { 'project.name': { $regex: searchTerm, $options: 'i' } },
+                { 'chatGroup.name': { $regex: searchTerm, $options: 'i' } },
+                { 'bondLink.name': { $regex: searchTerm, $options: 'i' } },
+            ],
         });
     }
 
@@ -214,8 +228,11 @@ const getConversation = async (
             },
         },
 
+        // ...(searchConditions.length > 0
+        //     ? [{ $match: { $and: [searchConditions] } }]
+        //     : []),
         ...(searchConditions.length > 0
-            ? [{ $match: { $and: [searchConditions] } }]
+            ? [{ $match: { $and: searchConditions } }]
             : []),
         {
             // $sort: { 'lastMessage.createdAt': -1 },
