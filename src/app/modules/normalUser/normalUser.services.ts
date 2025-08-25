@@ -312,14 +312,236 @@ const getAllUser = async (
 };
 
 // get single user
-const getSingleUser = async (id: string) => {
-    const result = await NormalUser.findById(id);
-    if (!result) {
+const getSingleUser = async (profileId: string, id: string) => {
+    const user = await getSingleUserWithStatus(profileId, id);
+    return user;
+};
+
+export async function getSingleUserWithStatus(
+    currentProfileId: string,
+    targetUserId: string
+) {
+    if (!mongoose.Types.ObjectId.isValid(currentProfileId)) {
+        throw new AppError(
+            httpStatus.BAD_REQUEST,
+            'Invalid current profile id'
+        );
+    }
+    if (!mongoose.Types.ObjectId.isValid(targetUserId)) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Invalid user id');
+    }
+
+    const currentId = new mongoose.Types.ObjectId(currentProfileId);
+    const targetId = new mongoose.Types.ObjectId(targetUserId);
+
+    const pipeline: any = [
+        // Match the target user (do NOT exclude self here; if you want to, add {_id: {$ne: currentId}})
+        { $match: { _id: targetId } },
+
+        // Find friend requests between current user and target user (both directions)
+        {
+            $lookup: {
+                from: 'friendrequests',
+                let: { otherUserId: '$_id' },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $or: [
+                                    // other -> current
+                                    {
+                                        $and: [
+                                            {
+                                                $eq: [
+                                                    '$sender',
+                                                    '$$otherUserId',
+                                                ],
+                                            },
+                                            { $eq: ['$receiver', currentId] },
+                                        ],
+                                    },
+                                    // current -> other
+                                    {
+                                        $and: [
+                                            {
+                                                $eq: [
+                                                    '$receiver',
+                                                    '$$otherUserId',
+                                                ],
+                                            },
+                                            { $eq: ['$sender', currentId] },
+                                        ],
+                                    },
+                                ],
+                            },
+                        },
+                    },
+                    // (Optional) project only needed fields to reduce memory
+                    { $project: { status: 1, sender: 1, receiver: 1, _id: 0 } },
+                ],
+                as: 'friendRequests',
+            },
+        },
+
+        // Derive friendRequestStatus (same ordering/precedence you used)
+        {
+            $addFields: {
+                friendRequestStatus: {
+                    $switch: {
+                        branches: [
+                            // If there's any Accepted request in either direction => "friend"
+                            {
+                                case: {
+                                    $anyElementTrue: {
+                                        $map: {
+                                            input: '$friendRequests',
+                                            as: 'req',
+                                            in: {
+                                                $eq: [
+                                                    '$$req.status',
+                                                    ENUM_FRIEND_REQUEST_STATUS.Accepted,
+                                                ],
+                                            },
+                                        },
+                                    },
+                                },
+                                then: 'friend',
+                            },
+
+                            // If current -> other with Pending => "following"
+                            {
+                                case: {
+                                    $anyElementTrue: {
+                                        $map: {
+                                            input: '$friendRequests',
+                                            as: 'req',
+                                            in: {
+                                                $and: [
+                                                    {
+                                                        $eq: [
+                                                            '$$req.sender',
+                                                            currentId,
+                                                        ],
+                                                    },
+                                                    {
+                                                        $eq: [
+                                                            '$$req.status',
+                                                            ENUM_FRIEND_REQUEST_STATUS.Pending,
+                                                        ],
+                                                    },
+                                                ],
+                                            },
+                                        },
+                                    },
+                                },
+                                then: 'following',
+                            },
+
+                            // If other -> current with Pending => "follower"
+                            {
+                                case: {
+                                    $anyElementTrue: {
+                                        $map: {
+                                            input: '$friendRequests',
+                                            as: 'req',
+                                            in: {
+                                                $and: [
+                                                    {
+                                                        $eq: [
+                                                            '$$req.receiver',
+                                                            currentId,
+                                                        ],
+                                                    },
+                                                    {
+                                                        $eq: [
+                                                            '$$req.status',
+                                                            ENUM_FRIEND_REQUEST_STATUS.Pending,
+                                                        ],
+                                                    },
+                                                ],
+                                            },
+                                        },
+                                    },
+                                },
+                                then: 'follower',
+                            },
+
+                            // If current -> other with Rejected => "following" (your current logic)
+                            {
+                                case: {
+                                    $anyElementTrue: {
+                                        $map: {
+                                            input: '$friendRequests',
+                                            as: 'req',
+                                            in: {
+                                                $and: [
+                                                    {
+                                                        $eq: [
+                                                            '$$req.sender',
+                                                            currentId,
+                                                        ],
+                                                    },
+                                                    {
+                                                        $eq: [
+                                                            '$$req.status',
+                                                            ENUM_FRIEND_REQUEST_STATUS.Rejected,
+                                                        ],
+                                                    },
+                                                ],
+                                            },
+                                        },
+                                    },
+                                },
+                                then: 'following',
+                            },
+
+                            // If other -> current with Rejected => "follower" (your current logic)
+                            {
+                                case: {
+                                    $anyElementTrue: {
+                                        $map: {
+                                            input: '$friendRequests',
+                                            as: 'req',
+                                            in: {
+                                                $and: [
+                                                    {
+                                                        $eq: [
+                                                            '$$req.receiver',
+                                                            currentId,
+                                                        ],
+                                                    },
+                                                    {
+                                                        $eq: [
+                                                            '$$req.status',
+                                                            ENUM_FRIEND_REQUEST_STATUS.Rejected,
+                                                        ],
+                                                    },
+                                                ],
+                                            },
+                                        },
+                                    },
+                                },
+                                then: 'follower',
+                            },
+                        ],
+                        default: 'none',
+                    },
+                },
+            },
+        },
+
+        // Don’t leak the raw requests array
+        { $project: { friendRequests: 0 } },
+    ] as const;
+
+    const [doc] = await NormalUser.aggregate(pipeline).exec();
+
+    if (!doc) {
         throw new AppError(httpStatus.NOT_FOUND, 'User not found');
     }
 
-    return result;
-};
+    return doc;
+}
 
 const NormalUserServices = {
     updateUserProfile,
