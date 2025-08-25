@@ -32,6 +32,7 @@ import { friendRequestRoutes } from '../modules/friendRequest/friendRequest.rout
 import { bondLinkRoutes } from '../modules/bondLink/bondLink.routes';
 import { DonateRoutes } from '../modules/donate/donate.routes';
 import { chatGroupRoutes } from '../modules/chatGroup/chatGroup.routes';
+import { conversationRoutes } from '../modules/conversation/conversation.routes';
 
 const router = Router();
 
@@ -170,6 +171,10 @@ const moduleRoutes = [
     {
         path: '/chat-group',
         router: chatGroupRoutes,
+    },
+    {
+        path: '/conversation',
+        router: conversationRoutes,
     },
 ];
 
