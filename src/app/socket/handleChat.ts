@@ -36,10 +36,10 @@ const handleChat = async (
             });
             if (!conversation) {
                 conversation = await Conversation.create({
-                    participants: [data.sender, data.receiver],
+                    participants: [currentUserId, data.receiver],
                 });
             }
-            console.log('conversation', conversation);
+
             const messageData = {
                 text: data.text,
                 imageUrl: data.imageUrl || [],

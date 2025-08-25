@@ -4,7 +4,7 @@ import ConversationService from './conversation.service';
 
 const getChatList = catchAsync(async (req, res) => {
     const result = await ConversationService.getConversation(
-        req?.user?.id,
+        req?.user?.profileId,
         req.query
     );
 

@@ -98,6 +98,20 @@ const getConversation = async (
         },
         {
             $lookup: {
+                from: 'bondlinks',
+                localField: 'bondLink',
+                foreignField: '_id',
+                as: 'bondLink',
+            },
+        },
+        {
+            $unwind: {
+                path: '$bondLink',
+                preserveNullAndEmptyArrays: true,
+            },
+        },
+        {
+            $lookup: {
                 from: 'normalusers',
                 let: { participants: '$participants' },
                 pipeline: [
@@ -187,6 +201,11 @@ const getConversation = async (
                     _id: 1,
                     name: 1,
                     image: 1,
+                },
+                bondLink: {
+                    _id: 1,
+                    name: 1,
+                    status: 1,
                 },
                 lastMessage: 1,
                 created_at: '$createdAt',
