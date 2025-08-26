@@ -16,13 +16,18 @@ const handleChat = async (
 ): Promise<void> => {
     // new message -----------------------------------
     socket.on('send-message', async (data) => {
-        if (!data.receiver && !data.projectId) {
+        if (
+            !data.receiver &&
+            !data.projectId &&
+            !data.groupId &&
+            !data.bondLinkId
+        ) {
             emitError(socket, {
                 code: 400,
                 message: 'Receiver or project id required',
                 type: 'general',
                 details:
-                    'You must provide either a receiverId (for one-to-one) or a projectId (for group chat)',
+                    'You must provide either a receiverId (for one-to-one) or a projectId (for group chat) or a groupId (for chat group) or a bondLinkId (for bond link chat)',
             });
             return;
         }
