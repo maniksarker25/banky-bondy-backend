@@ -100,7 +100,6 @@ const handleChat = async (
             }
             const chat = await Conversation.findOne({
                 projectId: data.projectId,
-                type: data?.type,
             });
             if (!chat) {
                 emitError(socket, {
@@ -172,7 +171,6 @@ const handleChat = async (
             }
             const chat = await Conversation.findOne({
                 chatGroup: groupId,
-                type: data?.type,
             });
             if (!chat) {
                 emitError(socket, {
@@ -245,7 +243,6 @@ const handleChat = async (
             }
             const chat = await Conversation.findOne({
                 bondLink: bondLinkId,
-                type: data?.type,
             });
             if (!chat) {
                 emitError(socket, {
