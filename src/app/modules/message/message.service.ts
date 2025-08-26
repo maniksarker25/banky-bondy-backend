@@ -26,6 +26,8 @@ const getMessages = async (
         );
     }
 
+    console.log('converation', conversation);
+
     const page = Number(query.page) || 1;
     const limit = Number(query.limit) || 10;
     const skip = (page - 1) * limit;
@@ -35,15 +37,12 @@ const getMessages = async (
         {
             $match: {
                 conversationId: new mongoose.Types.ObjectId(conversationId),
-                content: { $regex: searchTerm, $options: 'i' },
+                text: { $regex: searchTerm, $options: 'i' },
             },
         },
-        { $sort: { createdAt: -1 } },
-        { $skip: skip },
-        { $limit: limit },
         {
             $lookup: {
-                from: 'users',
+                from: 'normalusers',
                 localField: 'msgByUserId',
                 foreignField: '_id',
                 as: 'userDetails',
@@ -70,9 +69,8 @@ const getMessages = async (
                 conversationId: 1,
                 createdAt: 1,
                 updatedAt: 1,
-                'userDetails.firstName': 1,
-                'userDetails.lastName': 1,
-                'userDetails.profileImage': 1,
+                'userDetails.name': 1,
+                'userDetails.profile_image': 1,
                 isMyMessage: 1,
             },
         },

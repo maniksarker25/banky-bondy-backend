@@ -12,7 +12,7 @@ const getMessages = catchAsync(async (req, res) => {
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: 'Profile updated successfully',
+        message: 'Message retrieved successfully',
         data: result,
     });
 });
