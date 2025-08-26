@@ -1,24 +1,21 @@
-import httpStatus from "http-status";
-import catchAsync from "../../utilities/catchasync";
-import sendResponse from "../../utilities/sendResponse";
-import messageServices from "./message.service";
+import httpStatus from 'http-status';
+import catchAsync from '../../utilities/catchasync';
+import sendResponse from '../../utilities/sendResponse';
+import messageServices from './message.service';
 
-const updateUserProfile = catchAsync(async (req, res) => {
-    const { files } = req;
-    if (files && typeof files === "object" && "profile_image" in files) {
-        req.body.profile_image = files["profile_image"][0].path;
-    }
-    const result = await messageServices.updateUserProfile(
+const getMessages = catchAsync(async (req, res) => {
+    const result = await messageServices.getMessages(
         req.user.profileId,
-        req.body
+        req.params.id,
+        req.query
     );
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: "Profile updated successfully",
+        message: 'Profile updated successfully',
         data: result,
     });
 });
 
-const MessageController = { updateUserProfile };
+const MessageController = { getMessages };
 export default MessageController;

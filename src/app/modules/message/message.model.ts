@@ -7,15 +7,15 @@ const messageSchema = new Schema<IMessage>(
             type: String,
             required: true,
         },
-        imageUrls: {
+        imageUrl: {
             type: [String],
             default: [],
         },
-        videoUrls: {
+        videoUrl: {
             type: [String],
             default: [],
         },
-        pdfUrls: {
+        pdfUrl: {
             type: [String],
             default: [],
         },

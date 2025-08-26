@@ -3,9 +3,9 @@ import { ObjectId } from 'mongodb';
 export interface IMessage {
     id: ObjectId;
     text: string;
-    imageUrls: string[];
-    videoUrls: string[];
-    pdfUrls: string[];
+    imageUrl: string[];
+    videoUrl: string[];
+    pdfUrl: string[];
     msgByUserId: ObjectId;
     seenBy: ObjectId[];
     conversationId: ObjectId;

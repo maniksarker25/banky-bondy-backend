@@ -32,22 +32,6 @@ const getConversation = async (
         sortConditions[sortBy] = sortOrder === 'asc' ? 1 : -1;
     }
 
-    // search condition------------
-    // const searchConditions = [];
-    // if (searchTerm) {
-    //     searchConditions.push({
-    //         $or: [
-    //             'user.name',
-    //             'user.email',
-    //             'project.title',
-    //             'project.name',
-    //             'chatGroup.name',
-    //         ].map((field) => ({
-    //             [field]: { $regex: searchTerm, $options: 'i' },
-    //         })),
-    //     });
-    // }
-
     const searchConditions = [];
     if (searchTerm) {
         searchConditions.push({
