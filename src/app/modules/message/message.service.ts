@@ -8,25 +8,69 @@ import mongoose from 'mongoose';
 
 const getMessages = async (
     profileId: string,
-    conversationId: string,
     query: Record<string, unknown>
 ) => {
-    const conversation = await Conversation.findById(conversationId);
-    if (!conversation) {
-        throw new AppError(httpStatus.NOT_FOUND, 'Conversation not found');
+    console.log('qer', query);
+    let conversationId;
+    if (query.userId) {
+        const conversation = await Conversation.findOne({
+            participants: {
+                $all: [
+                    new mongoose.Types.ObjectId(profileId),
+                    new mongoose.Types.ObjectId(query.userId as string),
+                ],
+            },
+        });
+        if (!conversation) {
+            throw new AppError(
+                httpStatus.NOT_FOUND,
+                'Conversation not found between the users'
+            );
+        }
+        conversationId = conversation._id.toString();
+    } else if (query.projectId) {
+        const conversation = await Conversation.findOne({
+            project: new mongoose.Types.ObjectId(query.projectId as string),
+            participants: {
+                $in: [new mongoose.Types.ObjectId(profileId)],
+            },
+        });
+        if (!conversation) {
+            throw new AppError(
+                httpStatus.NOT_FOUND,
+                'Conversation not found for the project'
+            );
+        }
+        conversationId = conversation._id.toString();
+    } else if (query.chatGroupId) {
+        const conversation = await Conversation.findOne({
+            chatGroup: new mongoose.Types.ObjectId(query.chatGroupId as string),
+            participants: {
+                $in: [new mongoose.Types.ObjectId(profileId)],
+            },
+        });
+        if (!conversation) {
+            throw new AppError(
+                httpStatus.NOT_FOUND,
+                'Conversation not found for the chat group'
+            );
+        }
+        conversationId = conversation._id.toString();
+    } else if (query.bondLinkId) {
+        const conversation = await Conversation.findOne({
+            bondLink: new mongoose.Types.ObjectId(query.bondLinkId as string),
+            participants: {
+                $in: [new mongoose.Types.ObjectId(profileId)],
+            },
+        });
+        if (!conversation) {
+            throw new AppError(
+                httpStatus.NOT_FOUND,
+                'Conversation not found for the bond link'
+            );
+        }
+        conversationId = conversation._id.toString();
     }
-    if (
-        !conversation?.participants.includes(
-            new mongoose.Types.ObjectId(profileId)
-        )
-    ) {
-        throw new AppError(
-            httpStatus.FORBIDDEN,
-            'You are not a participant of this conversation'
-        );
-    }
-
-    console.log('converation', conversation);
 
     const page = Number(query.page) || 1;
     const limit = Number(query.limit) || 10;
