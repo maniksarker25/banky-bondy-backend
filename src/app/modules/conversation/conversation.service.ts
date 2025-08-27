@@ -69,7 +69,7 @@ const getConversation = async (
         {
             $lookup: {
                 from: 'projects',
-                localField: 'projectId',
+                localField: 'project',
                 foreignField: '_id',
                 as: 'project',
             },
