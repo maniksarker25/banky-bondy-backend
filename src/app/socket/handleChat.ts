@@ -98,9 +98,16 @@ const handleChat = async (
                 });
                 return;
             }
-            const chat = await Conversation.findOne({
-                projectId: data.projectId,
-            });
+
+            const [project, chat] = await Promise.all([
+                Project.findById(data?.projectId)
+                    .select('_id')
+                    .lean(),
+                Conversation.findOne({ project: data?.projectId })
+                    .select('_id participants')
+                    .lean(),
+            ]);
+
             if (!chat) {
                 emitError(socket, {
                     code: 404,
@@ -110,7 +117,6 @@ const handleChat = async (
                 });
                 return;
             }
-            const project = await Project.findById(data?.projectId);
             if (!project) {
                 emitError(socket, {
                     code: 400,
@@ -141,20 +147,33 @@ const handleChat = async (
                 }
             );
 
-            chat.participants.forEach(async (participantId: Types.ObjectId) => {
-                io.to(participantId.toString()).emit(
-                    `message-${projectId}`,
-                    populatedMessage
-                );
-                const singleConversation = await getSingleConversation(
-                    chat._id,
-                    participantId.toString()
-                );
-                io.to(participantId.toString()).emit(
-                    'conversation',
-                    singleConversation
-                );
-            });
+            // chat.participants.forEach(async (participantId: Types.ObjectId) => {
+            //     io.to(participantId.toString()).emit(
+            //         `message-${projectId}`,
+            //         populatedMessage
+            //     );
+            //     const singleConversation = await getSingleConversation(
+            //         chat._id,
+            //         participantId.toString()
+            //     );
+            //     io.to(participantId.toString()).emit(
+            //         'conversation',
+            //         singleConversation
+            //     );
+            // });
+
+            await Promise.all(
+                chat.participants.map(async (participantId: Types.ObjectId) => {
+                    const uid = participantId.toString();
+                    io.to(uid).emit(`message-${projectId}`, populatedMessage);
+
+                    const singleConversation = await getSingleConversation(
+                        chat._id,
+                        uid
+                    );
+                    io.to(uid).emit('conversation', singleConversation);
+                })
+            );
         } else if (data?.groupId) {
             const groupId = data?.groupId;
             if (groupId && Types.ObjectId.isValid(groupId)) {
@@ -169,9 +188,14 @@ const handleChat = async (
                 });
                 return;
             }
-            const chat = await Conversation.findOne({
-                chatGroup: groupId,
-            });
+            const [chatGroup, chat] = await Promise.all([
+                ChatGroup.findById(data?.groupId)
+                    .select('_id')
+                    .lean(),
+                Conversation.findOne({ project: data?.projectId })
+                    .select('_id participants')
+                    .lean(),
+            ]);
             if (!chat) {
                 emitError(socket, {
                     code: 404,
@@ -181,7 +205,6 @@ const handleChat = async (
                 });
                 return;
             }
-            const chatGroup = await ChatGroup.findById(data?.groupId);
             if (!chatGroup) {
                 emitError(socket, {
                     code: 400,
@@ -241,9 +264,15 @@ const handleChat = async (
                 });
                 return;
             }
-            const chat = await Conversation.findOne({
-                bondLink: bondLinkId,
-            });
+            const [bondLink, chat] = await Promise.all([
+                BondLink.findById(data?.bondLinkId)
+                    .select('_id')
+                    .lean(),
+
+                Conversation.findOne({ project: data?.projectId })
+                    .select('_id participants')
+                    .lean(),
+            ]);
             if (!chat) {
                 emitError(socket, {
                     code: 404,
@@ -253,7 +282,6 @@ const handleChat = async (
                 });
                 return;
             }
-            const bondLink = await BondLink.findById(data?.bondLinkId);
             if (!bondLink) {
                 emitError(socket, {
                     code: 400,
