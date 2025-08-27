@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Types } from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 
 import Conversation from './conversation.model';
 import pick from '../../helper/pick';
@@ -108,6 +108,36 @@ const getConversation = async (
                 preserveNullAndEmptyArrays: true,
             },
         },
+        // {
+        //     $lookup: {
+        //         from: 'normalusers',
+        //         let: { participants: '$participants' },
+        //         pipeline: [
+        //             {
+        //                 $match: {
+        //                     $expr: {
+        //                         $and: [
+        //                             {
+        //                                 $in: ['$_id', '$$participants'],
+        //                             },
+        //                             {
+        //                                 $ne: [
+        //                                     '$_id',
+        //                                     new Types.ObjectId(profileId),
+        //                                 ],
+        //                             },
+        //                         ],
+        //                     },
+        //                 },
+        //             },
+        //             {
+        //                 $limit: 1,
+        //             },
+        //         ],
+        //         as: 'otherUser',
+        //     },
+        // },
+
         {
             $lookup: {
                 from: 'normalusers',
@@ -117,9 +147,7 @@ const getConversation = async (
                         $match: {
                             $expr: {
                                 $and: [
-                                    {
-                                        $in: ['$_id', '$$participants'],
-                                    },
+                                    { $in: ['$_id', '$$participants'] },
                                     {
                                         $ne: [
                                             '$_id',
@@ -130,15 +158,16 @@ const getConversation = async (
                             },
                         },
                     },
-                    {
-                        $limit: 1,
-                    },
+                    { $limit: 1 },
                 ],
                 as: 'otherUser',
             },
         },
         {
-            $unwind: '$otherUser',
+            $unwind: {
+                path: '$otherUser',
+                preserveNullAndEmptyArrays: true, // keep the doc even if no otherUser
+            },
         },
         {
             $lookup: {
@@ -159,7 +188,9 @@ const getConversation = async (
                                     {
                                         $ne: [
                                             '$msgByUserId',
-                                            new Types.ObjectId(profileId),
+                                            new mongoose.Types.ObjectId(
+                                                profileId
+                                            ),
                                         ],
                                     },
                                 ],
@@ -189,11 +220,11 @@ const getConversation = async (
                     name: '$otherUser.name',
                     profile_image: '$otherUser.profile_image',
                 },
+
                 project: {
                     _id: 1,
-                    title: 1,
                     name: 1,
-                    projectImage: 1,
+                    cover_image: 1,
                 },
                 chatGroup: {
                     _id: 1,
@@ -212,14 +243,10 @@ const getConversation = async (
             },
         },
 
-        // ...(searchConditions.length > 0
-        //     ? [{ $match: { $and: [searchConditions] } }]
-        //     : []),
         ...(searchConditions.length > 0
             ? [{ $match: { $and: searchConditions } }]
             : []),
         {
-            // $sort: { 'lastMessage.createdAt': -1 },
             $sort: { updated_at: -1 },
         },
         { $skip: skip },
