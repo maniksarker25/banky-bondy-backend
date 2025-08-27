@@ -10,13 +10,11 @@ export const createChatGroupData = z.object({
         participants: z
             .array(ObjectIdSchema)
             .min(2, 'A chat group must have at least 2 participants'),
-        image: z.string(),
     }),
 });
 export const updateChatGroupData = z.object({
     body: z.object({
         name: z.string().optional(),
-        image: z.string(),
     }),
 });
 
