@@ -46,6 +46,7 @@ export const uploadFile = () => {
             'institution_cover',
             'comment_image',
             'profile_cover',
+            'group_chat_image',
         ];
 
         if (file.fieldname === undefined) {
@@ -137,6 +138,8 @@ export const uploadFile = () => {
                 uploadPath = 'uploads/images/comment_image';
             } else if (file.fieldname === 'profile_cover') {
                 uploadPath = 'uploads/images/profile_cover';
+            } else if (file.fieldname === 'group_chat_image') {
+                uploadPath = 'uploads/images/group_chat_image';
             } else {
                 uploadPath = 'uploads';
             }
@@ -185,6 +188,7 @@ export const uploadFile = () => {
         { name: 'institution_cover', maxCount: 1 },
         { name: 'comment_image', maxCount: 1 },
         { name: 'profile_cover', maxCount: 1 },
+        { name: 'group_chat_image', maxCount: 1 },
     ]);
 
     return upload;
