@@ -10,6 +10,9 @@ import ProjectJoinRequest from '../projectJoinRequest/projectJoinRequest.model';
 import Conversation from '../conversation/conversation.model';
 import mongoose from 'mongoose';
 import { ENUM_CONVERSATION_TYPE } from '../conversation/conversation.enum';
+import ProjectImage from '../projectImage/projectImage.model';
+import ProjectDocument from '../projectDocument/projectDocument.model';
+import Message from '../message/message.model';
 
 // Create Project
 const createProject = async (userId: string, payload: IProject) => {
@@ -491,16 +494,57 @@ const updateProject = async (projectId: string, payload: Partial<IProject>) => {
 
 // Delete Project
 const deleteProject = async (userId: string, projectId: string) => {
-    const project = await Project.findOne({ _id: projectId, ower: userId });
+    const project = await Project.findOne({ _id: projectId, owner: userId });
     if (!project) {
         throw new AppError(httpStatus.NOT_FOUND, 'Project not found');
     }
-    const result = await Project.findByIdAndDelete(projectId);
+
+    const images = await ProjectImage.find({ project: projectId }).select(
+        'image_url'
+    );
+    for (const img of images) {
+        if (img.image_url) {
+            await deleteFileFromS3(img.image_url);
+        }
+    }
+    await ProjectImage.deleteMany({ project: projectId });
+
+    const documents = await ProjectDocument.find({ project: projectId }).select(
+        'document_url'
+    );
+    for (const doc of documents) {
+        if (doc.document_url) {
+            await deleteFileFromS3(doc.document_url);
+        }
+    }
+    await ProjectDocument.deleteMany({ project: projectId });
+
     await ProjectMember.deleteMany({ project: projectId });
     await ProjectJoinRequest.deleteMany({ project: projectId });
+
     if (project.cover_image) {
-        deleteFileFromS3(project.cover_image);
+        await deleteFileFromS3(project.cover_image);
     }
+
+    const conversation = await Conversation.findOneAndDelete({
+        project: projectId,
+    });
+
+    if (conversation) {
+        const messages = await Message.find({ conversation: conversation._id });
+
+        const allFiles = [
+            ...messages.flatMap((m) => m.imageUrl || []),
+            ...messages.flatMap((m) => m.pdfUrl || []),
+            ...messages.flatMap((m) => m.videoUrl || []),
+        ];
+
+        await Promise.all(allFiles.map((file) => deleteFileFromS3(file)));
+        await Message.deleteMany({ conversation: conversation._id });
+    }
+
+    const result = await Project.findByIdAndDelete(projectId);
+
     return result;
 };
 
