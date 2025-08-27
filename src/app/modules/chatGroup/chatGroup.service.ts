@@ -5,6 +5,7 @@ import { IChatGroup } from './chatGroup.interface';
 import ChatGroup from './chatGroup.model';
 import mongoose from 'mongoose';
 import NormalUser from '../normalUser/normalUser.model';
+import { ENUM_CONVERSATION_TYPE } from '../conversation/conversation.enum';
 
 const createGroupChat = async (
     profileId: string,
@@ -19,6 +20,7 @@ const createGroupChat = async (
     }
     await Conversation.create({
         chatGroup: result._id,
+        type: ENUM_CONVERSATION_TYPE.group,
         participants: [...payload.participants, profileId],
     });
     return result;
