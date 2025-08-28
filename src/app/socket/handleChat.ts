@@ -4,6 +4,7 @@ import { Server as IOServer, Socket } from 'socket.io';
 import { getSingleConversation } from '../helper/getSingleConversation';
 import { BondLink } from '../modules/bondLink/bondLink.model';
 import ChatGroup from '../modules/chatGroup/chatGroup.model';
+import { ENUM_CONVERSATION_TYPE } from '../modules/conversation/conversation.enum';
 import Conversation from '../modules/conversation/conversation.model';
 import Message from '../modules/message/message.model';
 import Project from '../modules/project/project.model';
@@ -38,6 +39,7 @@ const handleChat = async (
                     { participants: currentUserId },
                     { participants: data.receiver },
                 ],
+                type: ENUM_CONVERSATION_TYPE.oneToOne,
             });
             if (!conversation) {
                 conversation = await Conversation.create({

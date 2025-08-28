@@ -1,18 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
-import AppError from '../../error/appError';
-import QueryBuilder from '../../builder/QueryBuilder';
-import Project from './project.model';
-import { IProject } from './project.interface';
-import { deleteFileFromS3 } from '../../helper/deleteFromS3';
-import ProjectMember from '../projectMember/projectMember.model';
-import ProjectJoinRequest from '../projectJoinRequest/projectJoinRequest.model';
-import Conversation from '../conversation/conversation.model';
 import mongoose from 'mongoose';
+import QueryBuilder from '../../builder/QueryBuilder';
+import AppError from '../../error/appError';
+import { deleteFileFromS3 } from '../../helper/deleteFromS3';
 import { ENUM_CONVERSATION_TYPE } from '../conversation/conversation.enum';
-import ProjectImage from '../projectImage/projectImage.model';
-import ProjectDocument from '../projectDocument/projectDocument.model';
+import Conversation from '../conversation/conversation.model';
 import Message from '../message/message.model';
+import ProjectDocument from '../projectDocument/projectDocument.model';
+import ProjectImage from '../projectImage/projectImage.model';
+import ProjectJoinRequest from '../projectJoinRequest/projectJoinRequest.model';
+import ProjectMember from '../projectMember/projectMember.model';
+import { IProject } from './project.interface';
+import Project from './project.model';
 
 // Create Project
 const createProject = async (userId: string, payload: IProject) => {
@@ -28,7 +28,7 @@ const createProject = async (userId: string, payload: IProject) => {
                 {
                     participants: [userId],
                     lastMessage: null,
-                    type: ENUM_CONVERSATION_TYPE.group,
+                    type: ENUM_CONVERSATION_TYPE.projectGroup,
                     institution: null,
                     project: result[0]._id,
                     chatGroup: null,
