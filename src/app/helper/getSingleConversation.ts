@@ -12,7 +12,10 @@ export const getSingleConversation = async (
             path: 'participants',
             select: 'name profile_image _id ',
         })
-        .populate({ path: 'lastMessage', model: 'Message' });
+        .populate({ path: 'lastMessage', model: 'Message' })
+        .populate({ path: 'project', select: 'name cover_image' })
+        .populate({ path: 'chatGroup', select: 'name image' })
+        .populate({ path: 'bondLink', select: 'name' });
     // .populate({ path: 'projectId', select: 'name title projectImage' });
 
     if (!conversation) return null;
