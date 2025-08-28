@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose, { Types } from 'mongoose';
 
-import Conversation from './conversation.model';
-import pick from '../../helper/pick';
 import calculatePagination from '../../helper/paginationHelper';
+import pick from '../../helper/pick';
+import Conversation from './conversation.model';
 
 const getConversation = async (
     profileId: string,

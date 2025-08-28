@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Server as IOServer, Socket } from 'socket.io';
-import Conversation from '../modules/conversation/conversation.model';
-import Message from '../modules/message/message.model';
-import { getSingleConversation } from '../helper/getSingleConversation';
-import { emitError } from './helper';
 import { Types } from 'mongoose';
-import Project from '../modules/project/project.model';
+import { Server as IOServer, Socket } from 'socket.io';
+import { getSingleConversation } from '../helper/getSingleConversation';
 import { BondLink } from '../modules/bondLink/bondLink.model';
 import ChatGroup from '../modules/chatGroup/chatGroup.model';
+import Conversation from '../modules/conversation/conversation.model';
+import Message from '../modules/message/message.model';
+import Project from '../modules/project/project.model';
+import { emitError } from './helper';
 
 const handleChat = async (
     io: IOServer,
@@ -53,6 +53,10 @@ const handleChat = async (
                 conversationId: conversation?._id,
             };
             const saveMessage = await Message.create(messageData);
+            const populatedMessage = await saveMessage.populate({
+                path: 'msgByUserId',
+                select: 'name profile_image',
+            });
             await Conversation.updateOne(
                 { _id: conversation?._id },
                 {
@@ -62,11 +66,11 @@ const handleChat = async (
             // send to the frontend only new message data ---------------
             io.to(currentUserId.toString()).emit(
                 `message-${data?.receiver}`,
-                saveMessage
+                populatedMessage
             );
             io.to(data?.receiver.toString()).emit(
                 `message-${currentUserId}`,
-                saveMessage
+                populatedMessage
             );
 
             //send conversation
