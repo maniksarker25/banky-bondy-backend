@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import InstitutionConversation from './institutionConversation.model';
 import httpStatus from 'http-status';
+import mongoose from 'mongoose';
 import AppError from '../../error/appError';
-import { IInstitutionConversation } from './institutionConversation.interface';
 import Institution from '../institution/institution.model';
 import InstitutionMember from '../institutionMember/institutionMember.model';
-import mongoose from 'mongoose';
+import { IInstitutionConversation } from './institutionConversation.interface';
+import InstitutionConversation from './institutionConversation.model';
 
 // Create
 const createInstitutionConversation = async (
@@ -55,6 +55,11 @@ const getAllInstitutionConversations = async (
         {
             $match: {
                 institution: new mongoose.Types.ObjectId(instituionId),
+                $or: [
+                    { isPublic: true },
+                    { ussers: new mongoose.Types.ObjectId(profileId) },
+                    { user: new mongoose.Types.ObjectId(profileId) },
+                ],
             },
         },
         {
