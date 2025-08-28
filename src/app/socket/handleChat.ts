@@ -77,12 +77,14 @@ const handleChat = async (
 
             //send conversation
             const conversationSender = await getSingleConversation(
-                conversation._id,
-                currentUserId
+                conversation._id.toString(),
+                currentUserId,
+                'participants'
             );
             const conversationReceiver = await getSingleConversation(
-                conversation._id,
-                data?.receiver
+                conversation._id.toString(),
+                data?.receiver,
+                'participants'
             );
             io.to(currentUserId.toString()).emit(
                 'conversation',
@@ -174,8 +176,9 @@ const handleChat = async (
                     io.to(uid).emit(`message-${projectId}`, populatedMessage);
 
                     const singleConversation = await getSingleConversation(
-                        chat._id,
-                        uid
+                        chat._id.toString(),
+                        uid,
+                        'project'
                     );
                     io.to(uid).emit('conversation', singleConversation);
                 })
@@ -247,8 +250,9 @@ const handleChat = async (
                     populatedMessage
                 );
                 const singleConversation = await getSingleConversation(
-                    chat._id,
-                    participantId.toString()
+                    chat._id.toString(),
+                    participantId.toString(),
+                    'chatGroup'
                 );
                 io.to(participantId.toString()).emit(
                     'conversation',
@@ -324,8 +328,9 @@ const handleChat = async (
                     populatedMessage
                 );
                 const singleConversation = await getSingleConversation(
-                    chat._id,
-                    participantId.toString()
+                    chat._id.toString(),
+                    participantId.toString(),
+                    'bondLink'
                 );
                 io.to(participantId.toString()).emit(
                     'conversation',
