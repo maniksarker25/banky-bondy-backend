@@ -109,7 +109,7 @@ const handleChat = async (
                 Project.findById(data?.projectId)
                     .select('_id')
                     .lean(),
-                Conversation.findOne({ project: data?.projectId })
+                Conversation.findOne({ project: projectId })
                     .select('_id participants')
                     .lean(),
             ]);
@@ -198,7 +198,7 @@ const handleChat = async (
                 ChatGroup.findById(data?.groupId)
                     .select('_id')
                     .lean(),
-                Conversation.findOne({ project: data?.projectId })
+                Conversation.findOne({ chatGroup: groupId })
                     .select('_id participants')
                     .lean(),
             ]);
@@ -275,7 +275,7 @@ const handleChat = async (
                     .select('_id')
                     .lean(),
 
-                Conversation.findOne({ project: data?.projectId })
+                Conversation.findOne({ bondLink: bondLinkId })
                     .select('_id participants')
                     .lean(),
             ]);
