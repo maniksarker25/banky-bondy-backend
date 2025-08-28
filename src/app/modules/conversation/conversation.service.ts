@@ -3,6 +3,7 @@ import mongoose, { Types } from 'mongoose';
 
 import calculatePagination from '../../helper/paginationHelper';
 import pick from '../../helper/pick';
+import Message from '../message/message.model';
 import Conversation from './conversation.model';
 
 const getConversation = async (
@@ -269,8 +270,60 @@ const getConversation = async (
     };
 };
 
+const getConversationMediaFiles = async (
+    profileId: string,
+    conversationId: string
+) => {
+    const conversation = await Conversation.findOne({
+        participants: { $in: [profileId] },
+        _id: conversationId,
+    });
+    if (!conversation) {
+        throw new Error('Conversation not found or access denied');
+    }
+    const [result] = await Message.aggregate([
+        { $match: { conversationId } },
+        {
+            $group: {
+                _id: null,
+                images: { $push: '$imageUrl' },
+                videos: { $push: '$videoUrl' },
+                pdfs: { $push: '$pdfUrl' },
+            },
+        },
+        {
+            $project: {
+                images: {
+                    $reduce: {
+                        input: '$images',
+                        initialValue: [],
+                        in: { $concatArrays: ['$$value', '$$this'] },
+                    },
+                },
+                videos: {
+                    $reduce: {
+                        input: '$videos',
+                        initialValue: [],
+                        in: { $concatArrays: ['$$value', '$$this'] },
+                    },
+                },
+                pdfs: {
+                    $reduce: {
+                        input: '$pdfs',
+                        initialValue: [],
+                        in: { $concatArrays: ['$$value', '$$this'] },
+                    },
+                },
+            },
+        },
+    ]);
+
+    return result || { images: [], videos: [], pdfs: [] };
+};
+
 const ConversationService = {
     getConversation,
+    getConversationMediaFiles,
 };
 
 export default ConversationService;

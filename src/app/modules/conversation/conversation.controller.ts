@@ -16,8 +16,23 @@ const getChatList = catchAsync(async (req, res) => {
     });
 });
 
+const getConversationMediaFiles = catchAsync(async (req, res) => {
+    const result = await ConversationService.getConversationMediaFiles(
+        req?.user?.profileId,
+        req.params.conversationId
+    );
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Media files retrieved successfully',
+        data: result,
+    });
+});
+
 const ConversationController = {
     getChatList,
+    getConversationMediaFiles,
 };
 
 export default ConversationController;

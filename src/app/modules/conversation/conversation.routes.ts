@@ -10,5 +10,9 @@ router.get(
     auth(USER_ROLE.user),
     ConversationController.getChatList
 );
-
+router.get(
+    '/get-media-files/:id',
+    auth(USER_ROLE.user),
+    ConversationController.getConversationMediaFiles
+);
 export const conversationRoutes = router;
