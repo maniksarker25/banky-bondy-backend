@@ -39,5 +39,9 @@ export const getSingleConversation = async (
         },
         unseenMsg: countUnseenMessage,
         lastMessage: conversation.lastMessage,
+        type: conversation.type,
+        chatGroup: conversation.chatGroup,
+        project: conversation.project,
+        bondLink: conversation.bondLink,
     };
 };
