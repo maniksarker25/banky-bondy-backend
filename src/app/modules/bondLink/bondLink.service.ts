@@ -8,7 +8,7 @@ const createBondLink = async (payload: IBondLink) => {
     const result = await BondLink.create(payload);
     await Conversation.create({
         participants: payload.participants,
-        type: ENUM_CONVERSATION_TYPE.group,
+        type: ENUM_CONVERSATION_TYPE.bondLinkGroup,
         bondLink: result._id,
     });
     return result;
