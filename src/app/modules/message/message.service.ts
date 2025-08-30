@@ -11,7 +11,6 @@ const getMessages = async (
     profileId: string,
     query: Record<string, unknown>
 ) => {
-    console.log('qer', query);
     let conversationId;
     if (query.userId) {
         const conversation = await Conversation.findOne({

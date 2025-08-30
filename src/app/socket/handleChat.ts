@@ -51,6 +51,7 @@ const handleChat = async (
                 text: data.text,
                 imageUrl: data.imageUrl || [],
                 videoUrl: data.videoUrl || [],
+                pdfUrl: data.pdfUrl || [],
                 msgByUserId: currentUserId,
                 conversationId: conversation?._id,
             };
@@ -134,12 +135,12 @@ const handleChat = async (
                 });
             }
 
-            console.log('curretn user id', currentUserId);
             // create new message
             const messageData = {
                 text: data.text,
                 imageUrl: data.imageUrl || [],
                 videoUrl: data.videoUrl || [],
+                pdfUrl: data.pdfUrl || [],
                 msgByUserId: currentUserId,
                 conversationId: chat?._id,
             };
@@ -223,12 +224,12 @@ const handleChat = async (
                 });
             }
 
-            console.log('curretn user id', currentUserId);
             // create new message
             const messageData = {
                 text: data.text,
                 imageUrl: data.imageUrl || [],
                 videoUrl: data.videoUrl || [],
+                pdfUrl: data.pdfUrl || [],
                 msgByUserId: currentUserId,
                 conversationId: chat?._id,
             };
@@ -301,12 +302,12 @@ const handleChat = async (
                 });
             }
 
-            console.log('curretn user id', currentUserId);
             // create new message
             const messageData = {
                 text: data.text,
                 imageUrl: data.imageUrl || [],
                 videoUrl: data.videoUrl || [],
+                pdfUrl: data.pdfUrl || [],
                 msgByUserId: currentUserId,
                 conversationId: chat?._id,
             };
