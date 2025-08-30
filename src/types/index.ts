@@ -28,6 +28,9 @@ declare namespace Express {
             comment_image?: File[];
             group_chat_image?: File[];
             profile_cover?: File[];
+            conversation_image?: File[];
+            conversation_video?: File[];
+            conversation_pdf?: File[];
         };
     }
 }

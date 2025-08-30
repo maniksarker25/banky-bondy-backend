@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose, { Types } from 'mongoose';
 
+import httpStatus from 'http-status';
+import AppError from '../../error/appError';
 import calculatePagination from '../../helper/paginationHelper';
 import pick from '../../helper/pick';
 import Message from '../message/message.model';
@@ -279,7 +281,10 @@ const getConversationMediaFiles = async (
         _id: conversationId,
     });
     if (!conversation) {
-        throw new Error('Conversation not found or access denied');
+        throw new AppError(
+            httpStatus.UNAUTHORIZED,
+            'Conversation not found or access denied'
+        );
     }
     const [result] = await Message.aggregate([
         { $match: { conversationId } },

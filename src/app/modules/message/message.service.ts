@@ -2,9 +2,10 @@
 import Conversation from '../conversation/conversation.model';
 import Message from './message.model';
 
-import AppError from '../../error/appError';
 import httpStatus from 'http-status';
 import mongoose from 'mongoose';
+import AppError from '../../error/appError';
+import { ENUM_CONVERSATION_TYPE } from '../conversation/conversation.enum';
 
 const getMessages = async (
     profileId: string,
@@ -20,6 +21,7 @@ const getMessages = async (
                     new mongoose.Types.ObjectId(query.userId as string),
                 ],
             },
+            type: ENUM_CONVERSATION_TYPE.oneToOne,
         });
         if (!conversation) {
             throw new AppError(
