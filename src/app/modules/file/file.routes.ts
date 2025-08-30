@@ -12,5 +12,10 @@ router.post(
     uploadFile(),
     fileController.uploadConversationFiles
 );
+router.post(
+    '/delete-files',
+    auth(USER_ROLE.user, USER_ROLE.admin, USER_ROLE.superAdmin),
+    fileController.deleteFiles
+);
 
 export const fileUploadRoutes = router;
