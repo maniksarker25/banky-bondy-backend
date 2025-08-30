@@ -93,7 +93,6 @@ const handleChat = async (
             );
             io.to(data?.receiver).emit('conversation', conversationReceiver);
         } else if (data?.projectId) {
-            console.log('else');
             const projectId = data?.projectId;
             if (projectId && Types.ObjectId.isValid(projectId)) {
                 console.log('Valid ObjectId');
