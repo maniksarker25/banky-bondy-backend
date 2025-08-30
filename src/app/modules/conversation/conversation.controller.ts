@@ -19,7 +19,8 @@ const getChatList = catchAsync(async (req, res) => {
 const getConversationMediaFiles = catchAsync(async (req, res) => {
     const result = await ConversationService.getConversationMediaFiles(
         req?.user?.profileId,
-        req.params.id
+        req.params.id,
+        req.query
     );
 
     sendResponse(res, {

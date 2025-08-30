@@ -48,7 +48,7 @@ const handleChat = async (
             }
 
             const messageData = {
-                text: data.text,
+                text: data.text || '',
                 imageUrl: data.imageUrl || [],
                 videoUrl: data.videoUrl || [],
                 pdfUrl: data.pdfUrl || [],

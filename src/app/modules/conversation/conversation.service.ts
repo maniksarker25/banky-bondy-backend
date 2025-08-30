@@ -272,58 +272,131 @@ const getConversation = async (
     };
 };
 
+// const getConversationMediaFiles = async (
+//     profileId: string,
+//     conversationId: string
+// ) => {
+//     const conversation = await Conversation.findOne({
+//         participants: profileId,
+//         _id: conversationId,
+//     });
+//     console.log('conversation', conversation);
+//     if (!conversation) {
+//         throw new AppError(
+//             httpStatus.UNAUTHORIZED,
+//             'Conversation not found or access denied'
+//         );
+//     }
+//     const [result] = await Message.aggregate([
+//         {
+//             $match: {
+//                 conversationId: new mongoose.Types.ObjectId(conversationId),
+//             },
+//         },
+//         {
+//             $group: {
+//                 _id: null,
+//                 images: { $push: '$imageUrl' },
+//                 videos: { $push: '$videoUrl' },
+//                 pdfs: { $push: '$pdfUrl' },
+//             },
+//         },
+//         {
+//             $project: {
+//                 images: {
+//                     $reduce: {
+//                         input: '$images',
+//                         initialValue: [],
+//                         in: { $concatArrays: ['$$value', '$$this'] },
+//                     },
+//                 },
+//                 videos: {
+//                     $reduce: {
+//                         input: '$videos',
+//                         initialValue: [],
+//                         in: { $concatArrays: ['$$value', '$$this'] },
+//                     },
+//                 },
+//                 pdfs: {
+//                     $reduce: {
+//                         input: '$pdfs',
+//                         initialValue: [],
+//                         in: { $concatArrays: ['$$value', '$$this'] },
+//                     },
+//                 },
+//             },
+//         },
+//     ]);
+//     console.log('result', result);
+
+//     return result || { images: [], videos: [], pdfs: [] };
+// };
+
 const getConversationMediaFiles = async (
     profileId: string,
-    conversationId: string
+    conversationId: string,
+    query: Record<string, unknown>
 ) => {
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 20;
+    const skip = (page - 1) * limit;
+
     const conversation = await Conversation.findOne({
         participants: profileId,
         _id: conversationId,
     });
+
     if (!conversation) {
         throw new AppError(
             httpStatus.UNAUTHORIZED,
             'Conversation not found or access denied'
         );
     }
+
     const [result] = await Message.aggregate([
-        { $match: { conversationId } },
         {
-            $group: {
-                _id: null,
-                images: { $push: '$imageUrl' },
-                videos: { $push: '$videoUrl' },
-                pdfs: { $push: '$pdfUrl' },
+            $match: {
+                conversationId: new mongoose.Types.ObjectId(conversationId),
             },
         },
         {
             $project: {
-                images: {
-                    $reduce: {
-                        input: '$images',
-                        initialValue: [],
-                        in: { $concatArrays: ['$$value', '$$this'] },
-                    },
+                media: {
+                    $concatArrays: [
+                        { $ifNull: ['$imageUrl', []] },
+                        { $ifNull: ['$videoUrl', []] },
+                        { $ifNull: ['$pdfUrl', []] },
+                    ],
                 },
-                videos: {
-                    $reduce: {
-                        input: '$videos',
-                        initialValue: [],
-                        in: { $concatArrays: ['$$value', '$$this'] },
-                    },
-                },
-                pdfs: {
-                    $reduce: {
-                        input: '$pdfs',
-                        initialValue: [],
-                        in: { $concatArrays: ['$$value', '$$this'] },
-                    },
-                },
+            },
+        },
+        { $unwind: '$media' },
+        {
+            $facet: {
+                paginatedResults: [
+                    { $sort: { _id: 1 } }, // optional sort
+                    { $skip: skip },
+                    { $limit: limit },
+                    { $group: { _id: null, media: { $push: '$media' } } },
+                ],
+                totalCount: [{ $count: 'count' }],
             },
         },
     ]);
 
-    return result || { images: [], videos: [], pdfs: [] };
+    const urls = result.paginatedResults[0]?.media || [];
+    const totalUrls = result.totalCount[0]?.count || 0;
+    const totalPages = Math.ceil(totalUrls / limit);
+
+    return {
+        meta: {
+            page,
+            limit,
+            totalPage: totalPages,
+            total: totalUrls,
+        },
+        urls,
+    };
 };
 
 const ConversationService = {

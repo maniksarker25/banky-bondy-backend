@@ -109,6 +109,7 @@ const getMessages = async (
                 text: 1,
                 imageUrl: 1,
                 videoUrl: 1,
+                pdfUrl: 1,
                 seen: 1,
                 msgByUserId: 1,
                 conversationId: 1,
