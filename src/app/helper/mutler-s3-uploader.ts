@@ -47,7 +47,7 @@ export const uploadFile = () => {
             'comment_image',
             'profile_cover',
             'group_chat_image',
-            'conversation_video',
+            'conversation_image',
             'conversation_pdf',
             'conversation_video',
         ];

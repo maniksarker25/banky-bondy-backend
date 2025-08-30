@@ -277,7 +277,7 @@ const getConversationMediaFiles = async (
     conversationId: string
 ) => {
     const conversation = await Conversation.findOne({
-        participants: { $in: [profileId] },
+        participants: profileId,
         _id: conversationId,
     });
     if (!conversation) {
