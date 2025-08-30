@@ -13,4 +13,4 @@ router.post(
     fileController.uploadConversationFiles
 );
 
-export const conversationRoutes = router;
+export const fileUploadRoutes = router;

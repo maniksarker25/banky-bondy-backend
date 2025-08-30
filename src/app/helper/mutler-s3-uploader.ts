@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { S3Client } from '@aws-sdk/client-s3';
 import { Request } from 'express';
 import multer from 'multer';
 import multerS3 from 'multer-s3';
-import { S3Client } from '@aws-sdk/client-s3';
 
 /**
  * Configure and setup AWS S3 client
@@ -47,6 +47,9 @@ export const uploadFile = () => {
             'comment_image',
             'profile_cover',
             'group_chat_image',
+            'conversation_video',
+            'conversation_pdf',
+            'conversation_video',
         ];
 
         if (file.fieldname === undefined) {
@@ -140,6 +143,12 @@ export const uploadFile = () => {
                 uploadPath = 'uploads/images/profile_cover';
             } else if (file.fieldname === 'group_chat_image') {
                 uploadPath = 'uploads/images/group_chat_image';
+            } else if (file.fieldname === 'conversation_pdf') {
+                uploadPath = 'uploads/pdf/conversation_pdf';
+            } else if (file.fieldname === 'conversation_image') {
+                uploadPath = 'uploads/images/conversation_image';
+            } else if (file.fieldname === 'conversation_video') {
+                uploadPath = 'uploads/videos/conversation_video';
             } else {
                 uploadPath = 'uploads';
             }
@@ -189,6 +198,9 @@ export const uploadFile = () => {
         { name: 'comment_image', maxCount: 1 },
         { name: 'profile_cover', maxCount: 1 },
         { name: 'group_chat_image', maxCount: 1 },
+        { name: 'conversation_pdf', maxCount: 2 },
+        { name: 'conversation_image', maxCount: 5 },
+        { name: 'conversation_video', maxCount: 1 },
     ]);
 
     return upload;
