@@ -134,6 +134,7 @@ const markAsCompleteBond = async (profileId: string, bondLinkId: string) => {
         },
         { new: true }
     );
+
     if (!result) {
         throw new AppError(
             httpStatus.BAD_REQUEST,
