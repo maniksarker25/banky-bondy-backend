@@ -7,6 +7,7 @@ export interface IBondLink {
     participants: Types.ObjectId[];
     requestedBonds: Types.ObjectId[];
     status: (typeof ENUM_BOND_LINK_STATUS)[keyof typeof ENUM_BOND_LINK_STATUS];
+    markAsCompletedBy: Types.ObjectId[];
     createdAt: Date;
     updated: Date;
 }
