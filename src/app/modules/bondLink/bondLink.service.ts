@@ -122,8 +122,11 @@ const markAsCompleteBond = async (profileId: string, bondLinkId: string) => {
         );
     }
 
-    const result = await BondLink.findByIdAndUpdate(
-        bondLinkId,
+    const result = await BondLink.findOneAndUpdate(
+        {
+            _id: bondLinkId,
+            participants: new mongoose.Types.ObjectId(profileId),
+        },
         {
             $addToSet: {
                 markAsCompletedBy: new mongoose.Types.ObjectId(profileId),
@@ -131,6 +134,12 @@ const markAsCompleteBond = async (profileId: string, bondLinkId: string) => {
         },
         { new: true }
     );
+    if (!result) {
+        throw new AppError(
+            httpStatus.BAD_REQUEST,
+            'Maybe you are not participant of that bond , if you please contact with admin'
+        );
+    }
     if (result?.markAsCompletedBy.length === bondLink.participants.length) {
         await BondLink.findByIdAndUpdate(bondLinkId, {
             status: ENUM_BOND_LINK_STATUS.Completed,
