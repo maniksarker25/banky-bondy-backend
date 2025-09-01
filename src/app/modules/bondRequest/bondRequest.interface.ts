@@ -9,6 +9,7 @@ export interface IBondRequest {
         type: 'Point';
         coordinates: [number, number];
     };
+    description?: string;
     radius?: number;
     status: (typeof ENUM_BOND_REQUEST_STATUS)[keyof typeof ENUM_BOND_REQUEST_STATUS];
     createdAt?: Date;

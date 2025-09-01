@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
+import { JwtPayload } from 'jsonwebtoken';
+import mongoose from 'mongoose';
+import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/appError';
+import { ENUM_FRIEND_REQUEST_STATUS } from '../friendRequest/friendRequest.enum';
+import Relative from '../relative/relative.model';
+import { USER_ROLE } from '../user/user.constant';
 import { INormalUser } from './normalUser.interface';
 import NormalUser from './normalUser.model';
-import QueryBuilder from '../../builder/QueryBuilder';
-import { JwtPayload } from 'jsonwebtoken';
-import { USER_ROLE } from '../user/user.constant';
-import { ENUM_FRIEND_REQUEST_STATUS } from '../friendRequest/friendRequest.enum';
-import mongoose from 'mongoose';
 
 const updateUserProfile = async (id: string, payload: Partial<INormalUser>) => {
     if (payload.email) {
@@ -314,7 +315,14 @@ const getAllUser = async (
 // get single user
 const getSingleUser = async (profileId: string, id: string) => {
     const user = await getSingleUserWithStatus(profileId, id);
-    return user;
+    const relatives = await Relative.find({ user: user._id }).populate({
+        path: 'relative',
+        select: 'name profile_image',
+    });
+    return {
+        ...user,
+        relatives,
+    };
 };
 
 export async function getSingleUserWithStatus(

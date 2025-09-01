@@ -1,11 +1,11 @@
 import httpStatus from 'http-status';
 import AppError from '../../error/appError';
-import ProjectJoinRequest from './projectJoinRequest.model';
+import Conversation from '../conversation/conversation.model';
 import Project from '../project/project.model';
-import { ENUM_PROJECT_JOIN_REQEST_STATUS } from './projectJoinRequest.enum';
 import ProjectMember from '../projectMember/projectMember.model';
 import { ENUM_PROJECT_MUMBER_TYPE } from '../projectMember/projectMumber.enum';
-import Conversation from '../conversation/conversation.model';
+import { ENUM_PROJECT_JOIN_REQEST_STATUS } from './projectJoinRequest.enum';
+import ProjectJoinRequest from './projectJoinRequest.model';
 
 const sendJoinRequest = async (userId: string, projectId: string) => {
     const project = await Project.exists({ _id: projectId });
