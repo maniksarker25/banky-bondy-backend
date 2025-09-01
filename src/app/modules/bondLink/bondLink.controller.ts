@@ -24,6 +24,22 @@ const getMyBondLinks = catchAsync(async (req, res) => {
         data: result,
     });
 });
+const markAsCompleteBond = catchAsync(async (req, res) => {
+    const result = await bondLinkServices.markAsCompleteBond(
+        req.user.profileId,
+        req.params.id
+    );
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Mark as completed from you end',
+        data: result,
+    });
+});
 
-const BondLinkController = { getMyBondLinks, createBondLink };
+const BondLinkController = {
+    getMyBondLinks,
+    createBondLink,
+    markAsCompleteBond,
+};
 export default BondLinkController;

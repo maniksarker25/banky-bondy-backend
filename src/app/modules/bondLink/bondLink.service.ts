@@ -25,11 +25,9 @@ const createBondLink = async (payload: IBondLink) => {
     // }
     // return result;
 
-    if (!payload) throw new Error('Payload is required.');
-
     const participants = Array.from(new Set(payload.participants ?? []));
-    if (participants.length === 0) {
-        throw new Error('At least one participant is required.');
+    if (participants.length < 2) {
+        throw new Error('At least two participant is required.');
     }
 
     const requestedBonds = Array.isArray(payload.requestedBonds)
