@@ -188,7 +188,7 @@ const moduleRoutes = [
         router: fileUploadRoutes,
     },
     {
-        path: '/super-amdin',
+        path: '/super-admin',
         router: superAdminRoutes,
     },
 ];
