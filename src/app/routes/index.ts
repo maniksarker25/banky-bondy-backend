@@ -32,6 +32,7 @@ import { projectMemberRoutes } from '../modules/projectMember/projectMember.rout
 import { relativeRoutes } from '../modules/relative/relative.routes';
 import { reportRoutes } from '../modules/report/report.routes';
 import { skillRoutes } from '../modules/skill/skill.routes';
+import { superAdminRoutes } from '../modules/superAdmin/superAdmin.routes';
 import { topicRoutes } from '../modules/topic/topic.routes';
 import { transactionRoutes } from '../modules/transaction/transaction.routes';
 import { userRoutes } from '../modules/user/user.routes';
@@ -185,6 +186,10 @@ const moduleRoutes = [
     {
         path: '/file-upload',
         router: fileUploadRoutes,
+    },
+    {
+        path: '/super-amdin',
+        router: superAdminRoutes,
     },
 ];
 

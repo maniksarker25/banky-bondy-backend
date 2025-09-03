@@ -1,10 +1,10 @@
-import validateRequest from '../../middlewares/validateRequest';
-import userControllers from './user.controller';
 import { Router } from 'express';
-import userValidations from './user.validation';
-import normalUserValidations from '../normalUser/normalUser.validation';
 import auth from '../../middlewares/auth';
+import validateRequest from '../../middlewares/validateRequest';
+import normalUserValidations from '../normalUser/normalUser.validation';
 import { USER_ROLE } from './user.constant';
+import userControllers from './user.controller';
+import userValidations from './user.validation';
 
 const router = Router();
 
@@ -33,9 +33,8 @@ router.get(
 );
 
 router.patch(
-    '/change-status/:id',
+    '/block-unblock/:id',
     auth(USER_ROLE.superAdmin),
-    validateRequest(userValidations.changeUserStatus),
     userControllers.changeUserStatus
 );
 router.delete(

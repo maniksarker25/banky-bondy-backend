@@ -21,6 +21,14 @@ const superAdminSchema = new Schema<ISuperAdmin>(
             type: String,
             default: '',
         },
+        contact: {
+            type: String,
+            default: '',
+        },
+        address: {
+            type: String,
+            default: '',
+        },
     },
     {
         timestamps: true,
