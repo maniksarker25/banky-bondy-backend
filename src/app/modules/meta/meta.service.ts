@@ -1,10 +1,41 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { ENUM_PAYMENT_STATUS } from '../../utilities/enum';
+import { Donate } from '../donate/donate.model';
 import NormalUser from '../normalUser/normalUser.model';
+import { User } from '../user/user.model';
 
 const getDashboardMetaData = async () => {
-    const totalUser = await NormalUser.countDocuments();
+    const [totalUser, totalBlockAccount, donationStats] = await Promise.all([
+        NormalUser.countDocuments(),
+        User.countDocuments({ isBlocked: true }),
+        Donate.aggregate([
+            {
+                $match: { status: ENUM_PAYMENT_STATUS.PAID },
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalAmount: { $sum: '$amount' },
+                    uniqueDonors: { $addToSet: '$user' },
+                },
+            },
+            {
+                $project: {
+                    _id: 0,
+                    totalAmount: 1,
+                    totalUniqueDonors: { $size: '$uniqueDonors' },
+                },
+            },
+        ]),
+    ]);
+
+    const { totalAmount = 0, totalUniqueDonors = 0 } = donationStats[0] || {};
+
     return {
         totalUser,
+        totalBlockAccount,
+        totalDonationAmount: totalAmount,
+        totalDonors: totalUniqueDonors,
     };
 };
 

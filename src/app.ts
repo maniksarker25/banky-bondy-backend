@@ -3,14 +3,14 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import express, { Application, Request, Response, application } from 'express';
-import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import globalErrorHandler from './app/middlewares/globalErrorHandler';
-import router from './app/routes';
-import notFound from './app/middlewares/notFound';
-const app: Application = express();
+import cors from 'cors';
+import express, { Application } from 'express';
 import sendContactUsEmail from './app/helper/sendContactUsEmail';
+import globalErrorHandler from './app/middlewares/globalErrorHandler';
+import notFound from './app/middlewares/notFound';
+import router from './app/routes';
+const app: Application = express();
 
 // web hook
 // app.post(
@@ -34,6 +34,7 @@ app.use(
             'http://localhost:3006',
             'http://localhost:3007',
             'http://localhost:3008',
+            'http://10.10.20.70:3000',
         ],
         credentials: true,
     })

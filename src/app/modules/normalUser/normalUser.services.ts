@@ -32,9 +32,14 @@ const getAllUser = async (
     userData: JwtPayload,
     query: Record<string, unknown>
 ) => {
-    console.log(userData);
-    if (userData.role == USER_ROLE.admin) {
-        const userQuery = new QueryBuilder(NormalUser.find(), query)
+    if (
+        userData.role == USER_ROLE.admin ||
+        userData.role == USER_ROLE.superAdmin
+    ) {
+        const userQuery = new QueryBuilder(
+            NormalUser.find().populate({ path: 'user', select: 'isBlocked' }),
+            query
+        )
             .search(['name'])
             .fields()
             .filter()

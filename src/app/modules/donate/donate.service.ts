@@ -34,7 +34,9 @@ const donate = async (userId: string, amount: number) => {
 
 const getAllDonner = async (query: Record<string, unknown>) => {
     const resultQuery = new QueryBuilder(
-        Donate.find().populate({ path: 'user', select: 'name profile_image' }),
+        Donate.find().populate({
+            path: 'user',
+        }),
         query
     )
         .search(['name'])
