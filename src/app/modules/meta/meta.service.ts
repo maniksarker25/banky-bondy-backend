@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ENUM_PAYMENT_STATUS } from '../../utilities/enum';
+import Audio from '../audio/audio.model';
 import { Donate } from '../donate/donate.model';
 import NormalUser from '../normalUser/normalUser.model';
 import { User } from '../user/user.model';
@@ -118,9 +119,42 @@ const getUserChartData = async (year: number) => {
     };
 };
 
+const getAudioPieChartData = async () => {
+    const audioStats = await Audio.aggregate([
+        {
+            $group: {
+                _id: null,
+                shortAudioCount: {
+                    $sum: { $cond: [{ $lt: ['$duration', 300] }, 1, 0] },
+                },
+                longAudioCount: {
+                    $sum: { $cond: [{ $gte: ['$duration', 300] }, 1, 0] },
+                },
+                totalCount: { $sum: 1 },
+            },
+        },
+        {
+            $project: {
+                _id: 0,
+                shortAudioCount: 1,
+                longAudioCount: 1,
+                totalCount: 1,
+            },
+        },
+    ]);
+    const stats = audioStats[0] || {
+        shortAudioCount: 0,
+        longAudioCount: 0,
+        totalCount: 0,
+    };
+
+    return stats;
+};
+
 const MetaService = {
     getDashboardMetaData,
     getUserChartData,
+    getAudioPieChartData,
 };
 
 export default MetaService;

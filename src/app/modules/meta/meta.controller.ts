@@ -22,12 +22,12 @@ const getUserChartData = catchAsync(async (req, res) => {
         data: result,
     });
 });
-const getEarningsByType = catchAsync(async (req, res) => {
-    const result = await MetaService.getEarningsByType(Number(req?.query.year));
+const getAudioPieChartData = catchAsync(async (req, res) => {
+    const result = await MetaService.getAudioPieChartData();
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: 'Earning chart data retrieved successfully',
+        message: 'Audio chart data retrieved successfully',
         data: result,
     });
 });
@@ -35,7 +35,7 @@ const getEarningsByType = catchAsync(async (req, res) => {
 const MetaController = {
     getDashboardMetaData,
     getUserChartData,
-    getEarningsByType,
+    getAudioPieChartData,
 };
 
 export default MetaController;

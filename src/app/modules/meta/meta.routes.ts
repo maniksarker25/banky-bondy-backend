@@ -7,19 +7,19 @@ const router = express.Router();
 
 router.get(
     '/get-meta-data',
-    auth(USER_ROLE.superAdmin),
+    auth(USER_ROLE.superAdmin, USER_ROLE.admin),
     MetaController.getDashboardMetaData
 );
 
 router.get(
     '/user-chart-data',
-    auth(USER_ROLE.superAdmin),
+    auth(USER_ROLE.superAdmin, USER_ROLE.admin),
     MetaController.getUserChartData
 );
 router.get(
-    '/earning-chart-data',
-    auth(USER_ROLE.superAdmin),
-    MetaController.getEarningsByType
+    '/audio-pie-chart',
+    auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+    MetaController.getAudioPieChartData
 );
 
 export const metaRoutes = router;
