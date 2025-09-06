@@ -1,14 +1,15 @@
 import { Router } from 'express';
-import validateRequest from '../../middlewares/validateRequest';
 import auth from '../../middlewares/auth';
+import validateRequest from '../../middlewares/validateRequest';
 import { USER_ROLE } from '../user/user.constant';
-import AdminValidations from './admin.validation';
 import AdminController from './admin.controller';
+import AdminValidations from './admin.validation';
 
 const router = Router();
 
 router.post(
     '/create-admin',
+    auth(USER_ROLE.superAdmin),
     validateRequest(AdminValidations.registerAdminValidationSchema),
     AdminController.createAdmin
 );

@@ -2,14 +2,16 @@
 
 import QueryBuilder from '../../builder/QueryBuilder';
 
-import { User } from '../user/user.model';
-import AppError from '../../error/appError';
+import bcrypt from 'bcrypt';
 import httpStatus from 'http-status';
+import mongoose from 'mongoose';
+import config from '../../config';
+import AppError from '../../error/appError';
+import { USER_ROLE } from '../user/user.constant';
+import { TUser } from '../user/user.interface';
+import { User } from '../user/user.model';
 import { IAdmin } from './admin.interface';
 import Admin from './admin.model';
-import mongoose from 'mongoose';
-import { TUser } from '../user/user.interface';
-import { USER_ROLE } from '../user/user.constant';
 
 // register Admin
 const createAdmin = async (payload: IAdmin & { password: string }) => {
@@ -56,7 +58,20 @@ const createAdmin = async (payload: IAdmin & { password: string }) => {
     }
 };
 
-const updateAdminProfile = async (id: string, payload: Partial<IAdmin>) => {
+const updateAdminProfile = async (
+    id: string,
+    payload: Partial<IAdmin> & { password: string }
+) => {
+    if (payload.password) {
+        const hashedPassword = await bcrypt.hash(
+            payload.password,
+            Number(config.bcrypt_salt_rounds)
+        );
+        await User.findOneAndUpdate(
+            { profileId: id },
+            { password: hashedPassword }
+        );
+    }
     const result = await Admin.findByIdAndUpdate(id, payload, {
         new: true,
         runValidators: true,
