@@ -31,5 +31,10 @@ router.get(
     auth(USER_ROLE.superAdmin, USER_ROLE.admin),
     MetaController.getAudioPieChartData
 );
+router.get(
+    '/bond-chart-data',
+    auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+    MetaController.bondChartData
+);
 
 export const metaRoutes = router;

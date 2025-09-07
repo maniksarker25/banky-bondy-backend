@@ -33,6 +33,15 @@ const donorGrowthChartData = catchAsync(async (req, res) => {
         data: result,
     });
 });
+const bondChartData = catchAsync(async (req, res) => {
+    const result = await MetaService.bondChartData(Number(req?.query.year));
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Bond chart data retrieved successfully',
+        data: result,
+    });
+});
 const getInstitutionChartData = catchAsync(async (req, res) => {
     const result = await MetaService.getInstitutionChartData(
         Number(req?.query.year)
@@ -60,6 +69,7 @@ const MetaController = {
     getAudioPieChartData,
     donorGrowthChartData,
     getInstitutionChartData,
+    bondChartData,
 };
 
 export default MetaController;
