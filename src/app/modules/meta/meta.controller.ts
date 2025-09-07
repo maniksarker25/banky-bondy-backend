@@ -33,6 +33,17 @@ const donorGrowthChartData = catchAsync(async (req, res) => {
         data: result,
     });
 });
+const getInstitutionChartData = catchAsync(async (req, res) => {
+    const result = await MetaService.getInstitutionChartData(
+        Number(req?.query.year)
+    );
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Institution chart data retrieved successfully',
+        data: result,
+    });
+});
 const getAudioPieChartData = catchAsync(async (req, res) => {
     const result = await MetaService.getAudioPieChartData();
     sendResponse(res, {
@@ -48,6 +59,7 @@ const MetaController = {
     getUserChartData,
     getAudioPieChartData,
     donorGrowthChartData,
+    getInstitutionChartData,
 };
 
 export default MetaController;

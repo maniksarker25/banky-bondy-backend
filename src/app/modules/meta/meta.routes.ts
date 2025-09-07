@@ -22,6 +22,11 @@ router.get(
     MetaController.donorGrowthChartData
 );
 router.get(
+    '/institution-chart-data',
+    auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+    MetaController.getInstitutionChartData
+);
+router.get(
     '/audio-pie-chart',
     auth(USER_ROLE.superAdmin, USER_ROLE.admin),
     MetaController.getAudioPieChartData

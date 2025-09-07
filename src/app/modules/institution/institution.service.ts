@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
+import mongoose from 'mongoose';
 import AppError from '../../error/appError';
-import Institution from './institution.model';
-import { IInstitution } from './institution.interface';
+import { deleteFileFromS3 } from '../../helper/deleteFromS3';
+import { ENUM_GROUP } from '../institutionMember/institutionMember.enum';
 import { IInstitutionMember } from '../institutionMember/institutionMember.interface';
 import InstitutionMember from '../institutionMember/institutionMember.model';
-import { ENUM_GROUP } from '../institutionMember/institutionMember.enum';
-import { deleteFileFromS3 } from '../../helper/deleteFromS3';
-import mongoose from 'mongoose';
+import { IInstitution } from './institution.interface';
+import Institution from './institution.model';
 
 // Create Institution
 const createInstitution = async (userId: string, payload: IInstitution) => {
@@ -76,10 +76,15 @@ const getAllInstitutions = async (
                 as: 'creator',
             },
         },
+        // {
+        //     $unwind: '$creator',
+        // },
         {
-            $unwind: '$creator',
+            $unwind: {
+                path: '$creator',
+                preserveNullAndEmptyArrays: true,
+            },
         },
-
         {
             $lookup: {
                 from: 'institutionmembers',

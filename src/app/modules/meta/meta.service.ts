@@ -2,6 +2,7 @@
 import { ENUM_PAYMENT_STATUS } from '../../utilities/enum';
 import Audio from '../audio/audio.model';
 import { Donate } from '../donate/donate.model';
+import Institution from '../institution/institution.model';
 import NormalUser from '../normalUser/normalUser.model';
 import { User } from '../user/user.model';
 
@@ -118,6 +119,232 @@ const getUserChartData = async (year: number) => {
         yearsDropdown,
     };
 };
+
+// const getInstitutionChartData = async (year: number) => {
+//     const currentYear = year || new Date().getFullYear();
+//     const startOfYear = new Date(currentYear, 0, 1);
+//     const endOfYear = new Date(currentYear + 1, 0, 1);
+//     const chartData = await Institution.aggregate([
+//         {
+//             $match: {
+//                 createdAt: {
+//                     $gte: startOfYear,
+//                     $lt: endOfYear,
+//                 },
+//             },
+//         },
+//         {
+//             $lookup: {
+//                 from: 'institutionmembers',
+//                 localField: '_id',
+//                 foreignField: 'institution',
+//                 as: 'members',
+//             },
+//         },
+//         {
+//             $addFields: {
+//                 memberCount: { $size: '$members' },
+//             },
+//         },
+
+//         {
+//             $addFields: {
+//                 avgMembersPerInstitution: {
+//                     $cond: [
+//                         { $eq: ['$totalInstitutions', 0] },
+//                         0,
+//                         { $divide: ['$totalMembers', '$totalInstitutions'] },
+//                     ],
+//                 },
+//             },
+//         },
+//         {
+//             $group: {
+//                 _id: { $month: '$createdAt' },
+//                 totalInstitutions: { $sum: 1 },
+//                 totalMembers: { $sum: '$memberCount' },
+//                 avgMembersPerInstitution: { $sum: 1 },
+//             },
+//         },
+//         {
+//             $project: {
+//                 month: '$_id',
+//                 totalInstitutions: 1,
+//                 totalMembers: 1,
+//                 avgMembersPerInstitution: 1,
+//                 _id: 0,
+//             },
+//         },
+//         {
+//             $sort: { _id: 1 },
+//         },
+//     ]);
+
+//     const months = [
+//         'Jan',
+//         'Feb',
+//         'Mar',
+//         'Apr',
+//         'May',
+//         'Jun',
+//         'Jul',
+//         'Aug',
+//         'Sep',
+//         'Oct',
+//         'Nov',
+//         'Dec',
+//     ];
+
+//     const data = Array.from({ length: 12 }, (_, index) => ({
+//         month: months[index],
+//         totalInstitutions:
+//             chartData.find((item) => item.month === index + 1)
+//                 ?.totalInstitutions || 0,
+//         totalMembers:
+//             chartData.find((item) => item.month === index + 1)?.totalMembers ||
+//             0,
+//         avgMembersPerInstitution:
+//             chartData.find((item) => item.month === index + 1)
+//                 ?.avgMembersPerInstitution || 0,
+//     }));
+
+//     const yearsResult = await Donate.aggregate([
+//         {
+//             $group: {
+//                 _id: { $year: '$createdAt' },
+//             },
+//         },
+//         {
+//             $project: {
+//                 year: '$_id',
+//                 _id: 0,
+//             },
+//         },
+//         {
+//             $sort: { year: 1 },
+//         },
+//     ]);
+
+//     const yearsDropdown = yearsResult.map((item: any) => item.year);
+
+//     return {
+//         chartData: data,
+//         yearsDropdown,
+//     };
+// };
+
+const getInstitutionChartData = async (year?: number) => {
+    const currentYear = year || new Date().getFullYear();
+    const startOfYear = new Date(currentYear, 0, 1);
+    const endOfYear = new Date(currentYear + 1, 0, 1);
+
+    const chartAgg = await Institution.aggregate([
+        { $match: { createdAt: { $gte: startOfYear, $lt: endOfYear } } },
+
+        // Efficient lookup that returns a count for each institution
+        {
+            $lookup: {
+                from: 'institutionmembers',
+                let: { instId: '$_id' },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: { $eq: ['$institution', '$$instId'] },
+                        },
+                    },
+                    { $count: 'count' },
+                ],
+                as: 'memberCounts',
+            },
+        },
+        {
+            $addFields: {
+                memberCount: {
+                    $ifNull: [{ $arrayElemAt: ['$memberCounts.count', 0] }, 0],
+                },
+            },
+        },
+
+        // Group by month and sum members/institutions
+        {
+            $group: {
+                _id: { $month: '$createdAt' },
+                totalInstitutions: { $sum: 1 },
+                totalMembers: { $sum: '$memberCount' },
+            },
+        },
+
+        // Compute average after grouping; round to 2 decimals
+        {
+            $project: {
+                month: '$_id',
+                totalInstitutions: 1,
+                totalMembers: 1,
+                avgMembersPerInstitution: {
+                    $cond: [
+                        { $eq: ['$totalInstitutions', 0] },
+                        0,
+                        {
+                            $round: [
+                                {
+                                    $divide: [
+                                        '$totalMembers',
+                                        '$totalInstitutions',
+                                    ],
+                                },
+                                2,
+                            ],
+                        },
+                    ],
+                },
+                _id: 0,
+            },
+        },
+
+        // Sort by month number
+        { $sort: { month: 1 } },
+    ]);
+
+    const months = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+    ];
+
+    const data = months.map((m, i) => {
+        const found = chartAgg.find((c: any) => c.month === i + 1) || {
+            totalInstitutions: 0,
+            totalMembers: 0,
+            avgMembersPerInstitution: 0,
+        };
+        return {
+            month: m,
+            totalInstitutions: found.totalInstitutions,
+            totalMembers: found.totalMembers,
+            avgMembersPerInstitution: found.avgMembersPerInstitution,
+        };
+    });
+
+    // Years dropdown from Institution (not Donate)
+    const yearsResult = await Institution.aggregate([
+        { $group: { _id: { $year: '$createdAt' } } },
+        { $project: { year: '$_id', _id: 0 } },
+        { $sort: { year: 1 } },
+    ]);
+    const yearsDropdown = yearsResult.map((r: any) => r.year);
+
+    return { chartData: data, yearsDropdown };
+};
+
 const donorGrowthChartData = async (year: number) => {
     const currentYear = year || new Date().getFullYear();
 
@@ -230,11 +457,14 @@ const getAudioPieChartData = async () => {
     return stats;
 };
 
+// get instation chart
+
 const MetaService = {
     getDashboardMetaData,
     getUserChartData,
     getAudioPieChartData,
     donorGrowthChartData,
+    getInstitutionChartData,
 };
 
 export default MetaService;
