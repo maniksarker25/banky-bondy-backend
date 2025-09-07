@@ -458,11 +458,125 @@ const bondChartData = async (year: number) => {
         if (item._id === ENUM_BOND_LINK_STATUS.Canceled) canceled = item.count;
     });
 
+    const chartData = await BondLink.aggregate([
+        {
+            $match: {
+                createdAt: {
+                    $gte: startOfYear,
+                    $lt: endOfYear,
+                },
+            },
+        },
+        {
+            $group: {
+                _id: { $month: '$createdAt' },
+                total: { $sum: 1 },
+                ongoing: {
+                    $sum: {
+                        $cond: [
+                            { $eq: ['$status', ENUM_BOND_LINK_STATUS.Ongoing] },
+                            1,
+                            0,
+                        ],
+                    },
+                },
+                completed: {
+                    $sum: {
+                        $cond: [
+                            {
+                                $eq: [
+                                    '$status',
+                                    ENUM_BOND_LINK_STATUS.Completed,
+                                ],
+                            },
+                            1,
+                            0,
+                        ],
+                    },
+                },
+                canceled: {
+                    $sum: {
+                        $cond: [
+                            {
+                                $eq: [
+                                    '$status',
+                                    ENUM_BOND_LINK_STATUS.Canceled,
+                                ],
+                            },
+                            1,
+                            0,
+                        ],
+                    },
+                },
+            },
+        },
+        {
+            $project: {
+                month: '$_id',
+                total: 1,
+                ongoing: 1,
+                completed: 1,
+                canceled: 1,
+                _id: 0,
+            },
+        },
+        {
+            $sort: { month: 1 },
+        },
+    ]);
+
+    const months = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+    ];
+
+    // Fill missing months with 0 values
+    const data = Array.from({ length: 12 }, (_, index) => {
+        const found = chartData.find((item) => item.month === index + 1);
+        return {
+            month: months[index],
+            total: found?.total || 0,
+            ongoing: found?.ongoing || 0,
+            completed: found?.completed || 0,
+            canceled: found?.canceled || 0,
+        };
+    });
+
+    // Distinct years dropdown
+    const yearsResult = await BondLink.aggregate([
+        {
+            $group: {
+                _id: { $year: '$createdAt' },
+            },
+        },
+        {
+            $project: {
+                year: '$_id',
+                _id: 0,
+            },
+        },
+        { $sort: { year: 1 } },
+    ]);
+
+    const yearsDropdown = yearsResult.map((item: any) => item.year);
+
     return {
         total,
         ongoing,
         completed,
         canceled,
+        chartData: data,
+        yearsDropdown,
     };
 };
 
