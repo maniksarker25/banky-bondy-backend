@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ENUM_PAYMENT_STATUS } from '../../utilities/enum';
 import Audio from '../audio/audio.model';
+import { ENUM_BOND_LINK_STATUS } from '../bondLink/bondLink.enum';
+import { BondLink } from '../bondLink/bondLink.model';
 import { Donate } from '../donate/donate.model';
 import Institution from '../institution/institution.model';
 import NormalUser from '../normalUser/normalUser.model';
@@ -425,6 +427,45 @@ const donorGrowthChartData = async (year: number) => {
     };
 };
 
+const bondChartData = async (year: number) => {
+    const startOfYear = new Date(year, 0, 1);
+    const endOfYear = new Date(year + 1, 0, 1);
+
+    const result = await BondLink.aggregate([
+        {
+            $match: {
+                createdAt: { $gte: startOfYear, $lt: endOfYear },
+            },
+        },
+        {
+            $group: {
+                _id: '$status',
+                count: { $sum: 1 },
+            },
+        },
+    ]);
+
+    let total = 0;
+    let ongoing = 0;
+    let completed = 0;
+    let canceled = 0;
+
+    result.forEach((item) => {
+        total += item.count;
+        if (item._id === ENUM_BOND_LINK_STATUS.Ongoing) ongoing = item.count;
+        if (item._id === ENUM_BOND_LINK_STATUS.Completed)
+            completed = item.count;
+        if (item._id === ENUM_BOND_LINK_STATUS.Canceled) canceled = item.count;
+    });
+
+    return {
+        total,
+        ongoing,
+        completed,
+        canceled,
+    };
+};
+
 const getAudioPieChartData = async () => {
     const audioStats = await Audio.aggregate([
         {
@@ -465,6 +506,7 @@ const MetaService = {
     getAudioPieChartData,
     donorGrowthChartData,
     getInstitutionChartData,
+    bondChartData,
 };
 
 export default MetaService;
