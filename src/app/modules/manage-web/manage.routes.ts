@@ -1,14 +1,14 @@
 import express from 'express';
-import auth from '../../middlewares/auth';
-import { ManageController } from './manage.controller';
-import { USER_ROLE } from '../user/user.constant';
 import { uploadFile } from '../../helper/fileUploader';
+import auth from '../../middlewares/auth';
+import { USER_ROLE } from '../user/user.constant';
+import { ManageController } from './manage.controller';
 
 const router = express.Router();
 
 router.post(
     '/add-about-us',
-    auth(USER_ROLE.superAdmin),
+    auth(USER_ROLE.superAdmin, USER_ROLE.admin),
     ManageController.addAboutUs
 );
 router.post('/add-faq', auth(USER_ROLE.superAdmin), ManageController.addFAQ);
