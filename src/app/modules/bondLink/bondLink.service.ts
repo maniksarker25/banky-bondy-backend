@@ -111,6 +111,29 @@ const getMyBondLinks = async (
     };
 };
 
+const getSingleBondLink = async (profileId: string, id: string) => {
+    const bondLink: any = await BondLink.findOne({
+        participants: new mongoose.Types.ObjectId(profileId),
+        _id: id,
+    });
+
+    if (!bondLink) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Bond link not found');
+    }
+
+    if (
+        bondLink.markAsCompletedBy.includes(
+            new mongoose.Types.ObjectId(profileId)
+        )
+    ) {
+        bondLink.isMarkAsCompletedByYou = true;
+    } else {
+        bondLink.isMarkAsCompletedByYou = false;
+    }
+
+    return bondLink;
+};
+
 const markAsCompleteBond = async (profileId: string, bondLinkId: string) => {
     const bondLink = await BondLink.findById(bondLinkId);
     if (
@@ -149,5 +172,10 @@ const markAsCompleteBond = async (profileId: string, bondLinkId: string) => {
     return result;
 };
 
-const BondLinkServices = { getMyBondLinks, createBondLink, markAsCompleteBond };
+const BondLinkServices = {
+    getMyBondLinks,
+    createBondLink,
+    markAsCompleteBond,
+    getSingleBondLink,
+};
 export default BondLinkServices;

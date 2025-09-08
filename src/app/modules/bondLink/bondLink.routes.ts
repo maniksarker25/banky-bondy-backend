@@ -19,6 +19,11 @@ router.get(
     auth(USER_ROLE.user),
     bondLinkController.getMyBondLinks
 );
+router.get(
+    '/get-single-bond-link/:id',
+    auth(USER_ROLE.user),
+    bondLinkController.getSingleBondLink
+);
 
 router.post(
     '/mark-as-complete/:id',
