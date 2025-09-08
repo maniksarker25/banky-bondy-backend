@@ -121,17 +121,19 @@ const getSingleBondLink = async (profileId: string, id: string) => {
         throw new AppError(httpStatus.NOT_FOUND, 'Bond link not found');
     }
 
+    let isMarkAsCompletedByYou = false;
     if (
         bondLink.markAsCompletedBy.includes(
             new mongoose.Types.ObjectId(profileId)
         )
     ) {
-        bondLink.isMarkAsCompletedByYou = true;
-    } else {
-        bondLink.isMarkAsCompletedByYou = false;
+        isMarkAsCompletedByYou = true;
     }
 
-    return bondLink;
+    return {
+        ...bondLink.toObject(),
+        isMarkAsCompletedByYou,
+    };
 };
 
 const markAsCompleteBond = async (profileId: string, bondLinkId: string) => {
