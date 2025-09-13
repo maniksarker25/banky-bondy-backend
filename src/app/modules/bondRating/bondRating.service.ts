@@ -1,21 +1,43 @@
-import httpStatus from "http-status";
-import AppError from "../../error/appError";
-import { IBondRating } from "./bondRating.interface";
-import bondRatingModel from "./bondRating.model";
+import httpStatus from 'http-status';
+import mongoose from 'mongoose';
+import AppError from '../../error/appError';
+import { BondLink } from '../bondLink/bondLink.model';
+import { IBondRating } from './bondRating.interface';
+import BondRating from './bondRating.model';
 
-const updateUserProfile = async (id: string, payload: Partial<IBondRating>) => {
-    if (payload.email || payload.username) {
-        throw new AppError(httpStatus.BAD_REQUEST, "You cannot change the email or username");
-    }
-    const user = await bondRatingModel.findById(id);
-    if (!user) {
-        throw new AppError(httpStatus.NOT_FOUND, "Profile not found");
-    }
-    return await bondRatingModel.findByIdAndUpdate(id, payload, {
-        new: true,
-        runValidators: true,
+const addRating = async (
+    profileId: string,
+    payload: IBondRating & { userId: string }
+) => {
+    const bondLink = await BondLink.findOne({
+        _id: payload.bondLink,
+        participants: new mongoose.Types.ObjectId(profileId),
     });
+
+    if (!bondLink) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Bond link not found');
+    }
+
+    const existingRating = await BondRating.findOne({
+        rated: payload.userId,
+        ratedBy: profileId,
+        bondLink: payload.bondLink,
+    });
+
+    if (!existingRating) {
+        throw new AppError(
+            httpStatus.NOT_FOUND,
+            'You already gave rating to that user for this bond'
+        );
+    }
+    const result = await BondRating.create({
+        rated: payload.userId,
+        ratedBy: profileId,
+        bondLink: payload.bondLink,
+    });
+
+    return result;
 };
 
-const BondRatingServices = { updateUserProfile };
+const BondRatingServices = { addRating };
 export default BondRatingServices;

@@ -4,4 +4,5 @@ export interface IBondRating {
     rated: Types.ObjectId;
     ratedBy: Types.ObjectId;
     rating: number;
+    bondLink: Types.ObjectId;
 }

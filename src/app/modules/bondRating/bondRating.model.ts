@@ -13,6 +13,11 @@ const bondRatingSchema = new Schema<IBondRating>(
             required: true,
             ref: 'NormalUser',
         },
+        bondLink: {
+            type: Schema.Types.ObjectId,
+            required: true,
+            ref: 'BondLink',
+        },
         rating: {
             type: Number,
             required: true,
@@ -23,5 +28,5 @@ const bondRatingSchema = new Schema<IBondRating>(
     { timestamps: true }
 );
 
-const bondRatingModel = model<IBondRating>('BondRating', bondRatingSchema);
-export default bondRatingModel;
+const BondRating = model<IBondRating>('BondRating', bondRatingSchema);
+export default BondRating;
