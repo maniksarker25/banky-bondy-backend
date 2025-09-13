@@ -7,7 +7,7 @@ import bondRatingValidations from './bondRating.validation';
 
 const router = express.Router();
 
-router.patch(
+router.post(
     '/add-rating',
     auth(USER_ROLE.user),
     validateRequest(bondRatingValidations.addRatingValidation),

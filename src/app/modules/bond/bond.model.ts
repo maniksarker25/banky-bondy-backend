@@ -10,7 +10,7 @@ const BondSchema = new Schema<IBond>(
         },
         offer: { type: String, required: true },
         want: { type: String, required: true },
-        tag: { type: String, required: true },
+        tag: { type: String },
     },
     { timestamps: true }
 );

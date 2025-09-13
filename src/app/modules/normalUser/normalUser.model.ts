@@ -56,14 +56,6 @@ const NormalUserSchema = new Schema<INormalUser>(
             type: [String],
             default: [],
         },
-        totalBondRating: {
-            type: Number,
-            default: 0,
-        },
-        totalRatingCount: {
-            type: Number,
-            default: 0,
-        },
     },
     {
         timestamps: true,

@@ -6,6 +6,7 @@ import { authRoutes } from '../modules/auth/auth.routes';
 import { bannerRoutes } from '../modules/banner/banner.routes';
 import { bondRoutes } from '../modules/bond/bond.routes';
 import { bondLinkRoutes } from '../modules/bondLink/bondLink.routes';
+import { bondRatingRoutes } from '../modules/bondRating/bondRating.routes';
 import { bondRequestRoutes } from '../modules/bondRequest/bondRequest.routes';
 import { categoryRoutes } from '../modules/category/category.routes';
 import { chatGroupRoutes } from '../modules/chatGroup/chatGroup.routes';
@@ -190,6 +191,10 @@ const moduleRoutes = [
     {
         path: '/super-admin',
         router: superAdminRoutes,
+    },
+    {
+        path: '/bond-rating',
+        router: bondRatingRoutes,
     },
 ];
 
