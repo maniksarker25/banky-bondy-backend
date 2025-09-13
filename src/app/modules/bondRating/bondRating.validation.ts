@@ -1,12 +1,15 @@
-import { z } from "zod";
+import { z } from 'zod';
 
-export const updateBondRatingData = z.object({
+export const addRatingValidation = z.object({
     body: z.object({
-        name: z.string().optional(),
-        phone: z.string().optional(),
-        address: z.string().optional(),
+        userId: z.string({ required_error: 'User id is required' }),
+        bondLink: z.string({ required_error: 'Bond link id is required' }),
+        rating: z
+            .number({ required_error: 'Rating is required' })
+            .min(1)
+            .max(5),
     }),
 });
 
-const BondRatingValidations = { updateBondRatingData };
+const BondRatingValidations = { addRatingValidation };
 export default BondRatingValidations;

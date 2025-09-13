@@ -1,25 +1,17 @@
-import express from "express";
-import auth from "../../middlewares/auth";
-import { USER_ROLE } from "../user/user.constant";
-import validateRequest from "../../middlewares/validateRequest";
-import bondRatingValidations from "./bondRating.validation";
-import bondRatingController from "./bondRating.controller";
-import { uploadFile } from "../../helper/fileUploader";
+import express from 'express';
+import auth from '../../middlewares/auth';
+import validateRequest from '../../middlewares/validateRequest';
+import { USER_ROLE } from '../user/user.constant';
+import bondRatingController from './bondRating.controller';
+import bondRatingValidations from './bondRating.validation';
 
 const router = express.Router();
 
 router.patch(
-    "/update-profile",
+    '/add-rating',
     auth(USER_ROLE.user),
-    uploadFile(),
-    (req, res, next) => {
-        if (req.body.data) {
-            req.body = JSON.parse(req.body.data);
-        }
-        next();
-    },
-    validateRequest(bondRatingValidations.updateBondRatingData),
-    bondRatingController.updateUserProfile
+    validateRequest(bondRatingValidations.addRatingValidation),
+    bondRatingController.addRating
 );
 
 export const bondRatingRoutes = router;
