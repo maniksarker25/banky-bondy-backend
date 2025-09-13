@@ -16,4 +16,6 @@ export interface INormalUser {
     bio: string;
     skills: [Types.ObjectId];
     socialLinks: string[];
+    totalRatingCount: number;
+    totalBondRating: number;
 }
