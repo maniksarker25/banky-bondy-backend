@@ -35,6 +35,7 @@ app.use(
             'http://localhost:3007',
             'http://localhost:3008',
             'http://10.10.20.70:3000',
+            'https://emilioroo-integration.vercel.app',
         ],
         credentials: true,
     })

@@ -24,6 +24,14 @@ const bondRatingSchema = new Schema<IBondRating>(
             max: 5,
             min: 1,
         },
+        want: {
+            type: String,
+            required: true,
+        },
+        offer: {
+            type: String,
+            required: true,
+        },
     },
     { timestamps: true }
 );

@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
+import { getCloudFrontUrl } from '../../helper/mutler-s3-uploader';
 import catchAsync from '../../utilities/catchasync';
 import sendResponse from '../../utilities/sendResponse';
 import PlaylistService from './playlist.service';
-import { getCloudFrontUrl } from '../../helper/mutler-s3-uploader';
 
 // Create Playlist
 const createPlaylist = catchAsync(async (req, res) => {
@@ -25,7 +25,10 @@ const createPlaylist = catchAsync(async (req, res) => {
 
 // Get All Playlists
 const getAllPlaylists = catchAsync(async (req, res) => {
-    const result = await PlaylistService.getAllPlaylists(req.query);
+    const result = await PlaylistService.getAllPlaylists(
+        req.query,
+        req.user.profileId
+    );
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,

@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
-import AppError from '../../error/appError';
+import mongoose from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
-import Playlist from './playlist.model';
-import { IPlaylist } from './playlist.interface';
+import AppError from '../../error/appError';
 import { deleteFileFromS3 } from '../../helper/deleteFromS3';
+import { IPlaylist } from './playlist.interface';
+import Playlist from './playlist.model';
 
 // Create Playlist
 const createPlaylist = async (userId: string, payload: IPlaylist) => {
@@ -12,27 +14,146 @@ const createPlaylist = async (userId: string, payload: IPlaylist) => {
 };
 
 // Get All Playlists with QueryBuilder
-const getAllPlaylists = async (query: Record<string, unknown>) => {
-    const playlistQuery = new QueryBuilder(
-        Playlist.find().populate({
-            path: 'user',
-            select: 'name profile_image',
-        }),
-        // .populate('audios'),
-        query
-    )
-        .search(['name', 'description'])
-        .filter()
-        .sort()
-        .paginate()
-        .fields();
+// const getAllPlaylists = async (query: Record<string, unknown>) => {
+//     const playlistQuery = new QueryBuilder(
+//         Playlist.find().populate({
+//             path: 'user',
+//             select: 'name profile_image',
+//         }),
+//         // .populate('audios'),
+//         query
+//     )
+//         .search(['name', 'description'])
+//         .filter()
+//         .sort()
+//         .paginate()
+//         .fields();
 
-    const result = await playlistQuery.modelQuery;
-    const meta = await playlistQuery.countTotal();
+//     const result = await playlistQuery.modelQuery;
+//     const meta = await playlistQuery.countTotal();
+
+//     return {
+//         meta,
+//         result,
+//     };
+// };
+
+const getAllPlaylists = async (query: any, userId: string) => {
+    const page = parseInt(query.page as string) || 1;
+    const limit = parseInt(query.limit as string) || 10;
+    const skip = (page - 1) * limit;
+
+    const matchStage: any = {};
+
+    // search (name, description)
+    if (query.searchTerm) {
+        matchStage.$or = [
+            { name: { $regex: query.searchTerm, $options: 'i' } },
+            { description: { $regex: query.searchTerm, $options: 'i' } },
+        ];
+    }
+
+    const sortStage: any = {};
+    if (query.sortBy) {
+        sortStage[query.sortBy] = query.sortOrder === 'asc' ? 1 : -1;
+    } else {
+        sortStage.createdAt = -1;
+    }
+
+    const aggregationPipeline = [
+        { $match: matchStage },
+
+        // populate user
+        {
+            $lookup: {
+                from: 'normalusers',
+                localField: 'user',
+                foreignField: '_id',
+                as: 'user',
+            },
+        },
+        { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } },
+
+        // populate audios
+        {
+            $lookup: {
+                from: 'audios', // collection name for Audio
+                localField: 'audios',
+                foreignField: '_id',
+                as: 'audios',
+            },
+        },
+
+        // add isMyPlaylist and project user fields
+        {
+            $addFields: {
+                isMyPlaylist: {
+                    $cond: {
+                        if: {
+                            $eq: [
+                                '$user._id',
+                                new mongoose.Types.ObjectId(userId),
+                            ],
+                        },
+                        then: true,
+                        else: false,
+                    },
+                },
+            },
+        },
+        {
+            $project: {
+                name: 1,
+                description: 1,
+                tags: 1,
+                cover_image: 1,
+                audios: 1, // populated audios
+                createdAt: 1,
+                updatedAt: 1,
+                isMyPlaylist: 1,
+                user: {
+                    _id: '$user._id',
+                    name: '$user.name',
+                    profile_image: '$user.profile_image',
+                },
+            },
+        },
+
+        // facet for pagination
+        {
+            $facet: {
+                meta: [
+                    { $count: 'total' },
+                    {
+                        $addFields: {
+                            page,
+                            limit,
+                            totalPage: {
+                                $ceil: { $divide: ['$total', limit] },
+                            },
+                        },
+                    },
+                ],
+                result: [
+                    { $sort: sortStage },
+                    { $skip: skip },
+                    { $limit: limit },
+                ],
+            },
+        },
+        {
+            $project: {
+                result: 1,
+                meta: { $arrayElemAt: ['$meta', 0] },
+            },
+        },
+    ];
+
+    const data = await Playlist.aggregate(aggregationPipeline);
 
     return {
-        meta,
-        result,
+        meta: data[0]?.meta || { page, limit, total: 0, totalPage: 0 },
+        result: data[0]?.result || [],
     };
 };
 // Get All Playlists with QueryBuilder

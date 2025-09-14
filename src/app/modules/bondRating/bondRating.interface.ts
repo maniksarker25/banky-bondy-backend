@@ -5,4 +5,6 @@ export interface IBondRating {
     ratedBy: Types.ObjectId;
     rating: number;
     bondLink: Types.ObjectId;
+    want: string;
+    offer: string;
 }

@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Server as IOServer, Socket } from 'socket.io';
 import { Server as HTTPServer } from 'http';
 import jwt, { JwtPayload } from 'jsonwebtoken';
+import { Server as IOServer, Socket } from 'socket.io';
 import config from '../config';
 import handleChat from './handleChat';
 let io: IOServer;
@@ -16,6 +16,7 @@ const initializeSocket = (server: HTTPServer) => {
                     'http://localhost:3000',
                     'http://192.168.10.25:7585',
                     'http://10.0.60.137:3001',
+                    'https://emilioroo-integration.vercel.app',
                 ],
             },
         });
@@ -63,4 +64,4 @@ const getIO = () => {
     return io;
 };
 
-export { initializeSocket, getIO };
+export { getIO, initializeSocket };
