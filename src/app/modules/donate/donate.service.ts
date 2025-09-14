@@ -1,5 +1,6 @@
 import QueryBuilder from '../../builder/QueryBuilder';
 import config from '../../config';
+import { ENUM_PAYMENT_PURPOSE } from '../../utilities/enum';
 import { stripe } from '../../utilities/stripe';
 import { Donate } from './donate.model';
 
@@ -22,7 +23,7 @@ const donate = async (userId: string, amount: number) => {
         mode: 'payment',
         metadata: {
             userId: userId.toString(),
-            paymentPurpose: 'Donate',
+            paymentPurpose: ENUM_PAYMENT_PURPOSE.DONATE,
             donateId: donateCreate._id.toString(),
         },
         success_url: `${config.stripe.stripe_payment_success_url}`,

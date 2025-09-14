@@ -10,14 +10,15 @@ import sendContactUsEmail from './app/helper/sendContactUsEmail';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import notFound from './app/middlewares/notFound';
 import router from './app/routes';
+import handleWebhook from './app/stripe/webhook';
 const app: Application = express();
 
 // web hook
-// app.post(
-//     '/stripe-webhook',
-//     express.raw({ type: 'application/json' }),
-//     handleWebhook
-// );
+app.post(
+    '/banky-bondy-webhook',
+    express.raw({ type: 'application/json' }),
+    handleWebhook
+);
 // parser
 app.use(express.json());
 app.use(cookieParser());
