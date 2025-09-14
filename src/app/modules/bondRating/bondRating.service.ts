@@ -12,7 +12,7 @@ const addRating = async (
     const bondLink = await BondLink.findOne({
         _id: payload.bondLink,
         participants: new mongoose.Types.ObjectId(profileId),
-    });
+    }).populate({ path: 'requestedBonds' });
 
     if (!bondLink) {
         throw new AppError(httpStatus.NOT_FOUND, 'Bond link not found');

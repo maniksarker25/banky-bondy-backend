@@ -12,6 +12,7 @@ export interface IBondRequest {
     description?: string;
     radius?: number;
     status: (typeof ENUM_BOND_REQUEST_STATUS)[keyof typeof ENUM_BOND_REQUEST_STATUS];
+    isLinked: boolean;
     createdAt?: Date;
     updatedAt?: Date;
 }

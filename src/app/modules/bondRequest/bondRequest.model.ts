@@ -30,6 +30,10 @@ const BondRequestSchema = new Schema<IBondRequest>(
             default: ENUM_BOND_REQUEST_STATUS.WAITING_FOR_LINK,
         },
         radius: { type: Number },
+        isLinked: {
+            type: Boolean,
+            default: false,
+        },
     },
     {
         timestamps: true,

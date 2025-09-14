@@ -12,19 +12,6 @@ import { IBondLink } from './bondLink.interface';
 import { BondLink } from './bondLink.model';
 
 const createBondLink = async (payload: IBondLink) => {
-    // const result = await BondLink.create(payload);
-    // await Conversation.create({
-    //     participants: payload.participants,
-    //     type: ENUM_CONVERSATION_TYPE.bondLinkGroup,
-    //     bondLink: result._id,
-    // });
-    // if (payload.requestedBonds.length > 0) {
-    //     await BondRequest.deleteMany({
-    //         _id: { $in: payload.requestedBonds },
-    //     });
-    // }
-    // return result;
-
     const participants = Array.from(new Set(payload.participants ?? []));
     if (participants.length < 2) {
         throw new Error('At least two participant is required.');
@@ -61,8 +48,11 @@ const createBondLink = async (payload: IBondLink) => {
 
                 // 3) Bulk delete requested BondRequests
                 if (requestedBonds.length) {
-                    await BondRequest.deleteMany(
+                    await BondRequest.updateMany(
                         { _id: { $in: requestedBonds } },
+                        {
+                            isLinked: true,
+                        },
                         { session }
                     );
                 }
