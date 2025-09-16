@@ -613,6 +613,89 @@ const getAudioPieChartData = async () => {
 };
 
 // get instation chart
+const getEarningChartData = async (year: number) => {
+    const currentYear = year || new Date().getFullYear();
+
+    const startOfYear = new Date(currentYear, 0, 1);
+    const endOfYear = new Date(currentYear + 1, 0, 1);
+
+    const chartData = await Donate.aggregate([
+        {
+            $match: {
+                createdAt: {
+                    $gte: startOfYear,
+                    $lt: endOfYear,
+                },
+                status: ENUM_PAYMENT_STATUS.PAID,
+            },
+        },
+        {
+            $group: {
+                _id: { $month: '$createdAt' },
+                totalEarning: { $sum: '$amount' }, // Sum amounts
+            },
+        },
+        {
+            $project: {
+                month: '$_id',
+                totalEarning: 1,
+                _id: 0,
+            },
+        },
+        {
+            $sort: { month: 1 },
+        },
+    ]);
+
+    const months = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+    ];
+
+    const data = Array.from({ length: 12 }, (_, index) => ({
+        month: months[index],
+        totalEarning:
+            chartData.find((item) => item.month === index + 1)?.totalEarning ||
+            0,
+    }));
+
+    const yearsResult = await Donate.aggregate([
+        {
+            $match: { status: ENUM_PAYMENT_STATUS.PAID },
+        },
+        {
+            $group: {
+                _id: { $year: '$createdAt' },
+            },
+        },
+        {
+            $project: {
+                year: '$_id',
+                _id: 0,
+            },
+        },
+        {
+            $sort: { year: 1 },
+        },
+    ]);
+
+    const yearsDropdown = yearsResult.map((item: any) => item.year);
+
+    return {
+        chartData: data,
+        yearsDropdown,
+    };
+};
 
 const MetaService = {
     getDashboardMetaData,
@@ -621,6 +704,7 @@ const MetaService = {
     donorGrowthChartData,
     getInstitutionChartData,
     bondChartData,
+    getEarningChartData,
 };
 
 export default MetaService;

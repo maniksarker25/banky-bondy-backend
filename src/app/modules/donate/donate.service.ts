@@ -1,6 +1,9 @@
 import QueryBuilder from '../../builder/QueryBuilder';
 import config from '../../config';
-import { ENUM_PAYMENT_PURPOSE } from '../../utilities/enum';
+import {
+    ENUM_PAYMENT_PURPOSE,
+    ENUM_PAYMENT_STATUS,
+} from '../../utilities/enum';
 import { stripe } from '../../utilities/stripe';
 import { Donate } from './donate.model';
 
@@ -35,7 +38,7 @@ const donate = async (userId: string, amount: number) => {
 
 const getAllDonner = async (query: Record<string, unknown>) => {
     const resultQuery = new QueryBuilder(
-        Donate.find().populate({
+        Donate.find({ status: ENUM_PAYMENT_STATUS.PAID }).populate({
             path: 'user',
         }),
         query
