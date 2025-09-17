@@ -31,6 +31,7 @@ const getAllBondRequests = async (query: Record<string, unknown>) => {
         result,
     };
 };
+// get my bond request
 const myBondRequests = async (
     userId: string,
     query: Record<string, unknown>
@@ -227,6 +228,7 @@ const getMatchingBondRequest = async (
         _id: bondRequestId,
         user: userId,
         status: ENUM_BOND_REQUEST_STATUS.WAITING_FOR_LINK,
+        isPause: false,
     })
         .select('offer want status location radius')
         .lean();
@@ -250,6 +252,7 @@ const getMatchingBondRequest = async (
     const baseQuery = {
         _id: { $ne: bondRequestId },
         status: ENUM_BOND_REQUEST_STATUS.WAITING_FOR_LINK,
+        isPause: false,
         ...geoFilter,
     };
 

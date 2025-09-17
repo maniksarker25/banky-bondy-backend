@@ -34,6 +34,10 @@ const BondRequestSchema = new Schema<IBondRequest>(
             type: Boolean,
             default: false,
         },
+        isPause: {
+            type: Boolean,
+            default: false,
+        },
     },
     {
         timestamps: true,

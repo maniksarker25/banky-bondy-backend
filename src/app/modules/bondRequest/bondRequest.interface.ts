@@ -15,4 +15,5 @@ export interface IBondRequest {
     isLinked: boolean;
     createdAt?: Date;
     updatedAt?: Date;
+    isPause: boolean;
 }
