@@ -234,7 +234,10 @@ const getMatchingBondRequest = async (
         .lean();
 
     if (!startRequest) {
-        throw new Error('Bond request not found or not eligible for linking.');
+        throw new AppError(
+            httpStatus.NOT_FOUND,
+            'Bond request not found or not eligible for linking.'
+        );
     }
 
     // 2. Apply geolocation filter (if radius and location present)
@@ -349,22 +352,46 @@ const getMatchingBondRequest = async (
     });
 
     // 7b. Aggregate average ratings for all pairs in one DB call
+    // const ratingFilters = Array.from(ratingKeys).map((key) => {
+    //     const [rated, offer, want] = key.split('_');
+    //     return { rated: new mongoose.Types.ObjectId(rated), offer, want };
+    // });
+
+    // const ratings = await BondRating.aggregate([
+    //     { $match: { $or: ratingFilters } },
+    //     {
+    //         $group: {
+    //             _id: { rated: '$rated', offer: '$offer', want: '$want' },
+    //             avgRating: { $avg: '$rating' },
+    //         },
+    //     },
+    // ]);
+
     const ratingFilters = Array.from(ratingKeys).map((key) => {
         const [rated, offer, want] = key.split('_');
         return { rated: new mongoose.Types.ObjectId(rated), offer, want };
     });
 
-    const ratings = await BondRating.aggregate([
-        { $match: { $or: ratingFilters } },
-        {
-            $group: {
-                _id: { rated: '$rated', offer: '$offer', want: '$want' },
-                avgRating: { $avg: '$rating' },
+    // If no rating filters are available, we skip the aggregation to prevent errors
+    let ratings = [];
+    if (ratingFilters.length > 0) {
+        ratings = await BondRating.aggregate([
+            { $match: { $or: ratingFilters } },
+            {
+                $group: {
+                    _id: { rated: '$rated', offer: '$offer', want: '$want' },
+                    avgRating: { $avg: '$rating' },
+                },
             },
-        },
-    ]);
+        ]);
+    }
 
     // 7c. Map average ratings for quick lookup
+    // const ratingMap = new Map<string, number>();
+    // ratings.forEach((r) => {
+    //     const key = `${r._id.rated}_${r._id.offer}_${r._id.want}`;
+    //     ratingMap.set(key, r.avgRating);
+    // });
     const ratingMap = new Map<string, number>();
     ratings.forEach((r) => {
         const key = `${r._id.rated}_${r._id.offer}_${r._id.want}`;
